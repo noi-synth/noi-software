@@ -1,0 +1,23 @@
+CXX=g++
+LD=g++
+CXXFLAGS= -std=c++11 -Wall -pedantic -Wextra -O3
+LIBS=lib/libportaudio.a -lrt -lm -lasound -pthread -lncurses
+PROGRAM=noi_software
+
+
+all: $(PROGRAM)
+
+$(PROGRAM): $(OBJS)
+	$(LD) -o $@ $^ $(LIBS)
+
+clean:
+	rm -f $(PROGRAM)
+	rm -f src/*/*.o
+	rm -f src/*.o
+
+run: $(PROGRAM)
+	./$(PROGRAM)
+
+%o: %cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+

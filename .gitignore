@@ -1,0 +1,4 @@
+*.o
+noi_software
+cmake-build-debug
+.idea
