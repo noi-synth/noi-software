@@ -7,11 +7,16 @@
 
 
 #include <stdint.h>
+#include <pthread.h>
 
 #define SND_DATA_TYPE float
 
 namespace NSnd {
     const uint32_t SAMPLE_RATE = 44100;
+
+
+    const int SCHED_POLICY = SCHED_FIFO;
+    //const int SCHED_PRIORITY_WORHER = ???
 
 }
 

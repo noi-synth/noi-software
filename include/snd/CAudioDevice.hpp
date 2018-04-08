@@ -5,6 +5,7 @@
 #ifndef NOI_SOFTWARE_CAUDIODEVICE_HPP
 #define NOI_SOFTWARE_CAUDIODEVICE_HPP
 
+#include <memory>
 #include "CAudioDeviceConfig.hpp"
 #include "NSndConfig.hpp"
 #include "../../include/lib/portaudio.h"
@@ -26,7 +27,6 @@ namespace NSnd {
     };
 
     /*############################################################################################################################*/
-
 
 
     class CAudioDevice {
@@ -63,6 +63,8 @@ namespace NSnd {
         PaStream *m_stream;
         ScopedPaHandler m_paInit;
     };
+
+    typedef std::shared_ptr<CAudioDevice> AAudioDevice;
 }
 
 

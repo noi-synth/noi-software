@@ -1,6 +1,6 @@
 CXX=g++
 LD=g++
-CXXFLAGS= -std=c++11 -Wall -pedantic -Wextra -O3
+CXXFLAGS= -std=c++17 -Wall -pedantic -Wextra -O3
 LIBS=lib/libportaudio.a -lrt -lm -lasound -pthread -lncurses
 PROGRAM=noi_software
 
