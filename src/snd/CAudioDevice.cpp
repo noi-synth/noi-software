@@ -9,6 +9,7 @@
 #include "../../include/msc/CLogger.hpp"
 
 // Just fast implementation of some basic functionality to start with. Mostly just a copy from "paex_sine_c++.cpp" example from PortAudio library.
+// TODO implement it like a reasonable human being would do that.
 
 using namespace NSnd;
 
@@ -29,8 +30,7 @@ PaError ScopedPaHandler::result() const { return _result; }
 /*############################################################################################################################*/
 
 /*----------------------------------------------------------------------*/
-CAudioDevice::CAudioDevice(int (*callback)(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long),
-                           NSnd::CAudioDeviceConfig config) : m_callback(callback) {
+CAudioDevice::CAudioDevice(NSnd::CAudioDeviceConfig config) : m_callback(nullptr), m_running(false) {
     if (m_paInit.result() != paNoError) {
         NMsc::CLogger::Log("paInit failed");
     }
@@ -43,6 +43,8 @@ bool CAudioDevice::StartStream() {
 
     PaError err = Pa_StartStream(m_stream);
 
+    m_running = err == paNoError;
+
     return (err == paNoError);
 }
 
@@ -53,6 +55,8 @@ bool CAudioDevice::StopStream() {
 
     PaError err = Pa_CloseStream(m_stream);
     m_stream = nullptr;
+
+    m_running = false; //todo make sure it really is off.
 
     return (err == paNoError);
 }
@@ -68,7 +72,10 @@ int CAudioDevice::InnerCallback(const void *inputBuffer, void *outputBuffer, uns
 /*----------------------------------------------------------------------*/
 int CAudioDevice::InnerCallbackMethod(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                                       const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags) {
-    return m_callback((SND_DATA_TYPE *) inputBuffer, (SND_DATA_TYPE *) outputBuffer, framesPerBuffer);
+    if (m_callback)
+
+        return m_callback((SND_DATA_TYPE *) inputBuffer, (SND_DATA_TYPE *) outputBuffer, framesPerBuffer);
+    return -1; // todo does this return value make sense?
 }
 
 /*----------------------------------------------------------------------*/
@@ -82,6 +89,14 @@ bool CAudioDevice::Open() {
     PaDeviceIndex index = Pa_GetDefaultOutputDevice();
 
     char msg[256];
+
+    if (!m_callback) {
+        NMsc::CLogger::Log("Callback not set!");
+
+        return false;
+    }
+
+
 
     sprintf(msg, "Trying device %d \n", index);
     NMsc::CLogger::Log(msg);
@@ -132,5 +147,17 @@ bool CAudioDevice::Open() {
         return false;
     }
 
+    return true;
+}
+
+/*----------------------------------------------------------------------*/
+bool
+CAudioDevice::BindCallback(const std::function<int(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long)> &callback) {
+
+    if (m_running) {
+        NMsc::CLogger::Log("Stream is active, can not bind the callback.");
+        return false;
+    }
+    m_callback = callback;
     return true;
 }

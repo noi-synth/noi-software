@@ -3,5 +3,7 @@
 //
 
 #include "../../include/snd/CEffect.hpp"
+
 using namespace NSnd;
+//TODO consider common ancestor with Instrument
 

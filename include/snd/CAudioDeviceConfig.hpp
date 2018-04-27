@@ -7,7 +7,7 @@
 
 namespace NSnd {
     class CAudioDeviceConfig {
-
+        //TODO use this class for audio device initialiyation
     };
 }
 

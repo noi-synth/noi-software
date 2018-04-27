@@ -1,4 +1,4 @@
-OBJS=src/snd/CChain.o src/snd/CSndCore.o src/snd/CEffect.o src/snd/CAudioDevice.o src/snd/CAudioDeviceConfig.o src/snd/CMidiMsg.o src/snd/CInstrument.o src/msc/MscFunctions.o src/msc/CLogger.o src/main.o 
+OBJS=src/snd/CChain.o src/snd/CSndCore.o src/snd/CEffect.o src/snd/CAudioDevice.o src/snd/CAudioDeviceConfig.o src/snd/CMidiMsg.o src/snd/CInstrument.o src/msc/MscFunctions.o src/msc/CLogger.o src/main.o plg/instr/SimpleOsc/CInstrSimpleOsc.o 
 CXX=g++
 LD=g++
 CXXFLAGS= -std=c++17 -Wall -pedantic -Wextra -O3
@@ -32,7 +32,8 @@ CChain.o: src/snd/CChain.cpp src/snd/../../include/snd/CChain.hpp \
  src/snd/../../include/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
  src/snd/../../include/snd/../../include/snd/CMidiMsg.hpp \
  src/snd/../../include/snd/../../include/snd/SndEnums.hpp \
- src/snd/../../include/snd/NSndConfig.hpp
+ src/snd/../../include/snd/NSndConfig.hpp \
+ src/snd/../../include/msc/CLogger.hpp
 CSndCore.o: src/snd/CSndCore.cpp src/snd/../../include/snd/CSndCore.hpp \
  src/snd/../../include/snd/../msc/CLocklessQue.hpp \
  src/snd/../../include/snd/CMidiMsg.hpp \
@@ -70,4 +71,19 @@ main.o: src/main.cpp src/../include/snd/CAudioDevice.hpp \
  src/../include/snd/CAudioDeviceConfig.hpp \
  src/../include/snd/NSndConfig.hpp \
  src/../include/snd/../../include/lib/portaudio.h \
- src/../include/msc/CLogger.hpp
+ src/../include/msc/CLogger.hpp src/../include/snd/CSndCore.hpp \
+ src/../include/snd/../msc/CLocklessQue.hpp \
+ src/../include/snd/CMidiMsg.hpp src/../include/snd/SndEnums.hpp \
+ src/../include/snd/CChain.hpp \
+ src/../include/snd/../../include/msc/CLocklessQue.hpp \
+ src/../include/snd/../../include/snd/CInstrument.hpp \
+ src/../include/snd/../../include/snd/NSndConfig.hpp \
+ src/../include/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
+ src/../include/snd/../../include/snd/CMidiMsg.hpp \
+ src/../include/snd/CAudioDevice.hpp \
+ src/../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp \
+ src/../plg/instr/SimpleOsc/../../../include/snd/CInstrument.hpp \
+ src/../plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp \
+ src/../plg/instr/SimpleOsc/../../../include/snd/../../include/msc/CLocklessQue.hpp \
+ src/../plg/instr/SimpleOsc/../../../include/snd/CMidiMsg.hpp \
+ src/../plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp

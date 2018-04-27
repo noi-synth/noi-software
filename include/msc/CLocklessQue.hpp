@@ -9,7 +9,8 @@
 
 namespace NMsc {
 
-
+// TODO do more in depth test of this, research atomic int under ARM
+// TODO investigate destructor behaviour in the cirrcle buffer. pop, push, rewriting, etc 
 /*############################################################################################################################*/
     template<class T>
     class CLocklessQue {
@@ -24,6 +25,8 @@ namespace NMsc {
         T Pop();
 
         bool Empty() const;
+
+        void Clear();
 
 
     private:
@@ -70,10 +73,11 @@ namespace NMsc {
     }
 
 /*----------------------------------------------------------------------*/
-
-
-
-
+    template<class T>
+    void CLocklessQue<T>::Clear() {
+        while (!Empty())
+            Pop();
+    }
 }
 
 #endif //NOI_SOFTWARE_CLOCKLESSQUE_HPP

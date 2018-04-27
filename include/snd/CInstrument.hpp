@@ -1,8 +1,9 @@
-//
+//);
 // Created by ddl_blue on 15.11.17.
 //
 #include <cstdint>
 #include <memory>
+#include <list>
 #include "NSndConfig.hpp"
 #include "../../include/msc/CLocklessQue.hpp"
 #include "CMidiMsg.hpp"
@@ -15,18 +16,24 @@ using NMsc::CLocklessQue;
 namespace NSnd {
     class CInstrument {
     public:
+
+        //TODO implement TICK logic
+        //TODO MIDI msg helpers
+        //TODO parameter logic
+
         CInstrument();
 
-        virtual void GenerateBuffer(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long);
+        virtual int
+        GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) = 0;
 
-        bool SendMidiMsg(const CMidiMsg &msg);
+        void ReciveMidiMsg(const CMidiMsg &msg);
 
 
     protected:
 
-        CLocklessQue<CMidiMsg> m_newMidiMsg;
+        std::list<CMidiMsg> m_newMidiMsg;
 
-        virtual void Tick();
+        virtual void Tick() = 0;
 
         uint32_t m_sambleFromTickCounter;
 

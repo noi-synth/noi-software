@@ -12,7 +12,8 @@
 
 namespace NSnd {
 
-    // TEMPORARY SOLUTION !!!!!!
+    // TEMPORARY SOLUTION !!!!!! TODO write this in a proper way
+    //TODO research priorities of audio
     class ScopedPaHandler {
     public:
         ScopedPaHandler();
@@ -31,10 +32,7 @@ namespace NSnd {
 
     class CAudioDevice {
     public:
-        CAudioDevice(int(*callback)(const SND_DATA_TYPE *, SND_DATA_TYPE *,
-                                    unsigned long),
-                     CAudioDeviceConfig config
-        );
+        CAudioDevice(CAudioDeviceConfig config);
 
         bool StartStream();
 
@@ -43,6 +41,8 @@ namespace NSnd {
         static void StreamFinishedCallback(void *userData);
 
         bool Open();
+
+        bool BindCallback(const std::function<int(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long)> &callback);
 
     private:
         static int InnerCallback(const void *inputBuffer, void *outputBuffer,
@@ -58,10 +58,11 @@ namespace NSnd {
                                 PaStreamCallbackFlags statusFlags);
 
 
-        int (*m_callback)(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long);
+        std::function<int(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long)> m_callback;
 
         PaStream *m_stream;
         ScopedPaHandler m_paInit;
+        bool m_running;
     };
 
     typedef std::shared_ptr<CAudioDevice> AAudioDevice;

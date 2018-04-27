@@ -13,23 +13,28 @@
 #include "CAudioDevice.hpp"
 
 using NMsc::CLocklessQue;
+
+
 namespace NSnd {
     class CSndCore {
     public:
 
-        bool SendMidiMsg(const CMidiMsg &message);
+        //TODO working thread
+        //TODO Mixing
+        //TODO tracks
+        //TODO more todos
 
+        bool ReciveMidiMsg(const CMidiMsg &message);
 
-        void ChainSelect(const AChain &chain);
+        bool ChainSelect(const AChain &chain);
 
         void ChainClearAllActive();
 
         AChain ChainGetSelected() = delete; // This is more tricky than it seems to be. Also, should not be needed.
 
-
         void Panic();
 
-        void AudioDeviceSet(const AAudioDevice &device);
+        bool AudioDeviceSet(const AAudioDevice &device);
 
         void AudioDeviceUnset();
 
@@ -38,10 +43,21 @@ namespace NSnd {
         bool AudioDeviceStop();
 
     private:
+
+        int AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *outputBuffer,
+                             unsigned long sampleCnt);
+
+        /*static int AudioDevCallbackFunction(const SND_DATA_TYPE * inputBuffer, SND_DATA_TYPE * outputBuffer,
+                                     unsigned long sampleCnt, void * caller);*/
+
         std::thread m_thread;
+        /// que of MIDI msgs to be sent to selected instrument
         CLocklessQue<CMidiMsg> m_midiMsgQue;
+        /// que of instruments, that should replace the selected one. Happens on callback for race condition reasons.
         CLocklessQue<AChain> m_newSelectedChain;
         std::set<AChain> m_activeChains;
+        bool m_shouldClearActiveCHains; //todo
+        AChain m_selectedCHain;
         AAudioDevice m_audioDevice;
     };
 

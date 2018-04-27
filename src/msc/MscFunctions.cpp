@@ -7,6 +7,7 @@
 #include <thread>
 #include <pthread.h>
 
+//TODO research + proper use
 bool setScheduling(std::thread &th, int policy, int priority) {
     sched_param sch_params;
     sch_params.sched_priority = priority;

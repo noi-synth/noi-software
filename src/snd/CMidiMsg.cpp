@@ -3,3 +3,9 @@
 //
 
 #include "../../include/snd/CMidiMsg.hpp"
+
+/*----------------------------------------------------------------------*/
+NSnd::CMidiMsg::CMidiMsg(EMidiMsgType type, ETones tone, uint8_t presure) : m_type(type), m_tone(tone),
+                                                                            m_presure(presure) {
+
+}

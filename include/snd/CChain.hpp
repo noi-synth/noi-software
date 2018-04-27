@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CCHAIN_HPP
 
 #include <memory>
+#include <thread>
 
 #include "../../include/msc/CLocklessQue.hpp"
 #include "../../include/snd/CInstrument.hpp"
@@ -16,19 +17,26 @@ using NMsc::CLocklessQue;
 namespace NSnd {
     class CChain {
     public:
+        //TODO implement effect chain, implement ProcessBuffer status flags, idle mechanics
+        //TODO polyphonic/monophonic support
+        explicit CChain(const AInstrument &instr);
 
         void MakrActive();
 
         void MarkInactive();
 
-        void InstrumentChange(const AInstrument &instrument);
+        bool InstrumentChange(const AInstrument &instrument);
 
-        void ProcessBuffer(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long);
+        bool ReciveMidiMsg(const CMidiMsg &message);
+
+        int ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen);
 
     private:
 
         AInstrument m_instrument;
         CLocklessQue<AInstrument> m_newInstrument;
+        CLocklessQue<AInstrument> m_toDeleteInstruments;
+        std::thread m_thread;
         bool m_active;
     };
 
