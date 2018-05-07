@@ -8,6 +8,7 @@
 #include "../include/msc/CLogger.hpp"
 #include "../include/snd/CSndCore.hpp"
 #include "../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
+#include "../include/hw/CI2CGpioExtenders.hpp"
 
 
 uint8_t tn;
@@ -39,6 +40,12 @@ int main(int argc, const char *argv[]) {
     NSnd::AChain chain = std::make_shared<NSnd::CChain>(instr);
 
     core->ChainSelect(chain);
+
+
+    NHw::CI2cGpioExtenders extender(0x20, [=](std::uint16_t val, std::uint16_t diff){
+        chain->ReciveMidiMsg(NSnd::CMidiMsg(
+                (val&1) ? NSnd::EMidiMsgType::NOTE_ON : NSnd::EMidiMsgType::NOTE_OFF , NSnd::ETones::C4, 255));
+    } );
 
 
     char tmp;

@@ -1,7 +1,7 @@
 CXX=g++
 LD=g++
 CXXFLAGS= -std=c++17 -Wall -pedantic -Wextra -O3
-LIBS=lib/libportaudio.a -lrt -lm -lasound -pthread -lncurses
+LIBS=lib/libportaudio.a -lrt -lm -lasound -pthread -lncurses -lwiringPi
 PROGRAM=noi_software
 
 
@@ -14,6 +14,8 @@ clean:
 	rm -f $(PROGRAM)
 	rm -f src/*/*.o
 	rm -f src/*.o
+	rm -f plg/*/*.o
+	rm -f plg/*/*/*.o
 
 run: $(PROGRAM)
 	./$(PROGRAM)
