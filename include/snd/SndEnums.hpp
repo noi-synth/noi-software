@@ -23,5 +23,16 @@ namespace NSnd {
     enum EMidiMsgType {
         NOTE_OFF, NOTE_ON, BEND_ON, BEND_OFF, ALL_OFF
     };
+
+/*----------------------------------------------------------------------*/
+    enum EInstrumentMode {
+        POLYPHONE,
+        MONOPHONE,
+        ONE_SHOT
+        // todo
+    };
 }
+
+
+
 #endif //NOI_SOFTWARE_SNDENUMS_HPP

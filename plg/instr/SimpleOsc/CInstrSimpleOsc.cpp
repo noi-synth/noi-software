@@ -3,6 +3,7 @@
 //
 
 #include <cstring>
+#include <cmath>
 #include "CInstrSimpleOsc.hpp"
 #include "../../../include/msc/CLogger.hpp"
 
@@ -10,8 +11,20 @@ using namespace NPlg::NInstr;
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
+bool CInstrSimpleOsc::waveTablesInitialized;
+const int CInstrSimpleOsc::WAVETABLE_LEN;
+float CInstrSimpleOsc::SIN_WAVE[CInstrSimpleOsc::WAVETABLE_LEN];
+
+/*----------------------------------------------------------------------*/
 CInstrSimpleOsc::CInstrSimpleOsc() : m_phase(0), m_on(false) {
 
+    if (!waveTablesInitialized) {
+        for (int i = 0; i < 512; ++i) {
+            SIN_WAVE[i] = sin(i / (double) WAVETABLE_LEN * M_PI);
+        }
+
+        waveTablesInitialized = true;
+    }
 }
 
 /*----------------------------------------------------------------------*/
@@ -21,8 +34,8 @@ int CInstrSimpleOsc::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYP
 
     if (m_on)
         for (int i = 0; i < buffLen; ++i) {
-            outputBuff[cur++] = ((m_phase) & 512) * .5 + ((m_phase) & 128) * .5;
-            outputBuff[cur++] = ((m_phase) & 512) * .5 + ((m_phase) & 128) * .5;
+            outputBuff[cur++] = SIN_WAVE[m_phase & (WAVETABLE_LEN - 1)];
+            outputBuff[cur++] = SIN_WAVE[m_phase & (WAVETABLE_LEN - 1)];
             ++m_phase;
         }
     else
@@ -45,4 +58,9 @@ int CInstrSimpleOsc::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYP
 /*----------------------------------------------------------------------*/
 void CInstrSimpleOsc::Tick() {
     //todo
+}
+
+/*----------------------------------------------------------------------*/
+void CInstrSimpleOsc::AsyncTick() {
+
 }

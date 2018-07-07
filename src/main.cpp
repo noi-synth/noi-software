@@ -3,12 +3,13 @@
 //
 
 #include <stdio.h>
+#include <map>
 
 #include "../include/snd/CAudioDevice.hpp"
 #include "../include/msc/CLogger.hpp"
 #include "../include/snd/CSndCore.hpp"
 #include "../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
-
+#include "../include/config.hpp"
 
 uint8_t tn;
 
@@ -40,19 +41,31 @@ int main(int argc, const char *argv[]) {
 
     core->ChainSelect(chain);
 
+    std::map<char, NSnd::ETones> toneKeys;
+
+    toneKeys.insert(std::make_pair('w', NSnd::ETones::C4));
+    toneKeys.insert(std::make_pair('e', NSnd::ETones::D4));
+    toneKeys.insert(std::make_pair('r', NSnd::ETones::E4));
+    toneKeys.insert(std::make_pair('t', NSnd::ETones::F4));
+
 
     char tmp;
 
     while (1) {
         std::cin >> tmp;
-        chain->ReciveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_ON, NSnd::ETones::C4, 255));
-        std::cin >> tmp;
-        chain->ReciveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_OFF, NSnd::ETones::C4, 255));
-
         if (tmp == 'q') {
             delete core;
             return 0;
         }
+        chain->ReciveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_ON, toneKeys[tmp], 255));
+
+        std::cin >> tmp;
+        if (tmp == 'q') {
+            delete core;
+            return 0;
+        }
+        chain->ReciveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_OFF, toneKeys[tmp], 255));
+
     }
 
 

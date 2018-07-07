@@ -9,7 +9,7 @@
 #include <thread>
 
 #include "../../include/msc/CLocklessQue.hpp"
-#include "../../include/snd/CInstrument.hpp"
+#include "../../src/snd/CInstrument.hpp"
 #include "NSndConfig.hpp"
 
 using NMsc::CLocklessQue;

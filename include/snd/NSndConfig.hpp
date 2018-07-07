@@ -17,6 +17,9 @@ namespace NSnd {
     const uint32_t TICK_LENGTH = 882; // 44100/50
 
     const int SCHED_POLICY = SCHED_FIFO;
+
+    const int INSTRUMENT_VOICE_NUMBER = 12;
+    const int INTERNAL_BUFFERS_LEN = 512;
     //const int SCHED_PRIORITY_WORHER = ???
 
 }

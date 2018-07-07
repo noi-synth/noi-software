@@ -5,7 +5,7 @@
 #ifndef NOI_SOFTWARE_CINSTRSIMPLEOSC_HPP
 #define NOI_SOFTWARE_CINSTRSIMPLEOSC_HPP
 
-#include "../../../include/snd/CInstrument.hpp"
+#include "../../../src/snd/CInstrument.hpp"
 #include "../../../include/snd/NSndConfig.hpp"
 
 namespace NPlg {
@@ -22,8 +22,19 @@ namespace NPlg {
         protected:
             virtual void Tick() override;
 
+            virtual void AsyncTick() override;
+
+
             uint32_t m_phase;
             bool m_on;
+
+            static bool waveTablesInitialized;
+
+            static const int WAVETABLE_LEN = 512;
+
+            static float SIN_WAVE[WAVETABLE_LEN];
+
+
         };
     }
 }
