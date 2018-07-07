@@ -27,11 +27,11 @@ run: $(PROGRAM)
 #AUTOMATICALLY GENERATED:
 CChain.o: src/snd/CChain.cpp src/snd/../../include/snd/CChain.hpp \
  src/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
- src/snd/../../include/snd/../../include/snd/CInstrument.hpp \
- src/snd/../../include/snd/../../include/snd/NSndConfig.hpp \
- src/snd/../../include/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
- src/snd/../../include/snd/../../include/snd/CMidiMsg.hpp \
- src/snd/../../include/snd/../../include/snd/SndEnums.hpp \
+ src/snd/../../include/snd/../../src/snd/CInstrument.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/snd/NSndConfig.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/msc/CLocklessQue.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/snd/CMidiMsg.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/snd/SndEnums.hpp \
  src/snd/../../include/snd/NSndConfig.hpp \
  src/snd/../../include/msc/CLogger.hpp
 CSndCore.o: src/snd/CSndCore.cpp src/snd/../../include/snd/CSndCore.hpp \
@@ -40,10 +40,10 @@ CSndCore.o: src/snd/CSndCore.cpp src/snd/../../include/snd/CSndCore.hpp \
  src/snd/../../include/snd/SndEnums.hpp \
  src/snd/../../include/snd/CChain.hpp \
  src/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
- src/snd/../../include/snd/../../include/snd/CInstrument.hpp \
- src/snd/../../include/snd/../../include/snd/NSndConfig.hpp \
- src/snd/../../include/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
- src/snd/../../include/snd/../../include/snd/CMidiMsg.hpp \
+ src/snd/../../include/snd/../../src/snd/CInstrument.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/snd/NSndConfig.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/msc/CLocklessQue.hpp \
+ src/snd/../../include/snd/../../src/snd/../../include/snd/CMidiMsg.hpp \
  src/snd/../../include/snd/NSndConfig.hpp \
  src/snd/../../include/snd/CAudioDevice.hpp \
  src/snd/../../include/snd/CAudioDeviceConfig.hpp \
@@ -60,12 +60,12 @@ CAudioDeviceConfig.o: src/snd/CAudioDeviceConfig.cpp \
  src/snd/../../include/snd/CAudioDeviceConfig.hpp
 CMidiMsg.o: src/snd/CMidiMsg.cpp src/snd/../../include/snd/CMidiMsg.hpp \
  src/snd/../../include/snd/SndEnums.hpp
-CInstrument.o: src/snd/CInstrument.cpp \
- src/snd/../../include/snd/CInstrument.hpp \
+CInstrument.o: src/snd/CInstrument.cpp src/snd/CInstrument.hpp \
  src/snd/../../include/snd/NSndConfig.hpp \
- src/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
+ src/snd/../../include/msc/CLocklessQue.hpp \
  src/snd/../../include/snd/CMidiMsg.hpp \
- src/snd/../../include/snd/SndEnums.hpp
+ src/snd/../../include/snd/SndEnums.hpp \
+ src/snd/../../include/msc/CLogger.hpp
 MscFunctions.o: src/msc/MscFunctions.cpp
 CLogger.o: src/msc/CLogger.cpp src/msc/../../include/msc/CLogger.hpp
 CI2CGpioExtenders.o: src/hw/CI2CGpioExtenders.cpp \
@@ -79,24 +79,27 @@ main.o: src/main.cpp src/../include/snd/CAudioDevice.hpp \
  src/../include/snd/CMidiMsg.hpp src/../include/snd/SndEnums.hpp \
  src/../include/snd/CChain.hpp \
  src/../include/snd/../../include/msc/CLocklessQue.hpp \
- src/../include/snd/../../include/snd/CInstrument.hpp \
- src/../include/snd/../../include/snd/NSndConfig.hpp \
- src/../include/snd/../../include/snd/../../include/msc/CLocklessQue.hpp \
- src/../include/snd/../../include/snd/CMidiMsg.hpp \
+ src/../include/snd/../../src/snd/CInstrument.hpp \
+ src/../include/snd/../../src/snd/../../include/snd/NSndConfig.hpp \
+ src/../include/snd/../../src/snd/../../include/msc/CLocklessQue.hpp \
+ src/../include/snd/../../src/snd/../../include/snd/CMidiMsg.hpp \
  src/../include/snd/CAudioDevice.hpp \
  src/../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp \
- src/../plg/instr/SimpleOsc/../../../include/snd/CInstrument.hpp \
- src/../plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp \
- src/../plg/instr/SimpleOsc/../../../include/snd/../../include/msc/CLocklessQue.hpp \
- src/../plg/instr/SimpleOsc/../../../include/snd/CMidiMsg.hpp \
+ src/../plg/instr/SimpleOsc/../../../src/snd/CInstrument.hpp \
+ src/../plg/instr/SimpleOsc/../../../src/snd/../../include/snd/NSndConfig.hpp \
+ src/../plg/instr/SimpleOsc/../../../src/snd/../../include/msc/CLocklessQue.hpp \
+ src/../plg/instr/SimpleOsc/../../../src/snd/../../include/snd/CMidiMsg.hpp \
  src/../plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp \
  src/../include/config.hpp
 CInstrSimpleOsc.o: plg/instr/SimpleOsc/CInstrSimpleOsc.cpp \
  plg/instr/SimpleOsc/CInstrSimpleOsc.hpp \
- plg/instr/SimpleOsc/../../../include/snd/CInstrument.hpp \
+ plg/instr/SimpleOsc/../../../src/snd/CInstrument.hpp \
+ plg/instr/SimpleOsc/../../../src/snd/../../include/snd/NSndConfig.hpp \
+ plg/instr/SimpleOsc/../../../src/snd/../../include/msc/CLocklessQue.hpp \
+ plg/instr/SimpleOsc/../../../src/snd/../../include/snd/CMidiMsg.hpp \
+ plg/instr/SimpleOsc/../../../src/snd/../../include/snd/SndEnums.hpp \
  plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp \
- plg/instr/SimpleOsc/../../../include/snd/../../include/msc/CLocklessQue.hpp \
- plg/instr/SimpleOsc/../../../include/snd/CMidiMsg.hpp \
+ plg/instr/SimpleOsc/../../../include/msc/CLogger.hpp \
+ plg/instr/SimpleOsc/../../../include/snd/CSndHelpers.hpp \
  plg/instr/SimpleOsc/../../../include/snd/SndEnums.hpp \
- plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp \
- plg/instr/SimpleOsc/../../../include/msc/CLogger.hpp
+ plg/instr/SimpleOsc/../../../include/snd/NSndConfig.hpp

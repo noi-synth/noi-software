@@ -25,7 +25,7 @@ namespace NSnd {
         CInstrument();
 
         virtual int
-        GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) = 0;
+        GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen);
 
         void ReciveMidiMsg(const CMidiMsg &msg);
 
@@ -35,24 +35,24 @@ namespace NSnd {
 
         virtual void Tick();
 
-        virtual void AsyncTick() = 0;
+        virtual void AsyncTick();
 
         class CInstrumentVoice {
         public:
-            CInstrumentVoice(std::weak_ptr<CInstrument> instrument, ETones tone);
+            CInstrumentVoice(CInstrument &instrument, ETones tone);
 
             virtual int
             GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) = 0;
 
-            virtual void Dectivate() = 0;
+            virtual void Deactivate();
 
-            virtual void Activate(CMidiMsg midiMessage) = 0;
+            virtual void Activate(CMidiMsg midiMessage);
 
             bool IsActive();
 
         protected:
             bool m_active;
-            std::weak_ptr<CInstrument> m_instrument;
+            CInstrument &m_instrument;
             ETones m_tone;
         };
 

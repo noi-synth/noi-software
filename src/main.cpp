@@ -43,10 +43,10 @@ int main(int argc, const char *argv[]) {
 
     std::map<char, NSnd::ETones> toneKeys;
 
-    toneKeys.insert(std::make_pair('w', NSnd::ETones::C4));
-    toneKeys.insert(std::make_pair('e', NSnd::ETones::D4));
-    toneKeys.insert(std::make_pair('r', NSnd::ETones::E4));
-    toneKeys.insert(std::make_pair('t', NSnd::ETones::F4));
+    toneKeys.insert(std::make_pair('w', NSnd::ETones::C5));
+    toneKeys.insert(std::make_pair('e', NSnd::ETones::D5));
+    toneKeys.insert(std::make_pair('r', NSnd::ETones::E5));
+    toneKeys.insert(std::make_pair('t', NSnd::ETones::F5));
 
 
     char tmp;
@@ -57,6 +57,7 @@ int main(int argc, const char *argv[]) {
             delete core;
             return 0;
         }
+
         chain->ReciveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_ON, toneKeys[tmp], 255));
 
         std::cin >> tmp;

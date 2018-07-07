@@ -16,23 +16,34 @@ namespace NPlg {
         public:
             CInstrSimpleOsc();
 
-            virtual int
-            GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) override;
 
         protected:
-            virtual void Tick() override;
-
-            virtual void AsyncTick() override;
-
 
             uint32_t m_phase;
             bool m_on;
 
-            static bool waveTablesInitialized;
 
-            static const int WAVETABLE_LEN = 512;
+            class CSimpleOscVoice : public CInstrument::CInstrumentVoice {
+            public:
+                CSimpleOscVoice(CInstrument &instrument, NSnd::ETones tone);
 
-            static float SIN_WAVE[WAVETABLE_LEN];
+                int GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff,
+                                   unsigned long buffLen) override;
+
+                void Activate(NSnd::CMidiMsg midiMessage) override;
+
+            protected:
+
+                double m_phase;
+
+                double m_sampleStep;
+
+                static bool waveTablesInitialized;
+
+                static const int WAVETABLE_LEN = 512;
+
+                static float SIN_WAVE[WAVETABLE_LEN];
+            };
 
 
         };
