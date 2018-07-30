@@ -23,6 +23,13 @@ int callback(const SND_DATA_TYPE *in, SND_DATA_TYPE *out,
 }
 
 int main(int argc, const char *argv[]) {
+
+
+
+
+//    return 0;
+
+
     NSnd::AAudioDevice dev = std::make_shared<NSnd::CAudioDevice>(NSnd::CAudioDeviceConfig());
 
     std::cout << "AudioDevice CREATED" << std::endl;

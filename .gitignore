@@ -1,4 +1,6 @@
 *.o
 noi_software
+bin/*
 cmake-build-debug
 .idea
+.sconsign.dblite

@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CAUDIODEVICE_HPP
 
 #include <memory>
+#include <functional>
 #include "CAudioDeviceConfig.hpp"
 #include "NSndConfig.hpp"
 #include "../../include/lib/portaudio.h"

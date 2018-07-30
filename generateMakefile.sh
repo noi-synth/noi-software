@@ -1,5 +1,11 @@
 #!/bin/bash
 
+echo 'Generating makefile is depricated. You do not need to do that anymore.'
+exit 0
+
+
+##############
+
 echo "OBJS=`find src plg -name '*.cpp' | sed s/\.cpp/\.o/ | tr '\n' ' '`" >Makefile &&
 cat "MakefileTemplate" >>Makefile && 
 echo -e '\n\n#AUTOMATICALLY GENERATED:'>>Makefile && 

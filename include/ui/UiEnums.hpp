@@ -38,6 +38,12 @@ namespace NUi {
         NONE
     };
 
+    /*----------------------------------------------------------------------*/
+    enum ControlInputType {
+        PRESS,
+        RELEASE
+    };
+
 
 }
 
