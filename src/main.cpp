@@ -4,12 +4,15 @@
 
 #include <stdio.h>
 #include <map>
+#include <csignal>
 
 #include "../include/snd/CAudioDevice.hpp"
 #include "../include/msc/CLogger.hpp"
 #include "../include/snd/CSndCore.hpp"
 #include "../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
 #include "../include/config.hpp"
+#include "../include/gfx/CNcurses.hpp"
+#include "../include/ui/term/CTerminalUi.hpp"
 
 uint8_t tn;
 
@@ -22,12 +25,49 @@ int callback(const SND_DATA_TYPE *in, SND_DATA_TYPE *out,
 
 }
 
+void signalHandler(int signum) {
+
+
+    // close ncurses
+    NGfx::CNcurses::GetInstance()->FreeInstance();
+
+    std::cout << "Interrupt signal (" << signum << ") received.\n" << std::endl;
+
+    // terminate program
+
+    exit(signum);
+}
+
 int main(int argc, const char *argv[]) {
 
+    signal(SIGSEGV, signalHandler);
+
+    NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
+
+    NUi::NTerm::CTerminalUi Ui(app);
+    Ui.Run();
+
+    Ui.WaitForStop();
 
 
+    return 0;
+    NGfx::CNcurses *gfx = NGfx::CNcurses::GetInstance();
 
-//    return 0;
+    gfx->ClearScreen();
+
+    gfx->SetFrame(30, 15);
+    gfx->DrawEmptyWindow(NGfx::CNcurses::ColorPair::WHITE_BLUE);
+    gfx->DrawText(2, 2, "lol", NGfx::CNcurses::ColorPair::RED_BLACK);
+    gfx->DrawTextCentered(5, "CENTERED TEXT VOLE", NGfx::CNcurses::ColorPair::WHITE_BLACK);
+    gfx->Update();
+
+    while (gfx->GetInput() != 'q') {
+
+    }
+
+    gfx->FreeInstance();
+
+    return 0;
 
 
     NSnd::AAudioDevice dev = std::make_shared<NSnd::CAudioDevice>(NSnd::CAudioDeviceConfig());

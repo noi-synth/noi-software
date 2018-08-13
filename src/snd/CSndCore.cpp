@@ -7,7 +7,7 @@
 
 using namespace NSnd;
 
-bool CSndCore::AudioDeviceSet(const NSnd::AAudioDevice &device) {
+bool CSndCore::AudioDeviceSet(NSnd::AAudioDevice &device) {
     AudioDeviceStop();
     m_audioDevice = device;
     if (!m_audioDevice->BindCallback(
@@ -53,7 +53,7 @@ bool CSndCore::ReciveMidiMsg(const NSnd::CMidiMsg &message) {
 }
 
 /*----------------------------------------------------------------------*/
-bool CSndCore::ChainSelect(const NSnd::AChain &chain) {
+bool CSndCore::ChainSelect(NSnd::AChain &chain) {
     return m_newSelectedChain.Push(chain);
 }
 

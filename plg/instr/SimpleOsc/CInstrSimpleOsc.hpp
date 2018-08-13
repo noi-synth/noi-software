@@ -5,7 +5,7 @@
 #ifndef NOI_SOFTWARE_CINSTRSIMPLEOSC_HPP
 #define NOI_SOFTWARE_CINSTRSIMPLEOSC_HPP
 
-#include "../../../src/snd/CInstrument.hpp"
+#include "../../../include/snd/CInstrument.hpp"
 #include "../../../include/snd/NSndConfig.hpp"
 
 namespace NPlg {

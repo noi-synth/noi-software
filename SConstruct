@@ -1,4 +1,3 @@
-
 import os
 import os.path
 import fnmatch, re
@@ -20,21 +19,27 @@ def GetDirectoriesRecursive(directory = '.'):
 
 # ----------------------------------------------------------
 
-
-
-# Setup enviroment
-env = Environment()
-# Compiler color output
-env['ENV']['TERM'] = os.environ['TERM']  
-
-# --- Flags ---
-env.Append( CCFLAGS=["-std=c++17", "-Wall", "-pedantic", "-Wextra", "-O3"] )
-
-# --- CONSTANTS ---
+# --- CONSTANTS AND SETTINGS ---
 APP_NAME='noi'
 APP_DEST='bin/'
 SOURCE_SUBFOLDERS = ['src', 'plg']
 INCLUDE_SUBFOLDERS = ['include', 'plg']
+libs = ["rt", "m", "asound", "pthread", "ncurses"]
+debug = True
+COMPILER_FLAGS = ["-std=c++17", "-Wall", "-pedantic", "-Wextra"]
+# Setup enviroment
+env = Environment()
+
+# Enable compiler color output
+env['ENV']['TERM'] = os.environ['TERM']  
+
+# --- Compiler flags ---
+
+if (debug):
+    COMPILER_FLAGS.extend(["-O0", "-g"])
+else:
+    COMPILER_FLAGS.extend(["-O3"])
+env.Append( CCFLAGS=COMPILER_FLAGS )
 
 # --- Search for files and folders ---
 sources = []
@@ -42,8 +47,6 @@ for subfolder in SOURCE_SUBFOLDERS:
     sources.extend(GetFilesRecursive(subfolder, '*.cpp'))
 
 sources.extend(GetFilesRecursive("./lib", '*.a'))
-
-libs = ["rt", "m", "asound", "pthread", "ncurses"]
 
 includes = []
 for subfolder in INCLUDE_SUBFOLDERS:

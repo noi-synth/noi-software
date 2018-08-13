@@ -31,6 +31,10 @@ namespace NUi {
 
         virtual void Draw();
 
+        virtual void Update();
+
+        virtual void Init();
+
     protected:
         WWindowManager m_manager;
         bool m_isActive;

@@ -26,7 +26,7 @@ namespace NSnd {
 
         bool ReciveMidiMsg(const CMidiMsg &message);
 
-        bool ChainSelect(const AChain &chain);
+        bool ChainSelect(AChain &chain);
 
         void ChainClearAllActive();
 
@@ -34,7 +34,7 @@ namespace NSnd {
 
         void Panic();
 
-        bool AudioDeviceSet(const AAudioDevice &device);
+        bool AudioDeviceSet(AAudioDevice &device);
 
         void AudioDeviceUnset();
 
@@ -61,5 +61,6 @@ namespace NSnd {
         AAudioDevice m_audioDevice;
     };
 
+    typedef std::shared_ptr<CSndCore> ASndCore;
 }
 #endif //NOI_SOFTWARE_CSNDCORE_HPP

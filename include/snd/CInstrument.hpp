@@ -5,9 +5,9 @@
 #include <memory>
 #include <list>
 #include <vector>
-#include "../../include/snd/NSndConfig.hpp"
-#include "../../include/msc/CLocklessQue.hpp"
-#include "../../include/snd/CMidiMsg.hpp"
+#include "NSndConfig.hpp"
+#include "../msc/CLocklessQue.hpp"
+#include "CMidiMsg.hpp"
 
 #ifndef NOI_SOFTWARE_CINSTRUMENT_HPP
 #define NOI_SOFTWARE_CINSTRUMENT_HPP

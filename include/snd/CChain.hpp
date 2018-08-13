@@ -9,7 +9,7 @@
 #include <thread>
 
 #include "../../include/msc/CLocklessQue.hpp"
-#include "../../src/snd/CInstrument.hpp"
+#include "CInstrument.hpp"
 #include "NSndConfig.hpp"
 
 using NMsc::CLocklessQue;
@@ -18,7 +18,7 @@ namespace NSnd {
     class CChain {
     public:
         //TODO implement effect chain, implement ProcessBuffer status flags, idle mechanics
-        //TODO polyphonic/monophonic support
+        //TODO UI-SndCore sync mechanism
         explicit CChain(const AInstrument &instr);
 
         void MakrActive();

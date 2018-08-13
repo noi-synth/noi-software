@@ -16,16 +16,17 @@ namespace NUi {
 }
 
 #include "CWindow.hpp"
+#include "../lgc/CNoiApp.hpp"
 
 namespace NUi {
     class CWindowManager : public std::enable_shared_from_this<CWindowManager> {
     public:
-        CWindowManager(DrawingPolicy drawingPolicy, AWindow mainWindow);
+        CWindowManager(DrawingPolicy drawingPolicy, NLgc::ANoiApp app);
 
         // static AWindowManager CreateSharedInstance(DrawingPolicy drawingPolicy, AWindow mainWindow);
 
         // todo these "Callback" names are a bit unlucky
-        void SetMainWindowCallback(AWindow &window);
+        void SetMainWindowCallback(const AWindow &window);
 
         void ReplaceTopWindowCallback(AWindow window);
 
@@ -35,14 +36,26 @@ namespace NUi {
 
         void CloseTopWindowCallback();
 
-        void Redraw();
-
         void ProcessControlInput(ControlInput control, ControlInputType type);
+
+        void RequestRedraw();
+
+        void Update();
+
+        bool m_exiting;
+
+        NLgc::ANoiApp GetApp();
 
         DrawingPolicy m_drawingPolicy;
     private:
+
+        void Redraw();
+
+        bool m_redrawRequested;
+        bool m_breakWindowIteration;
         std::list<AWindow> m_windows;
         AWindow m_mainWindow;
+        NLgc::ANoiApp m_app;
     };
 
 }

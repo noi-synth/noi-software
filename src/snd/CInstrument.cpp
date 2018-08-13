@@ -3,7 +3,7 @@
 //
 
 #include <cstring>
-#include "CInstrument.hpp"
+#include "../../include/snd/CInstrument.hpp"
 #include "../../include/msc/CLogger.hpp"
 
 
