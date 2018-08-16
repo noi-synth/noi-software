@@ -16,7 +16,8 @@ namespace NGfx {
         enum ColorPair {
             WHITE_BLACK = 1,
             RED_BLACK,
-            WHITE_BLUE
+            WHITE_BLUE,
+            BLACK_BLUE
         };
 
         static CNcurses *GetInstance();

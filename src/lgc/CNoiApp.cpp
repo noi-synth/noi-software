@@ -4,6 +4,7 @@
 
 #include "../../include/lgc/CNoiApp.hpp"
 #include "../../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
+#include "../../include/msc/CLogger.hpp"
 
 using namespace NLgc;
 
@@ -15,7 +16,9 @@ CNoiApp::CNoiApp() {
     // Create instrument and chain
     NSnd::AInstrument instrument = std::make_shared<NPlg::NInstr::CInstrSimpleOsc>();
     m_state.m_chains.push_back(std::make_shared<NSnd::CChain>(instrument));
+    //m_state.m_soundCore.get();
     m_state.m_soundCore->ChainSelect(m_state.m_chains[0]);
+    NMsc::CLogger::Log("App constructor. m_sndCore = %", m_state.m_soundCore.get());
 
 }
 
@@ -46,5 +49,13 @@ void CNoiApp::AudioPanic() {
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
+
+    NMsc::CLogger::Log("CNoiApp: SendMidiMsg; This = %", this);
+    NMsc::CLogger::Log("CNoiApp: SendMidiMsg; m_state = %", &m_state);
+
+    if (!m_state.m_soundCore) {
+        NMsc::CLogger::Log("SndCore not set");
+        return false;
+    }
     return m_state.m_soundCore->ReciveMidiMsg(message);
 }

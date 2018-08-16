@@ -7,6 +7,12 @@
 
 using namespace NSnd;
 
+/*----------------------------------------------------------------------*/
+CSndCore::CSndCore() {
+    NMsc::CLogger::Log("CSndCore constructor");
+}
+
+/*----------------------------------------------------------------------*/
 bool CSndCore::AudioDeviceSet(NSnd::AAudioDevice &device) {
     AudioDeviceStop();
     m_audioDevice = device;

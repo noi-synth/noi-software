@@ -19,6 +19,8 @@ namespace NSnd {
     class CSndCore {
     public:
 
+        CSndCore();
+
         //TODO working thread
         //TODO Mixing
         //TODO tracks

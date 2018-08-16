@@ -28,6 +28,7 @@ CNcurses::CNcurses() {
     init_pair(ColorPair::WHITE_BLACK, COLOR_WHITE, COLOR_BLACK);
     init_pair(ColorPair::RED_BLACK, COLOR_RED, COLOR_BLACK);
     init_pair(ColorPair::WHITE_BLUE, COLOR_WHITE, COLOR_BLUE);
+    init_pair(ColorPair::BLACK_BLUE, COLOR_BLACK, COLOR_BLUE);
 
 
     timeout(17);
@@ -57,7 +58,7 @@ void CNcurses::FreeInstance() {
 
 /*----------------------------------------------------------------------*/
 bool CNcurses::SetFrame(unsigned int width, unsigned int height) {
-    if (width >= COLS || height >= LINES)
+    if (width > COLS || height > LINES)
         return false;
 
     m_frameW = width;

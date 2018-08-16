@@ -16,6 +16,8 @@ namespace NUi {
 
         private:
             virtual void UiThreadWorker() override;
+
+            std::vector<bool> m_toneState;
         };
     }
 }

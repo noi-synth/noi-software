@@ -6,7 +6,7 @@
 #include <map>
 #include <csignal>
 
-#include "../include/snd/CAudioDevice.hpp"
+#include "../include/snd/CAudioDevicePA.hpp"
 #include "../include/msc/CLogger.hpp"
 #include "../include/snd/CSndCore.hpp"
 #include "../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
@@ -49,8 +49,9 @@ int main(int argc, const char *argv[]) {
 
     Ui.WaitForStop();
 
-
     return 0;
+/*
+
     NGfx::CNcurses *gfx = NGfx::CNcurses::GetInstance();
 
     gfx->ClearScreen();
@@ -67,10 +68,10 @@ int main(int argc, const char *argv[]) {
 
     gfx->FreeInstance();
 
-    return 0;
+    //return 0;
 
 
-    NSnd::AAudioDevice dev = std::make_shared<NSnd::CAudioDevice>(NSnd::CAudioDeviceConfig());
+    NSnd::AAudioDevice dev = std::make_shared<NSnd::CAudioDevicePA>(NSnd::CAudioDeviceInfo());
 
     std::cout << "AudioDevice CREATED" << std::endl;
 
@@ -131,5 +132,5 @@ int main(int argc, const char *argv[]) {
 
 
     return 0;
-
+*/
 }

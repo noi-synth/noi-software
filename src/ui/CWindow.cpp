@@ -33,3 +33,21 @@ void CWindow::Update() {}
 
 /*----------------------------------------------------------------------*/
 void CWindow::Init() {}
+
+/*----------------------------------------------------------------------*/
+void CWindow::RequestRedraw() {
+    AWindowManager manager = m_manager.lock();
+    if (manager)
+        manager->RequestRedraw();
+}
+
+/*----------------------------------------------------------------------*/
+bool CWindow::DoWithManager(std::function<void(AWindowManager)> funct) {
+    AWindowManager manager = m_manager.lock();
+
+    if (manager) {
+        funct(manager);
+        return true;
+    }
+    return false;
+}

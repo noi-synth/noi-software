@@ -3,6 +3,7 @@
 //
 
 #include "../../include/ui/CWindowManager.hpp"
+#include "../../include/msc/CLogger.hpp"
 
 using namespace NUi;
 
@@ -12,6 +13,7 @@ CWindowManager::CWindowManager(NUi::DrawingPolicy drawingPolicy, NLgc::ANoiApp a
                                                                                       m_app(app),
                                                                                       m_redrawRequested(true),
                                                                                       m_breakWindowIteration(false) {
+    NMsc::CLogger::Log("CWindowManager constructor, app  = %, m_app = %", app.get(), m_app.get());
 }
 
 /*----------------------------------------------------------------------*/
@@ -128,6 +130,7 @@ void CWindowManager::ProcessControlInput(NUi::ControlInput control, NUi::Control
 
 /*----------------------------------------------------------------------*/
 NLgc::ANoiApp CWindowManager::GetApp() {
+    NMsc::CLogger::Log("CWindowManager::GetApp = %, this=%", m_app.get(), this);
     return m_app;
 }
 

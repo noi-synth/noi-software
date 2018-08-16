@@ -18,8 +18,12 @@ namespace NUi {
             virtual void Draw() override;
 
             void Init() override;
+
+        private:
+            NLgc::ANoiApp m_app;
         };
     }
+
 }
 
 #endif //NOI_SOFTWARE_WNDMAIN_HPP

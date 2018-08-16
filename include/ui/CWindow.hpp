@@ -35,10 +35,13 @@ namespace NUi {
 
         virtual void Init();
 
+
     protected:
+        void RequestRedraw();
+
+        bool DoWithManager(std::function<void(AWindowManager)> funct);
         WWindowManager m_manager;
         bool m_isActive;
-
     };
 
 }
