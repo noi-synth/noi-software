@@ -39,8 +39,10 @@ namespace NMsc {
                 }
                 std::cerr << *format;
             }
-            if (!(*format))
+        }
 
+        static void Print(const char *format) {
+            std::cerr << format;
         }
     };
 
