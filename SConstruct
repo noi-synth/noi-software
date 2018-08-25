@@ -24,7 +24,7 @@ APP_NAME='noi'
 APP_DEST='bin/'
 SOURCE_SUBFOLDERS = ['src', 'plg']
 INCLUDE_SUBFOLDERS = ['include', 'plg']
-libs = ["rt", "m", "asound", "pthread", "ncurses"]
+libs = ["rt", "m", "asound", "pthread", "ncurses", "jack"]
 debug = True
 COMPILER_FLAGS = ["-std=c++17", "-Wall", "-pedantic", "-Wextra"]
 # Setup enviroment

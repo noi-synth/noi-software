@@ -122,9 +122,9 @@ void CInstrument::AsyncTick() {
             if (s.second->IsActive())
                 ++debugVoiceCnt;
 
-        char bff[64];
+        /*char bff[64];
         snprintf(bff, 64, "Active voice cnt: %d", debugVoiceCnt);
-        NMsc::CLogger::Log(bff);
+        NMsc::CLogger::Log(bff);*/
     }
 
 }
@@ -145,11 +145,11 @@ bool CInstrument::CInstrumentVoice::IsActive() {
 void CInstrument::CInstrumentVoice::Activate(NSnd::CMidiMsg midiMessage) {
     m_tone = midiMessage.m_tone;
     m_active = true;
-    NMsc::CLogger::Log("Activated");
+    //NMsc::CLogger::Log("Activated");
 }
 
 /*----------------------------------------------------------------------*/
 void CInstrument::CInstrumentVoice::Deactivate() {
     m_active = false;
-    NMsc::CLogger::Log("DeActivated");
+    //NMsc::CLogger::Log("DeActivated");
 }

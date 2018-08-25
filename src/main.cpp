@@ -13,6 +13,7 @@
 #include "../include/config.hpp"
 #include "../include/gfx/CNcurses.hpp"
 #include "../include/ui/term/CTerminalUi.hpp"
+#include "../include/msc/CMaintainer.hpp"
 
 uint8_t tn;
 
@@ -48,6 +49,8 @@ int main(int argc, const char *argv[]) {
     Ui.Run();
 
     Ui.WaitForStop();
+
+    NMsc::CMaintainer::GetInstance().Stop();
 
     return 0;
 /*

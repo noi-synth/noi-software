@@ -28,6 +28,14 @@ namespace NMsc {
             std::cerr << std::endl;
         }
 
+        enum LogType {
+            TMP_DEBUG,
+            NOTE,
+            WARNING,
+            ERROR,
+            RT_ERROR
+        };
+
     private:
         template<typename T, typename... Targs>
         static void Print(const char *format, T value, Targs... Fargs) {
@@ -45,7 +53,5 @@ namespace NMsc {
             std::cerr << format;
         }
     };
-
-
 }
 #endif //NOI_SOFTWARE_CLOGGER_HPP

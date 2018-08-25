@@ -52,7 +52,7 @@ ControlInput WinAudioDevicePick::ProcessInput(ControlInput control, ControlInput
 void WinAudioDevicePick::Draw() {
     NGfx::CNcurses *gfx = NGfx::CNcurses::GetInstance();
 
-    gfx->SetFrame(80, 20);
+    gfx->SetFrame(80, 30);
 
     gfx->DrawEmptyWindow(Color::WHITE_BLUE);
     gfx->DrawTextCentered(2, "Pick sound device:", Color::WHITE_BLACK);

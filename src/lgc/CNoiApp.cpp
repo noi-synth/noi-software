@@ -50,8 +50,8 @@ void CNoiApp::AudioPanic() {
 /*----------------------------------------------------------------------*/
 bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
 
-    NMsc::CLogger::Log("CNoiApp: SendMidiMsg; This = %", this);
-    NMsc::CLogger::Log("CNoiApp: SendMidiMsg; m_state = %", &m_state);
+    /*NMsc::CLogger::Log("CNoiApp: SendMidiMsg; This = %", this);
+    NMsc::CLogger::Log("CNoiApp: SendMidiMsg; m_state = %", &m_state);*/
 
     if (!m_state.m_soundCore) {
         NMsc::CLogger::Log("SndCore not set");

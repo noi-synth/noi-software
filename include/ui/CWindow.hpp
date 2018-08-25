@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CWINDOW_HPP
 
 #include <memory>
+#include <functional>
 
 namespace NUi {
     class CWindow;

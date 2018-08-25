@@ -22,3 +22,6 @@ vlg:
 	scons -Q -j 8
 	valgrind ./bin/noi 2>log.log
 	cat log.log | less
+
+fixterm:
+	stty sane
