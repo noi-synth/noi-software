@@ -1,6 +1,5 @@
 all:
 	scons -Q -j 8
-
 clean:
 	scons -c -j 8
 	rm -rf doc

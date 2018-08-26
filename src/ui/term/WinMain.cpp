@@ -26,7 +26,6 @@ void WinMain::Draw() {
 
     gfx->DrawTextCentered(1, "NOI synth", Color::WHITE_BLACK);
 
-
     gfx->Update();
 }
 

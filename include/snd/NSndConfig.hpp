@@ -16,6 +16,8 @@ namespace NSnd {
     const uint32_t SAMPLE_RATE = 44100;
     const uint32_t TICK_LENGTH = 882; // 44100/50
 
+    const uint32_t TRACK_SLICE_LEN = 1024;
+
     const int SCHED_POLICY = SCHED_FIFO;
 
     const int INSTRUMENT_VOICE_NUMBER = 12;
