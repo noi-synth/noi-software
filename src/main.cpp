@@ -14,6 +14,8 @@
 #include "../include/gfx/CNcurses.hpp"
 #include "../include/ui/term/CTerminalUi.hpp"
 #include "../include/msc/CMaintainer.hpp"
+#include "../include/msc/CTeam3Lock.hpp"
+#include "../include/msc/CTeamLock.hpp"
 
 uint8_t tn;
 
@@ -40,6 +42,122 @@ void signalHandler(int signum) {
 }
 
 int main(int argc, const char *argv[]) {
+
+    /*NMsc::CTeamLock lock2;
+
+    std::atomic_int check;
+    std::atomic_int cnt;
+    std::atomic_int control;
+
+    check = cnt = control = 0;
+
+
+
+    std::thread t1([&](){
+       while(true){
+           if (lock2.TryLockBlue()){
+               check |= 1;
+               for (int i = 0; i < 100; ++i) {
+                   if (check != 1)
+                       std::cout << "Error, check = " << check << std::endl;
+               }
+
+               check &= ~1;
+               lock2.Unlock();
+
+               if (++control & (1<<20)){
+                   control = 0;
+                   ++cnt;
+                   std::cout << "ok" << cnt << std::endl;
+               }
+
+           }
+       }
+    });
+
+    std::thread t2([&](){
+        while(true){
+            if (lock2.TryLockRed()){
+                check |= 2;
+                for (int i = 0; i < 100; ++i) {
+                    if (check != 2)
+                        std::cout << "Error, check = " << check << std::endl;
+                }
+
+                check &= ~2;
+                lock2.Unlock();
+
+                if (++control & (1<<20)){
+                    control = 0;
+                    ++cnt;
+                    std::cout << "ok" << cnt << std::endl;
+                }
+            }
+        }
+    });
+
+    t1.join();
+    t2.join();
+    return 0;
+*/
+    /*NMsc::CTeam3Lock lock;
+
+    std::atomic_int check;
+    check = 0;
+
+    std::thread t1([&](){
+        while (true){
+            if (lock.TryLockBlue()){
+                check |= 1;
+
+                for (int i = 0; i < 100; ++i) {
+                    if (check != 1)
+                        std::cout << "error, check = " << check << std::endl;
+                }
+
+                check &= ~1;
+                lock.Unlock();
+            }
+        }
+    });
+
+    std::thread t2([&](){
+        while (true){
+            if (lock.TryLockRed()){
+                check |= 2;
+
+                for (int i = 0; i < 100; ++i) {
+                    if (check != 2)
+                        std::cout << "error, check = " << check << std::endl;
+                }
+
+                check &= ~2;
+                lock.Unlock();
+            }
+        }
+    });
+
+    std::thread t3([&](){
+        while (true){
+            if (lock.TryLockGreen()){
+                check |= 4;
+
+                for (int i = 0; i < 100; ++i) {
+                    if (check != 4)
+                        std::cout << "error, check = " << check << std::endl;
+                }
+
+                check &= ~4;
+                lock.Unlock();
+            }
+        }
+    });
+
+    t1.join();
+    t2.join();
+    t3.join();
+
+    return 0;*/
 
     signal(SIGSEGV, signalHandler);
 

@@ -11,7 +11,7 @@ using namespace NSnd;
 NMsc::CLocklessQue<CTrackSlice *> CTrackSlice::m_newUnusedSlices;
 std::atomic_int CTrackSlice::m_newUnusedSliceCnt;
 NMsc::CLocklessQue<CTrackSlice *> CTrackSlice::m_unusedSlices;
-SND_DATA_TYPE CTrackSlice::m_trashBuffer[NSnd::TRACK_SLICE_LEN];
+SND_DATA_TYPE CTrackSlice::m_trashBuffer[NSnd::TRACK_SLICE_BUFFER_LEN];
 uint32_t CTrackSlice::m_uniqueIdCounter;
 std::map<uint32_t, CTrackSlice *> CTrackSlice::m_sliceDatabase;
 int CTrackSlice::m_workerId;

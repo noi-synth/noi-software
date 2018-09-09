@@ -49,7 +49,7 @@ namespace NSnd {
 
         static NMsc::CLocklessQue<CTrackSlice *> m_unusedSlices;
 
-        static SND_DATA_TYPE m_trashBuffer[NSnd::TRACK_SLICE_LEN];
+        static SND_DATA_TYPE m_trashBuffer[NSnd::TRACK_SLICE_BUFFER_LEN];
         static uint32_t m_uniqueIdCounter;
 
         static std::map<uint32_t, CTrackSlice *> m_sliceDatabase;

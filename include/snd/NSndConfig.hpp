@@ -16,13 +16,16 @@ namespace NSnd {
     const uint32_t SAMPLE_RATE = 44100;
     const uint32_t TICK_LENGTH = 882; // 44100/50
 
-    const uint32_t TRACK_SLICE_LEN = 1024;
+    // Track slice length must be 2^n
+    const uint32_t TRACK_SLICE_LEN_EXPONENT = 10;
+    constexpr uint32_t TRACK_SLICE_LEN = 1 << TRACK_SLICE_LEN_EXPONENT;
+    constexpr uint32_t TRACK_SLICE_BUFFER_LEN = TRACK_SLICE_LEN << 1; // two channels
 
     const int SCHED_POLICY = SCHED_FIFO;
 
     const int INSTRUMENT_VOICE_NUMBER = 12;
-    const int INTERNAL_BUFFERS_LEN = 512;
-    //const int SCHED_PRIORITY_WORHER = ???
+    const int INTERNAL_BUFFERS_LEN = 1 << 9;
+    //const int SCHED_PRIORITY_WORKER = ???
 
 }
 
