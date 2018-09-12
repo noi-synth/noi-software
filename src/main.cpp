@@ -16,6 +16,7 @@
 #include "../include/msc/CMaintainer.hpp"
 #include "../include/msc/CTeam3Lock.hpp"
 #include "../include/msc/CTeamLock.hpp"
+#include "../include/hw/CPhysicalInputHandler.hpp"
 
 uint8_t tn;
 
@@ -162,6 +163,11 @@ int main(int argc, const char *argv[]) {
     signal(SIGSEGV, signalHandler);
 
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
+
+    NHw::CPhysicalInputHandler physicalInput;
+    physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
+        app->SendMidiMessage(msg);
+    }));
 
     NUi::NTerm::CTerminalUi Ui(app);
     Ui.Run();

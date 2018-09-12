@@ -21,6 +21,7 @@ namespace NHw {
     class CI2cGpioExtenders {
     public:
 
+
         CI2cGpioExtenders(uint32_t i2cAddress, const std::function<void(std::uint16_t, std::uint16_t)> &callback );
 
     private:

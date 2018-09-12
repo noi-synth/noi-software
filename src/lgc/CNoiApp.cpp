@@ -20,6 +20,7 @@ CNoiApp::CNoiApp() {
     m_state.m_soundCore->ChainSelect(m_state.m_chains[0]);
     NMsc::CLogger::Log("App constructor. m_sndCore = %", m_state.m_soundCore.get());
 
+
 }
 
 /*----------------------------------------------------------------------*/
