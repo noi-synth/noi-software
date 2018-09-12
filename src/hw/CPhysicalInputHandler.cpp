@@ -28,4 +28,12 @@ CPhysicalInputHandler::CPhysicalInputHandler()
 }
 
 /*----------------------------------------------------------------------*/
+void CPhysicalInputHandler::AttachMidiOutput(const std::function<void(NSnd::CMidiMsg)> &outputFunction) {
+    m_midiOutputs.push_back(outputFunction);
+}
+
+/*----------------------------------------------------------------------*/
+void CPhysicalInputHandler::ClearMidiOuptuts() {
+    m_midiOutputs.clear();
+}
 

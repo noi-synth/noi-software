@@ -21,7 +21,7 @@ namespace NHw {
         void ClearMidiOuptuts();
 
     private:
-        std::vector<std::function<NSnd::CMidiMsg()>> m_midiOutputs;
+        std::vector<std::function<void(NSnd::CMidiMsg)>> m_midiOutputs;
 
 
         // I2C
