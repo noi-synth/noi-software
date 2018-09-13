@@ -43,7 +43,7 @@ int CChain::ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputB
     // Replace instrument with ne one
     while (!m_newInstrument.Empty()) {
         if (!m_toDeleteInstruments.Push(m_instrument)) {
-            NMsc::CLogger::Log("ERROR: Chain: instrument deletion que is full.");
+            NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "ERROR: Chain: instrument deletion que is full.");
         }
         m_instrument = m_newInstrument.Pop();
         //TODO wake up thread (and implement it) (Make ThrashBinCLass)

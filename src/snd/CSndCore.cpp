@@ -9,7 +9,8 @@ using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
 CSndCore::CSndCore() {
-    NMsc::CLogger::Log("CSndCore constructor");
+    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSndCore constructor");
+
 }
 
 /*----------------------------------------------------------------------*/
@@ -42,7 +43,7 @@ bool CSndCore::AudioDeviceStart() {
     if (m_audioDevice)
         return m_audioDevice->StartStream();
 
-    NMsc::CLogger::Log("NsdCore: AudioDeviceStart: no device selected.");
+    NMsc::CLogger::Log(NMsc::ELogType::ERROR, "NsdCore: AudioDeviceStart: no device selected.");
     return false;
 }
 

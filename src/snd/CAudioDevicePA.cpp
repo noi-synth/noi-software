@@ -20,7 +20,7 @@ using namespace NSnd;
 ScopedPaHandler::ScopedPaHandler()
         : _result(Pa_Initialize()) {
     if (_result != paNoError) {
-        NMsc::CLogger::Log("paInit failed");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "paInit failed");
     }
 }
 
@@ -92,37 +92,34 @@ void CAudioDevicePA::StreamFinishedCallback(void *userData) {
 bool CAudioDevicePA::Open() {
 
     if (m_paInit.result() != paNoError) {
-        NMsc::CLogger::Log("paInit failed");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "paInit failed");
         return false;
     }
 
     PaDeviceIndex index = m_deviceInfo.m_index; //Pa_GetDefaultOutputDevice();
 
-    char msg[256];
+    //char msg[256];
 
     if (!m_callback) {
-        NMsc::CLogger::Log("Callback not set!");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "Callback not set!");
 
         return false;
     }
 
-
-    sprintf(msg, "Trying device %d \n", index);
-    NMsc::CLogger::Log(msg);
+    NMsc::CLogger::Log(NMsc::ELogType::NOTE, "Trying device %", index);
 
 
     PaStreamParameters outputParameters;
 
     outputParameters.device = index;
     if (outputParameters.device == paNoDevice) {
-        NMsc::CLogger::Log("PaNoDevice");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "PaNoDevice");
         return false;
     }
 
     const PaDeviceInfo *pInfo = Pa_GetDeviceInfo(index);
     if (pInfo != 0) {
-        sprintf(msg, "Output device name: '%s'\r", pInfo->name);
-        NMsc::CLogger::Log(msg);
+        NMsc::CLogger::Log(NMsc::ELogType::NOTE, "Output device name: '%'", pInfo->name);
     }
 
     outputParameters.channelCount = 2;       /* stereo output */
@@ -142,7 +139,7 @@ bool CAudioDevicePA::Open() {
     );
 
     if (err != paNoError) {
-        NMsc::CLogger::Log("Failed to open stream to device!");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "Failed to open stream to device!");
         /* Failed to open stream to device !!! */
         return false;
     }
@@ -152,7 +149,7 @@ bool CAudioDevicePA::Open() {
     if (err != paNoError) {
         Pa_CloseStream(m_stream);
         m_stream = 0;
-        NMsc::CLogger::Log("Error in opening stream. Finish could not be assigned.");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "Error in opening stream. Finish could not be assigned.");
         return false;
     }
 
@@ -165,7 +162,7 @@ CAudioDevicePA::BindCallback(
         const std::function<int(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long)> &callback) {
 
     if (m_running) {
-        NMsc::CLogger::Log("Stream is active, can not bind the callback.");
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "Stream is active, can not bind the callback.");
         return false;
     }
     m_callback = callback;

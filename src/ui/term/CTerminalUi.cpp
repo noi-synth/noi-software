@@ -14,7 +14,7 @@ using namespace NUi::NTerm;
 
 /*----------------------------------------------------------------------*/
 CTerminalUi::CTerminalUi(NLgc::ANoiApp app) {
-    NMsc::CLogger::Log("CTerminalUI constructor. app=%", app.get());
+    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTerminalUI constructor. app=%", app.get());
     m_windowManager = std::make_shared<CWindowManager>(NUi::DrawingPolicy::DRAW_ALL, app);
     m_toneState.insert(m_toneState.begin(), ControlInput::_NOTE_LAST - ControlInput::_NOTE_FIRST, true);
 }

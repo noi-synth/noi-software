@@ -1,26 +1,27 @@
-all:
+all: noi
+	
+
+noi:
 	scons -Q -j 8
+
 clean:
 	scons -c -j 8
 	rm -rf doc
 
-run:
-	scons -Q -j 8
+run: noi
 	./bin/noi 2>log.log
 
 rebuild:
 	scons -c
 	scons -Q -j 8
 
-debug:
-	scons -Q -j 8
+debug: noi
 	./bin/noi 2>log.log
-	cat log.log | less
+	cat log.log | less -R
 
-vlg:
-	scons -Q -j 8
+vlg: noi
 	valgrind ./bin/noi 2>log.log
-	cat log.log | less
+	cat log.log | less -R
 
 fixterm:
 	stty sane

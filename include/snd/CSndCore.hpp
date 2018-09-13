@@ -11,6 +11,7 @@
 #include "CMidiMsg.hpp"
 #include "CChain.hpp"
 #include "CAudioDevice.hpp"
+#include "CTrackManager.hpp"
 
 using NMsc::CLocklessQue;
 
@@ -61,6 +62,8 @@ namespace NSnd {
         bool m_shouldClearActiveCHains; //todo
         AChain m_selectedCHain;
         AAudioDevice m_audioDevice;
+
+        ATrackManager m_trackManager;
     };
 
     typedef std::shared_ptr<CSndCore> ASndCore;

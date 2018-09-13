@@ -63,7 +63,7 @@ CInstrSimpleOsc::CSimpleOscVoice::CSimpleOscVoice(CInstrument &instrument, NSnd:
         }
 
         waveTablesInitialized = true;
-        NMsc::CLogger::Log("CSimpleOscVoice tables initialized.");
+        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice tables initialized.");
     }
 }
 
