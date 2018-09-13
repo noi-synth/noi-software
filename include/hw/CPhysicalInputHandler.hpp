@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CPHYSICALINPUTHANDLER_HPP
 
 #include <vector>
+#include <functional>
 #include "../config.hpp"
 #include "CI2CGpioExtenders.hpp"
 #include "../snd/CMidiMsg.hpp"
