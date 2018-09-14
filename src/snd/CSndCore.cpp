@@ -106,6 +106,9 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
 
 //TODO
 
-
+/*----------------------------------------------------------------------*/
+int CSndCore::GetLastAudioFrameLength() {
+    return (m_audioDevice ? ((int) m_audioDevice->m_LastFrameSize) : -1);
+}
 
 

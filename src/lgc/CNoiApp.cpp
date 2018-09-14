@@ -60,3 +60,8 @@ bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
     }
     return m_state.m_soundCore->ReciveMidiMsg(message);
 }
+
+/*----------------------------------------------------------------------*/
+int CNoiApp::GetAudioDeviceBufferLen() {
+    return m_state.m_soundCore->GetLastAudioFrameLength();
+}

@@ -44,7 +44,7 @@ void CTerminalUi::UiThreadWorker() {
             m_windowManager->ProcessControlInput(input, inputType);
 
         m_windowManager->Update();
-
+        
         // Wait...
         timespec waitingTime;
         waitingTime.tv_sec = 0;

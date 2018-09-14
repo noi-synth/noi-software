@@ -45,6 +45,8 @@ namespace NSnd {
 
         bool AudioDeviceStop();
 
+        int GetLastAudioFrameLength();
+
     private:
 
         int AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *outputBuffer,

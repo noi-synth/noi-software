@@ -24,6 +24,8 @@ namespace NLgc {
 
         bool SendMidiMessage(NSnd::CMidiMsg message);
 
+        int GetAudioDeviceBufferLen();
+
     private:
         CAppState m_state;
     };

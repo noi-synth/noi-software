@@ -142,6 +142,8 @@ void CWindowManager::RequestRedraw() {
 
 /*----------------------------------------------------------------------*/
 void CWindowManager::Update() {
+    if (m_mainWindow)
+        m_mainWindow->Update();
     for (auto &&window : m_windows) {
         window->Update();
     }

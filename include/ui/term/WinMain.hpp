@@ -17,10 +17,13 @@ namespace NUi {
 
             virtual void Draw() override;
 
+            void Update() override;
+
             void Init() override;
 
         private:
             NLgc::ANoiApp m_app;
+            int m_lastFrameBufferLength;
         };
     }
 

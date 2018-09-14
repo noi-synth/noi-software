@@ -77,6 +77,7 @@ int CAudioDevicePA::InnerCallback(const void *inputBuffer, void *outputBuffer, u
 /*----------------------------------------------------------------------*/
 int CAudioDevicePA::InnerCallbackMethod(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                                         const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags) {
+    m_LastFrameSize = framesPerBuffer;
     if (m_callback)
 
         return m_callback((SND_DATA_TYPE *) inputBuffer, (SND_DATA_TYPE *) outputBuffer, framesPerBuffer);
