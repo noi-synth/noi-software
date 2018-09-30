@@ -45,7 +45,22 @@ namespace NSnd {
 
         bool AudioDeviceStop();
 
-        int GetLastAudioFrameLength();
+        bool TrackRecordingStart();
+
+        bool TrackRecordingStop();
+
+        bool IsRecording();
+
+        bool TrackPlaybackStart();
+
+        bool TrackPlaybackStop();
+
+        bool IsPlaying();
+
+        uint32_t TrackGetPosition();
+
+        bool TrackSetPosition(uint32_t position);
+
 
     private:
 
@@ -62,8 +77,14 @@ namespace NSnd {
         CLocklessQue<AChain> m_newSelectedChain;
         std::set<AChain> m_activeChains;
         bool m_shouldClearActiveCHains; //todo
-        AChain m_selectedCHain;
+        AChain m_selectedChain;
         AAudioDevice m_audioDevice;
+
+        int m_bpm;
+        bool m_metronomeEnabled;
+
+        /// Temporary buffer for audio callback
+        SND_DATA_TYPE m_buffer[INTERNAL_BUFFERS_LEN];
 
         ATrackManager m_trackManager;
     };

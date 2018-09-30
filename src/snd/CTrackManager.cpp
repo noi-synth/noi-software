@@ -4,6 +4,7 @@
 
 #include "../../include/snd/CTrackManager.hpp"
 #include "../../include/msc/CMaintainer.hpp"
+#include "../../include/msc/CLogger.hpp"
 
 using namespace NSnd;
 
@@ -20,7 +21,7 @@ CTrackManager::~CTrackManager() {
 }
 
 /*----------------------------------------------------------------------*/
-void CTrackManager::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, int len) {
+void CTrackManager::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len) {
     if (m_isPlaying && m_trackLock.TryLockBlue()) {
 
         for (const auto &track : m_tracks) {
@@ -30,6 +31,7 @@ void CTrackManager::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, i
         m_playbackPosition += len;
         m_trackLock.Unlock();
     } else {
+        NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrackManager: playback failed to lock the lock.");
         // TODO log warning
     }
 }
@@ -161,3 +163,50 @@ bool CTrackManager::StopPlayback() {
 uint32_t CTrack::PositionToSampleNumber(uint32_t position) {
 
 }
+
+/*----------------------------------------------------------------------*/
+
+bool CTrackManager::IsRecording() {
+    return m_isRecording;
+}
+
+/*----------------------------------------------------------------------*/
+
+bool CTrackManager::IsPlaying() {
+    return m_isPlaying;
+}
+
+/*----------------------------------------------------------------------*/
+bool CTrackManager::SetPlaybackPosition(uint32_t position) {
+    if (m_trackLock.TryLockBlue()) {
+
+        m_playbackPosition = position;
+        for (auto &&track : m_tracks) {
+            track->SetPosition(position);
+        }
+
+        m_trackLock.Unlock();
+        return true;
+    }
+
+    return false;
+}
+
+/*----------------------------------------------------------------------*/
+uint32_t CTrackManager::GetPlaybackPosition() {
+    return m_playbackPosition;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,6 +5,7 @@
 #ifndef NOI_SOFTWARE_CTRACK_HPP
 #define NOI_SOFTWARE_CTRACK_HPP
 
+#include <functional>
 #include <memory>
 #include <vector>
 #include "../msc/CTeamLock.hpp"
@@ -18,7 +19,7 @@ namespace NSnd {
 
         ~CTrack();
 
-        void ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, int len);
+        void ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len);
 
         void SetPosition(uint32_t position); // clears undo
         void ClearUndo(); // clears undo :)

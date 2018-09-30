@@ -23,7 +23,8 @@ namespace NUi {
 
         private:
             NLgc::ANoiApp m_app;
-            int m_lastFrameBufferLength;
+            int m_frameBufferLength;
+            int m_position;
         };
     }
 

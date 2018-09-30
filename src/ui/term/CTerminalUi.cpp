@@ -44,7 +44,10 @@ void CTerminalUi::UiThreadWorker() {
             m_windowManager->ProcessControlInput(input, inputType);
 
         m_windowManager->Update();
-        
+
+        NGfx::CNcurses *gfx = NGfx::CNcurses::GetInstance();
+        gfx->Update();
+
         // Wait...
         timespec waitingTime;
         waitingTime.tv_sec = 0;

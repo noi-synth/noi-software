@@ -17,11 +17,11 @@ rebuild:
 
 debug: noi
 	./bin/noi 2>log.log
-	cat log.log | less -R
+	less -R log.log
 
 vlg: noi
 	valgrind ./bin/noi 2>log.log
-	cat log.log | less -R
+	less -R log.log
 
 fixterm:
 	stty sane

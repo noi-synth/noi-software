@@ -2,14 +2,25 @@
 // Created by ddl_blue on 7.4.18.
 //
 
+#include <cstring>
 #include "../../include/snd/CSndCore.hpp"
 #include "../../include/msc/CLogger.hpp"
 
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CSndCore::CSndCore() {
+CSndCore::CSndCore() : m_bpm(0), m_metronomeEnabled(true) {
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSndCore constructor");
+
+    m_trackManager = std::make_shared<CTrackManager>();
+    ATrack firstTrack;
+
+    // todo this probably is not the best idea...
+    while (!firstTrack)
+        firstTrack = m_trackManager->CreateTrack();
+
+
+
 
 }
 
@@ -74,7 +85,7 @@ void CSndCore::Panic() {
     AudioDeviceStop();
     m_newSelectedChain.Clear();
     m_activeChains.clear();
-    m_selectedCHain.reset();
+    m_selectedChain.reset();
 }
 
 /*----------------------------------------------------------------------*/
@@ -92,23 +103,77 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
     //todo active chains , proper deletion
 
     while (!m_newSelectedChain.Empty())
-        m_selectedCHain = m_newSelectedChain.Pop();
+        m_selectedChain = m_newSelectedChain.Pop();
 
-    if (m_selectedCHain) {
+    if (m_selectedChain) {
         while (!m_midiMsgQue.Empty())
-            m_selectedCHain->ReciveMidiMsg(m_midiMsgQue.Pop());
+            m_selectedChain->ReciveMidiMsg(m_midiMsgQue.Pop());
 
-        return m_selectedCHain->ProcessBuffer(inputBuffer, outputBuffer, sampleCnt);
+        // todo process all the active chains
+        int ret = m_selectedChain->ProcessBuffer(inputBuffer, outputBuffer, sampleCnt);
     }
+
+    // Metronome
+    if (m_metronomeEnabled && m_trackManager->IsPlaying()) {
+        const int bpmModulo = SAMPLE_RATE * 60 / m_bpm;
+        int positionInBeat = m_trackManager->GetPlaybackPosition() % bpmModulo;
+
+        // todo do this properly
+        if (positionInBeat < 1000) {
+            for (unsigned int i = 0; i < sampleCnt * 2 && i < 10000; ++i) {
+                outputBuffer[i] += (i & 512) - 0.5;
+            }
+        }
+    }
+
+    //memset(outputBuffer, 0, sampleCnt<<1);
+    memcpy(m_buffer, outputBuffer, sampleCnt << 1);
+    m_trackManager->ProcessBuffer(m_buffer, outputBuffer, sampleCnt);
+
 
     return 0; //todo what should I return here?
 }
 
-//TODO
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackRecordingStart() {
+    return m_trackManager->StartRecording();
+}
 
 /*----------------------------------------------------------------------*/
-int CSndCore::GetLastAudioFrameLength() {
-    return (m_audioDevice ? ((int) m_audioDevice->m_LastFrameSize) : -1);
+bool CSndCore::TrackRecordingStop() {
+    return m_trackManager->StopRecording();
 }
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::IsRecording() {
+    return m_trackManager->IsRecording();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackPlaybackStart() {
+    return m_trackManager->StartPlayback();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackPlaybackStop() {
+    return m_trackManager->StopPlayback();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::IsPlaying() {
+    return m_trackManager->IsPlaying();
+}
+
+/*----------------------------------------------------------------------*/
+uint32_t CSndCore::TrackGetPosition() {
+    return m_trackManager->GetPlaybackPosition();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackSetPosition(uint32_t position) {
+    return m_trackManager->SetPlaybackPosition(position);
+}
+
+//TODO
 
 

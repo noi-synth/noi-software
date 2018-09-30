@@ -25,7 +25,6 @@ namespace NSnd {
         virtual bool
         BindCallback(const std::function<int(const SND_DATA_TYPE *, SND_DATA_TYPE *, unsigned long)> &callback) = 0;
 
-        std::atomic_int m_LastFrameSize;
     };
 
     typedef std::shared_ptr<CAudioDevice> AAudioDevice;

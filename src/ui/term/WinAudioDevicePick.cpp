@@ -69,8 +69,6 @@ void WinAudioDevicePick::Draw() {
         std::snprintf(bff, BUFF_LEN, "%s [%lf]", dev.m_name.c_str(), dev.m_latency);
         gfx->DrawText(2, devDispY + i++, bff, i == m_selectedDevice ? Color::WHITE_BLUE : Color::BLACK_BLUE);
     }
-
-    gfx->Update();
 }
 
 void WinAudioDevicePick::Init() {

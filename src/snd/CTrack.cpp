@@ -5,6 +5,7 @@
 #include "../../include/snd/CTrack.hpp"
 #include "../../include/msc/CMaintainer.hpp"
 #include "../../include/msc/Common.hpp"
+#include "../../include/msc/CLogger.hpp"
 
 using namespace NSnd;
 
@@ -50,8 +51,10 @@ CTrack::~CTrack() {
 }
 
 /*----------------------------------------------------------------------*/
-void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, int len) {
+void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len) {
     if (m_recordingManipulationLock.TryLockRed()) {
+
+        // todo optimise
 
         // play
 
@@ -97,17 +100,19 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, int len)
 //                if (m_trackData.size()<sampleCursor-2)
 //                    m_trackData.push_back(CTrackSlice::GetNewSlice());
 
-                SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
-                for (int i = 0; i < limit; ++i) {
-                    // L
-                    buffer[copyCursor] = sliceBuffer[offsetCursor << 1] * m_volume;
+                if (m_trackData.size() >= sampleCursor) {
+                    SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
+                    for (int i = 0; i < limit; ++i) {
+                        // L
+                        buffer[copyCursor] = sliceBuffer[offsetCursor << 1] * m_volume;
 //                    sliceBuffer[offsetCursor<<1] += input[copyCursor++];
 
-                    // R
-                    buffer[copyCursor] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
+                        // R
+                        buffer[copyCursor] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
 //                    sliceBuffer[(offsetCursor<<1)+1] += input[copyCursor++];
 
-                    offsetCursor += 1;
+                        offsetCursor += 1;
+                    }
                 }
 // todo undo
                 m_playbackPosition += limit;
@@ -120,8 +125,11 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, int len)
         if (m_isRecording) {
             if (!m_recordingEmergencyLen) {
                 // todo emergency record
+                NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrack: Emergency recording not implemented yet");
             } else {
-                // todo log fail
+                NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+                                   "CTrack: Recording slice failed. Emergency buffer is already full.");
+                // todo log fail (or just add more to the buffer?)
             }
         }
     }

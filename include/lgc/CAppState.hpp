@@ -16,7 +16,9 @@ namespace NLgc {
 
         // Serialized
         std::vector<NSnd::AChain> m_chains;
-
+        std::vector<NSnd::ATrack> m_tracks;
+        // Track BPM
+        int m_bpm;
 
         // Not serialized
         //NSnd::AInstrument m_instrument;

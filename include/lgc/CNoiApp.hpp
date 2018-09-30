@@ -22,9 +22,27 @@ namespace NLgc {
 
         void AudioPanic();
 
-        bool SendMidiMessage(NSnd::CMidiMsg message);
+        bool IsRecording();
 
-        int GetAudioDeviceBufferLen();
+        bool RecordingStart();
+
+        bool RecordingStop();
+
+        bool PlaybackStart();
+
+        bool PlaybackStop();
+
+        bool PlaybackSetPosition(uint32_t position);
+
+        uint32_t PlaybackGetPosition();
+
+        bool IsPlaying();
+
+        bool BpmSet(int bpm);
+
+        bool MetronomeSet(bool enable);
+
+        bool SendMidiMessage(NSnd::CMidiMsg message);
 
     private:
         CAppState m_state;

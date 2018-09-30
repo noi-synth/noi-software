@@ -62,6 +62,56 @@ bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
 }
 
 /*----------------------------------------------------------------------*/
-int CNoiApp::GetAudioDeviceBufferLen() {
-    return m_state.m_soundCore->GetLastAudioFrameLength();
+bool CNoiApp::IsRecording() {
+    return m_state.m_soundCore->IsRecording();
 }
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::RecordingStart() {
+    return m_state.m_soundCore->TrackRecordingStart();
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::RecordingStop() {
+    return m_state.m_soundCore->TrackRecordingStop();
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::PlaybackStart() {
+    return m_state.m_soundCore->TrackPlaybackStart();
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::PlaybackStop() {
+    return m_state.m_soundCore->TrackPlaybackStop();
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::PlaybackSetPosition(uint32_t position) {
+    m_state.m_soundCore->TrackSetPosition(position);
+}
+
+/*----------------------------------------------------------------------*/
+uint32_t CNoiApp::PlaybackGetPosition() {
+    return m_state.m_soundCore->TrackGetPosition();
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::IsPlaying() {
+    return m_state.m_soundCore->IsPlaying();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -8,6 +8,7 @@
 #include "../../include/snd/CAudioDevicePA.hpp"
 #include "../../include/snd/CAudioDeviceInfo.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/msc/CDebugInfo.hpp"
 
 
 // Just fast implementation of some basic functionality to start with. Mostly just a copy from "paex_sine_c++.cpp" example from PortAudio library.
@@ -77,7 +78,9 @@ int CAudioDevicePA::InnerCallback(const void *inputBuffer, void *outputBuffer, u
 /*----------------------------------------------------------------------*/
 int CAudioDevicePA::InnerCallbackMethod(const void *inputBuffer, void *outputBuffer, unsigned long framesPerBuffer,
                                         const PaStreamCallbackTimeInfo *timeInfo, PaStreamCallbackFlags statusFlags) {
-    m_LastFrameSize = framesPerBuffer;
+#ifdef DEBUG
+    NMsc::CDebugInfo::m_lastAudioBufferLen = framesPerBuffer;
+#endif
     if (m_callback)
 
         return m_callback((SND_DATA_TYPE *) inputBuffer, (SND_DATA_TYPE *) outputBuffer, framesPerBuffer);

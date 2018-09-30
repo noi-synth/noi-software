@@ -1,4 +1,4 @@
-//
+//37:1
 // Created by ddl_blue on 2.8.18.
 //
 
@@ -6,13 +6,14 @@
 #include "../../../include/gfx/CNcurses.hpp"
 #include "../../../include/ui/term/WinAudioDevicePick.hpp"
 #include "../../../include/msc/CLogger.hpp"
+#include "../../../include/msc/CDebugInfo.hpp"
 
 using namespace NUi;
 using namespace NUi::NTerm;
 using Color = NGfx::CNcurses::ColorPair;
 
 /*----------------------------------------------------------------------*/
-WinMain::WinMain(NUi::WWindowManager windowManager) : CWindow(windowManager), m_lastFrameBufferLength(-1) {
+WinMain::WinMain(NUi::WWindowManager windowManager) : CWindow(windowManager), m_frameBufferLength(-1) {
     AWindowManager manager = windowManager.lock();
     m_app = manager->GetApp();
 }
@@ -29,10 +30,12 @@ void WinMain::Draw() {
 
     gfx->DrawTextCentered(1, "NOI synth", Color::WHITE_BLACK);
 
-    snprintf(buff, 64, "Last audio buff len: %d", m_lastFrameBufferLength);
+    snprintf(buff, 64, "Last audio buff len: %d", m_frameBufferLength);
     gfx->DrawText(1, 5, buff, Color::WHITE_BLACK);
 
-    gfx->Update();
+
+
+    //gfx->Update();
 }
 
 /*----------------------------------------------------------------------*/
@@ -72,9 +75,9 @@ void WinMain::Init() {
 
 /*----------------------------------------------------------------------*/
 void WinMain::Update() {
-    int audioBufferLen = m_app->GetAudioDeviceBufferLen();
-    if (audioBufferLen != m_lastFrameBufferLength) {
-        m_lastFrameBufferLength = audioBufferLen;
+    int audioBufferLen = NMsc::CDebugInfo::m_lastAudioBufferLen;
+    if (audioBufferLen != m_frameBufferLength) {
+        m_frameBufferLength = audioBufferLen;
         RequestRedraw();
     }
 }
