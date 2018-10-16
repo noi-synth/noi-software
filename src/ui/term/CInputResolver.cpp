@@ -14,7 +14,13 @@ using namespace NUi;
 ControlInput CInputResolver::ResolveInput(int input) {
     switch (input) {
 
-        // Arrows
+        // Playtback
+        case 's':
+            return ControlInput::BTN_PLAY;
+        case 'd':
+            return ControlInput::BTN_REC;
+
+            // Arrows
         case KEY_RIGHT:
             return ControlInput::BTN_RIGHT;
         case KEY_UP:
@@ -41,7 +47,6 @@ ControlInput CInputResolver::ResolveInput(int input) {
             return ControlInput::NOTE_2;
         case 't':
             return ControlInput::NOTE_3;
-
 
         default:
             return ControlInput::NONE;

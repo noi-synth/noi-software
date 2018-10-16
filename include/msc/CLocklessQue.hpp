@@ -30,7 +30,7 @@ namespace NMsc {
 
 
     private:
-        const static int BUFFER_SIZE = 16;
+        const static int BUFFER_SIZE = 256;
         std::atomic_int m_head, m_tail;
         T *m_buffer;
     };

@@ -18,10 +18,7 @@ namespace NPlg {
 
 
         protected:
-
-            uint32_t m_phase;
             bool m_on;
-
 
             class CSimpleOscVoice : public CInstrument::CInstrumentVoice {
             public:

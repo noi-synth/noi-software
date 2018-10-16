@@ -24,7 +24,7 @@ namespace NSnd {
     const int SCHED_POLICY = SCHED_FIFO;
 
     const int INSTRUMENT_VOICE_NUMBER = 12;
-    const int INTERNAL_BUFFERS_LEN = 1 << 9;
+    const int INTERNAL_BUFFERS_LEN = 1 << 12;
     //const int SCHED_PRIORITY_WORKER = ???
 
 }

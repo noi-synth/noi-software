@@ -9,10 +9,12 @@
 
 #include <iostream>
 #include <string>
+#include "Functions.hpp"
 
 static const bool COLOR_OUTPUT = true;
-static const std::string LINE_PREFIXES[] = {"#TMP> ", "#NOT> ", "#WRN> ", "#ERR> ", "#RTE> "};
-static const std::string TYPE_COLORS[] = {"\u001b[32m", "\u001b[36m", "\u001b[33m", "\u001b[31m", "\u001b[35m"};
+static const std::string LINE_PREFIXES[] = {"#TMP> ", "#NOT> ", "#WRN> ", "#ERR> ", "#RTE> ", "#RTW> "};
+static const std::string TYPE_COLORS[] = {"\u001b[32m", "\u001b[36m", "\u001b[33m", "\u001b[31m", "\u001b[35m",
+                                          "\u001b[33;1m"};
 static const std::string TYPE_COLOR_RESET = "\u001b[0m";
 
 namespace NMsc {
@@ -21,7 +23,8 @@ namespace NMsc {
         NOTE = 1,
         WARNING = 2,
         ERROR = 3,
-        RT_ERROR = 4
+        RT_ERROR = 4,
+        RT_WARNING = 5
     };
 
 
@@ -31,7 +34,7 @@ namespace NMsc {
         //TODO make logger thread safe
         static void Log(ELogType type, const char *format) {
             if (COLOR_OUTPUT)
-                std::cerr << TYPE_COLORS[type] << LINE_PREFIXES << format << TYPE_COLOR_RESET << std::endl;
+                std::cerr << TYPE_COLORS[type] << LINE_PREFIXES[type] << format << TYPE_COLOR_RESET << std::endl;
             else
                 std::cerr << LINE_PREFIXES << format << std::endl;
         }
@@ -44,7 +47,7 @@ namespace NMsc {
             else
                 std::cerr << LINE_PREFIXES[type];
 
-            Print(format, value, Fargs...);
+            NMsc::Functions::Print(std::cerr, format, value, Fargs...);
 
             if (COLOR_OUTPUT)
                 std::cerr << TYPE_COLORS[type] << std::endl;
@@ -55,7 +58,7 @@ namespace NMsc {
 
 
     private:
-        template<typename T, typename... Targs>
+        /*template<typename T, typename... Targs>
         static void Print(const char *format, T value, Targs... Fargs) {
             for (; *format != '\0'; format++) {
                 if (*format == '%') {
@@ -69,7 +72,7 @@ namespace NMsc {
 
         static void Print(const char *format) {
             std::cerr << format;
-        }
+        }*/
     };
 
 

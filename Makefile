@@ -20,7 +20,7 @@ debug: noi
 	less -R log.log
 
 vlg: noi
-	valgrind ./bin/noi 2>log.log
+	valgrind --suppressions=./vlgsuppress.conf ./bin/noi 2>log.log
 	less -R log.log
 
 fixterm:

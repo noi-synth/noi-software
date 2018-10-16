@@ -2,6 +2,7 @@
 // Created by ddl_blue on 30.7.18.
 //
 #include "../config.hpp"
+#include "../msc/Functions.hpp"
 
 #ifdef NCURSES_ENABLED
 
@@ -9,6 +10,7 @@
 #define NOI_SOFTWARE_CNCURSES_HPP
 
 #include <string>
+#include <sstream>
 
 namespace NGfx {
     class CNcurses {
@@ -46,6 +48,9 @@ namespace NGfx {
 
         unsigned int GetScreenHeight();
 
+        template<typename T, typename... Targs>
+        void
+        DrawTextFormated(unsigned int x, unsigned int y, ColorPair colors, const char *format, T value, Targs... Fargs);
 
     private:
         CNcurses();
@@ -54,7 +59,17 @@ namespace NGfx {
 
         static CNcurses *m_instance;
         unsigned int m_frameX, m_frameY, m_frameW, m_frameH;
+
     };
+
+    /*----------------------------------------------------------------------*/
+    template<typename T, typename... Targs>
+    void CNcurses::DrawTextFormated(unsigned int x, unsigned int y, NGfx::CNcurses::ColorPair colors,
+                                    const char *format, T value, Targs... Fargs) {
+        std::ostringstream stream;
+        NMsc::Functions::Print(stream, format, value, Fargs...);
+        DrawText(x, y, stream.str(), colors);
+    }
 }
 
 #endif //NOI_SOFTWARE_CNCURSES_HPP

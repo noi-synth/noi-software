@@ -5,11 +5,12 @@
 #include <cstring>
 #include "../../include/snd/CSndCore.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/msc/CDebugInfo.hpp"
 
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CSndCore::CSndCore() : m_bpm(0), m_metronomeEnabled(true) {
+CSndCore::CSndCore() : m_bpm(120), m_metronomeEnabled(true) {
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSndCore constructor");
 
     m_trackManager = std::make_shared<CTrackManager>();
@@ -19,9 +20,13 @@ CSndCore::CSndCore() : m_bpm(0), m_metronomeEnabled(true) {
     while (!firstTrack)
         firstTrack = m_trackManager->CreateTrack();
 
+    m_trackManager->SelectTrack(firstTrack);
 
+}
 
-
+/*----------------------------------------------------------------------*/
+CSndCore::~CSndCore() {
+    AudioDeviceStop();
 }
 
 /*----------------------------------------------------------------------*/
@@ -40,7 +45,6 @@ bool CSndCore::AudioDeviceSet(NSnd::AAudioDevice &device) {
         m_audioDevice.reset();
         return false;
     }
-
 }
 
 /*----------------------------------------------------------------------*/
@@ -99,19 +103,39 @@ void CSndCore::Panic() {
 /*----------------------------------------------------------------------*/
 int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *outputBuffer,
                                unsigned long sampleCnt) {
+
+    if (sampleCnt * 2 > INTERNAL_BUFFERS_LEN) {
+        NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+                           "NsdCore: Unreasonably big request of % samples came from the audio device.", sampleCnt);
+        return 666;
+    }
+
     //todo mixer
     //todo active chains , proper deletion
 
     while (!m_newSelectedChain.Empty())
         m_selectedChain = m_newSelectedChain.Pop();
 
+    // Send recived midi messages to the active instrument.
     if (m_selectedChain) {
         while (!m_midiMsgQue.Empty())
             m_selectedChain->ReciveMidiMsg(m_midiMsgQue.Pop());
 
         // todo process all the active chains
-        int ret = m_selectedChain->ProcessBuffer(inputBuffer, outputBuffer, sampleCnt);
+        int ret = m_selectedChain->ProcessBuffer(inputBuffer, m_buffer, sampleCnt);
+#ifdef DEBUG
+        NMsc::CDebugInfo::m_sndLastChainOutput = m_buffer[0];
+#endif
+    } else {
+        // No chain selected, generate a silence.
+        memset(m_buffer, 0, sampleCnt << 1 * sizeof(SND_DATA_TYPE));
     }
+
+
+    //memset(outputBuffer, 0, sampleCnt<<1);
+    //memcpy(m_buffer, outputBuffer, sampleCnt << 1);
+
+    m_trackManager->ProcessBuffer(m_buffer, outputBuffer, sampleCnt);
 
     // Metronome
     if (m_metronomeEnabled && m_trackManager->IsPlaying()) {
@@ -120,16 +144,19 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
 
         // todo do this properly
         if (positionInBeat < 1000) {
-            for (unsigned int i = 0; i < sampleCnt * 2 && i < 10000; ++i) {
-                outputBuffer[i] += (i & 512) - 0.5;
-            }
+            if (((m_trackManager->GetPlaybackPosition() / bpmModulo) % 4) == 0)
+                for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
+                    outputBuffer[i] += (positionInBeat * 2 + i & 64) - 0.25;
+            else
+                for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
+                    outputBuffer[i] += (positionInBeat * 2 + i & 128) - 0.25;
+
         }
     }
 
-    //memset(outputBuffer, 0, sampleCnt<<1);
-    memcpy(m_buffer, outputBuffer, sampleCnt << 1);
-    m_trackManager->ProcessBuffer(m_buffer, outputBuffer, sampleCnt);
-
+#ifdef DEBUG
+    NMsc::CDebugInfo::m_sndLastOutput = outputBuffer[0];
+#endif
 
     return 0; //todo what should I return here?
 }

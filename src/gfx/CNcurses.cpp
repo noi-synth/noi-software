@@ -100,7 +100,33 @@ void CNcurses::DrawEmptyWindow(NGfx::CNcurses::ColorPair colors) {
 /*----------------------------------------------------------------------*/
 void CNcurses::DrawText(unsigned int x, unsigned int y, std::string text, NGfx::CNcurses::ColorPair colors) {
     attron(COLOR_PAIR(colors));
-    mvaddstr(m_frameY + y, m_frameX + x, text.c_str());
+
+    // Move to local window coordinates
+    x += m_frameX;
+    y += m_frameY;
+
+    int lineX = x;
+
+    const char *t = text.c_str();
+    move(y, x);
+    for (; *t; ++t) {
+        // newline
+        if (*t == '\n') {
+            move(++y, x);
+            lineX = x;
+        }
+            // tab
+        else if (*t == '\t') {
+            lineX = ((lineX & (~0x7)) + 8);
+            move(y, lineX);
+        } else {
+            addch((chtype) *t);
+            ++lineX;
+        }
+    }
+
+
+    //mvaddstr(m_frameY + y, m_frameX + x, text.c_str());
     attroff(COLOR_PAIR(colors));
 }
 
@@ -113,7 +139,7 @@ void CNcurses::DrawTextCentered(unsigned int y, std::string text, NGfx::CNcurses
 
 /*----------------------------------------------------------------------*/
 void CNcurses::ClearScreen() {
-    clear();
+    erase();
 }
 
 /*----------------------------------------------------------------------*/
@@ -135,5 +161,6 @@ unsigned int CNcurses::GetScreenHeight() {
 int CNcurses::GetInput() {
     return getch();
 }
+
 
 #endif /* NCURSES_ENABLED */

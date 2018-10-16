@@ -22,6 +22,8 @@ namespace NSnd {
 
         CSndCore();
 
+        ~CSndCore();
+
         //TODO working thread
         //TODO Mixing
         //TODO tracks

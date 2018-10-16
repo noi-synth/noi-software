@@ -3,6 +3,7 @@
 //
 
 #include "../../include/msc/CMaintainer.hpp"
+#include "../../include/msc/CLogger.hpp"
 #include <chrono>
 #include <thread>
 
@@ -79,7 +80,6 @@ void CMaintainer::ThreadWorker() {
             for (const auto &task : m_tasks) {
                 task.second();
             }
-
         }
 
         std::this_thread::sleep_for(std::chrono::milliseconds(100));

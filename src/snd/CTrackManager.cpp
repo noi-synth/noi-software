@@ -2,9 +2,11 @@
 // Created by ddl_blue on 26.8.18.
 //
 
+#include <cstring>
 #include "../../include/snd/CTrackManager.hpp"
 #include "../../include/msc/CMaintainer.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/msc/CDebugInfo.hpp"
 
 using namespace NSnd;
 
@@ -22,17 +24,25 @@ CTrackManager::~CTrackManager() {
 
 /*----------------------------------------------------------------------*/
 void CTrackManager::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len) {
-    if (m_isPlaying && m_trackLock.TryLockBlue()) {
 
-        for (const auto &track : m_tracks) {
-            track->ProcessBuffer(input, buffer, len);
+#ifdef DEBUG
+    NMsc::CDebugInfo::m_sndPositionDisplacement = m_playbackPosition;
+#endif
+
+    std::memcpy(buffer, input, (len << 1) * sizeof(SND_DATA_TYPE));
+    if (m_isPlaying) {
+        if (m_trackLock.TryLockBlue()) {
+//            memset(buffer, 0, (len<<1) * sizeof(SND_DATA_TYPE));
+            for (const auto &track : m_tracks) {
+                track->ProcessBuffer(input, buffer, len);
+            }
+
+            m_playbackPosition += len;
+            m_trackLock.Unlock();
+        } else {
+            NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrackManager: playback failed to lock the lock.");
+            // TODO log warning
         }
-
-        m_playbackPosition += len;
-        m_trackLock.Unlock();
-    } else {
-        NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrackManager: playback failed to lock the lock.");
-        // TODO log warning
     }
 }
 
@@ -118,6 +128,9 @@ bool CTrackManager::UndoRecording() {
 
 /*----------------------------------------------------------------------*/
 bool CTrackManager::StartRecording() {
+    if (m_isRecording)
+        return true;
+
     StartPlayback();
     m_isRecording = true;
 
@@ -128,11 +141,19 @@ bool CTrackManager::StartRecording() {
         m_trackLock.Unlock();
     }
 
+    if (m_selectedTrack)
+        m_selectedTrack->StartRecording();
+
+//    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrackManager: Recording started. Selected track = %", m_selectedTrack.get());
+
     return true; // todo change return type to void?
 }
 
 /*----------------------------------------------------------------------*/
 bool CTrackManager::StopRecording() {
+    if (!m_isRecording)
+        return true;
+
     m_isRecording = false;
     if (m_selectedTrack)
         m_selectedTrack->StopRecording();
@@ -141,6 +162,9 @@ bool CTrackManager::StopRecording() {
 
 /*----------------------------------------------------------------------*/
 bool CTrackManager::StartPlayback() {
+    if (m_isPlaying)
+        return true;
+
     m_isPlaying = true;
 
     if (m_trackLock.TryLockBlue()) {
@@ -155,6 +179,9 @@ bool CTrackManager::StartPlayback() {
 
 /*----------------------------------------------------------------------*/
 bool CTrackManager::StopPlayback() {
+    if (!m_isPlaying)
+        return true;
+
     StopRecording();
     m_isPlaying = false;
 }

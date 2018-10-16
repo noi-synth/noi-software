@@ -2,24 +2,35 @@
 // Created by ddl_blue on 26.8.18.
 //
 
+#include <cmath>
 #include "../../include/snd/CTrack.hpp"
 #include "../../include/msc/CMaintainer.hpp"
 #include "../../include/msc/Common.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/msc/CDebugInfo.hpp"
 
 using namespace NSnd;
 
-static const unsigned int TRACK_REALLOCATION_THRESHOLD = 10;
-static const unsigned int TRACK_REALLOCATION_AMOUNT = 100;
+static const unsigned int TRACK_REALLOCATION_THRESHOLD = 32;
+static const unsigned int TRACK_REALLOCATION_RATIO = 2;
 
 
 /*----------------------------------------------------------------------*/
-CTrack::CTrack() : m_playbackPosition(0), m_volume(1), m_isRecording(false), m_recordingEmergencyLen(0),
+CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_volume(1), m_isRecording(false),
+                   m_recordingEmergencyLen(0),
                    m_undoRecordingStartSamplePosition(0) {
+
+    // Reserve some initial space in track (must be nonzero, otherwise multiplication by TRACK_REALLOCATION_RATIO would do nothing)
+    m_trackData.resize(8, nullptr);
+
+    // Start CTrackSlice allocation
+    CTrackSlice::StartAutomaticAllocation();
+
     m_workerId = NMsc::CMaintainer::GetInstance().RegisterTask([&]() {
         // nothing to do, no need to lock anything
+
         if (m_quedTrackManipulations.Empty() && !m_recordingEmergencyLen &&
-            (m_trackData.capacity() - m_trackData.size()) >= TRACK_REALLOCATION_THRESHOLD)
+            ((m_trackData.size() - m_farestPlaybackSample) > TRACK_REALLOCATION_THRESHOLD))
             return;
 
         // RT thread holds the lock, try it next time
@@ -27,8 +38,15 @@ CTrack::CTrack() : m_playbackPosition(0), m_volume(1), m_isRecording(false), m_r
             return;
 
         // Alloc more space
-        if ((m_trackData.capacity() - m_trackData.size()) < TRACK_REALLOCATION_THRESHOLD) {
-            m_trackData.reserve(m_trackData.capacity() + TRACK_REALLOCATION_AMOUNT);
+        // todo change this while to if - calculate the final multiplication instead of iterating
+        // todo this might also create an endless loop when RPI runs out of RAM, right?
+        while ((m_trackData.size() - m_farestPlaybackSample) < TRACK_REALLOCATION_THRESHOLD) {
+            m_trackData.resize(m_trackData.size() * TRACK_REALLOCATION_RATIO, nullptr);
+
+#ifdef DEBUG
+            NMsc::CDebugInfo::m_sndTrackSize = m_trackData.size();
+#endif
+
         }
 
         if (m_recordingEmergencyLen) {
@@ -52,87 +70,272 @@ CTrack::~CTrack() {
 
 /*----------------------------------------------------------------------*/
 void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len) {
+
+#ifdef DEBUG
+    NMsc::CDebugInfo::m_sndPositionDisplacement -= m_playbackPosition;
+#endif
+
+#ifdef DEBUG
+    float preBuffer = input[0];
+    for (int j = 0; j < 6; ++j) {
+        NMsc::CDebugInfo::m_sndLastTrackCall[j] = '-';
+    }
+#endif
+
+
+
     if (m_recordingManipulationLock.TryLockRed()) {
 
-        // todo optimise
+        // Cursor in buffers from arguments.
+        int copyCursor = 0;
 
-        // play
+        while (len > 0) {
 
-        // record
-        if (m_isRecording) {
-            int copyCursor = 0;
+#ifdef DEBUG
+            NMsc::CDebugInfo::m_sndLastTrackCall[0] = 'W';
+#endif
 
-            while (len > 0) {
-                int sampleCursor = PositionToSampleNumber(m_playbackPosition);
-                int offsetCursor = PositionToSampleOffset(m_playbackPosition);
+            // Cursors in track slices.
+            int sampleCursor = PositionToSampleNumber(m_playbackPosition);
+            int offsetCursor = PositionToSampleOffset(m_playbackPosition);
 
-                int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
-                // Make sure there is a slice for recording
-                if (m_trackData.size() < sampleCursor - 2)
-                    m_trackData.push_back(CTrackSlice::GetNewSlice());
+            // For extension of the track slice container by maintainer.
+            m_farestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
+                                         (uint32_t) m_farestPlaybackSample);
 
-                SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
-                for (int i = 0; i < limit; ++i) {
-                    // L
-                    buffer[copyCursor] = sliceBuffer[offsetCursor << 1] * m_volume;
-                    sliceBuffer[offsetCursor << 1] += input[copyCursor++];
+            // Maximum samples to be recorded/played in actual slice.
+            int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
 
-                    // R
-                    buffer[copyCursor] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
-                    sliceBuffer[(offsetCursor << 1) + 1] += input[copyCursor++];
-
-                    offsetCursor += 1;
+            // Make sure there is a slice for recording
+            if (m_isRecording) {
+                if (m_trackData.size() < sampleCursor + 1) {
+                    NMsc::CLogger::Log(NMsc::ELogType::RT_WARNING,
+                                       "CTrack: Recording - Track had to be resized in RT thread! Original size=%, sampleCursor=%",
+                                       m_trackData.size(), sampleCursor);
+                    m_trackData.resize(MAX(m_trackData.size(), sampleCursor + 32), nullptr);
                 }
 
-                m_playbackPosition += limit;
-                len -= limit;
+                // Fill missing track slice
+#ifdef DEBUG
+                NMsc::CDebugInfo::m_sndLastTrackCall[1] = '0';
+#endif
+                if (!m_trackData[sampleCursor]) {
+#ifdef DEBUG
+                    NMsc::CDebugInfo::m_sndLastTrackCall[1] = 'S';
+#endif
+                    CTrackSlice *newSlice = CTrackSlice::GetNewSlice();
+                    m_trackData[sampleCursor] = newSlice;
+                    // todo optimise - move this action out of RT thread?
+                    newSlice->ClearSample();
+                }
             }
 
-        } else {
-            int copyCursor = 0;
+#ifdef DEBUG
+            if (m_trackData.size() <= sampleCursor)
+                NMsc::CDebugInfo::m_sndLastTrackCall[0] = 'S';
+            else if (!m_trackData[sampleCursor])
+                NMsc::CDebugInfo::m_sndLastTrackCall[0] = 'D';
+#endif
 
-            while (len > 0) {
-                int sampleCursor = PositionToSampleNumber(m_playbackPosition);
-                int offsetCursor = PositionToSampleOffset(m_playbackPosition);
 
-                int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
-                // Make sure there is a slice for recording
-//                if (m_trackData.size()<sampleCursor-2)
-//                    m_trackData.push_back(CTrackSlice::GetNewSlice());
+            if (m_trackData.size() > sampleCursor && m_trackData[sampleCursor]) {
+                // Get a slice buffer
+                SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
+                if (!sliceBuffer)
+                    NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+                                       "CTrack: sliceBuffer at position % is null. trackData size= %, offsetCursor=%",
+                                       sampleCursor, m_trackData.size(), offsetCursor);
 
-                if (m_trackData.size() >= sampleCursor) {
-                    SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
+                if (m_isRecording) {
+                    // Record
+
+#ifdef DEBUG
+                    NMsc::CDebugInfo::m_sndLastTrackCall[2] = 'R';
+#endif
+
                     for (int i = 0; i < limit; ++i) {
                         // L
-                        buffer[copyCursor] = sliceBuffer[offsetCursor << 1] * m_volume;
-//                    sliceBuffer[offsetCursor<<1] += input[copyCursor++];
-
+                        buffer[copyCursor] += sliceBuffer[offsetCursor << 1] * m_volume;
+                        sliceBuffer[offsetCursor << 1] += input[copyCursor++];
                         // R
-                        buffer[copyCursor] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
-//                    sliceBuffer[(offsetCursor<<1)+1] += input[copyCursor++];
+                        buffer[copyCursor] += sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
+                        sliceBuffer[(offsetCursor << 1) + 1] += input[copyCursor++];
+
+#ifdef DEBUG
+                        NMsc::CDebugInfo::m_sndLastTrackCall[3] = fabs(buffer[copyCursor - 1]) > 0.01 ? '1' : '0';
+                        NMsc::CDebugInfo::m_sndLastTrackCall[4] =
+                                fabs(sliceBuffer[(offsetCursor << 1) + 1]) > 0.01 ? '1' : '0';
+#endif
+
+                        offsetCursor += 1;
+                    }
+                } else {
+                    // Play
+
+#ifdef DEBUG
+                    NMsc::CDebugInfo::m_sndLastTrackCall[2] = 'P';
+#endif
+
+                    for (int i = 0; i < limit; ++i) {
+                        // L
+                        buffer[copyCursor++] += sliceBuffer[offsetCursor << 1] * m_volume;
+                        // R
+                        buffer[copyCursor++] += sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
+
+#ifdef DEBUG
+                        NMsc::CDebugInfo::m_sndLastTrackCall[3] = fabs(buffer[copyCursor - 1]) > 0.01 ? '1' : '0';
+#endif
 
                         offsetCursor += 1;
                     }
                 }
-// todo undo
-                m_playbackPosition += limit;
-                len -= limit;
+            } else {
+                if (m_isRecording)
+                    NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+                                       "CTrack: SliceBuffer does not contain a slice at position %. trackData size= %, offsetCursor=%",
+                                       sampleCursor, m_trackData.size(), offsetCursor);
             }
+
+            // Progress in a track.
+            m_playbackPosition += limit;
+            len -= limit;
         }
 
         m_recordingManipulationLock.Unlock();
     } else {
         if (m_isRecording) {
             if (!m_recordingEmergencyLen) {
-                // todo emergency record
+// todo emergency record
                 NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrack: Emergency recording not implemented yet");
             } else {
                 NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
                                    "CTrack: Recording slice failed. Emergency buffer is already full.");
-                // todo log fail (or just add more to the buffer?)
+// todo log fail (or just add more to the buffer?)
             }
         }
     }
+
+#ifdef DEBUG
+    NMsc::CDebugInfo::m_sndLastTrackOutput = preBuffer - buffer[0];
+    NMsc::CDebugInfo::m_sndLastTrackManagerOutput = buffer[0];
+#endif
+
+
+    /* ------------------------- */
+//
+//    if (m_recordingManipulationLock.TryLockRed()) {
+//
+//        // todo optimise
+//        // record
+//        if (m_isRecording) {
+//            //NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Recording.... Sample %, offset %", PositionToSampleNumber(m_playbackPosition), PositionToSampleOffset(m_playbackPosition));
+//            int copyCursor = 0;
+//
+//            while (len > 0) {
+//                int sampleCursor = PositionToSampleNumber(m_playbackPosition);
+//                int offsetCursor = PositionToSampleOffset(m_playbackPosition);
+//
+//                int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
+//
+//
+//                // Make sure there is a slice for recording
+//                if (m_trackData.size() < sampleCursor + 2) {
+//                    NMsc::CLogger::Log(NMsc::ELogType::RT_WARNING,
+//                                       "CTrack: Recording - Track had to be resized in RT thread! Original size=%, sampleCursor=%",
+//                                       m_trackData.size(), sampleCursor);
+//                    m_trackData.resize(m_trackData.size() + 8, nullptr);
+//                }
+//
+//                // Fill missing track slice
+//                if (!m_trackData[sampleCursor]) {
+//                    CTrackSlice *newSlice = CTrackSlice::GetNewSlice();
+//                    m_trackData[sampleCursor] = newSlice;
+//                    // todo optimise - move this action out of RT thread?
+//                    newSlice->ClearSample();
+//                }
+//
+//                SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
+//
+//                if (!sliceBuffer)
+//                    NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+//                                       "CTrack: Recording: sliceBuffer at position % is null. trackData size= %, offsetCursor=%",
+//                                       sampleCursor, m_trackData.size(), offsetCursor);
+//
+//                for (int i = 0; i < limit; ++i) {
+//                    // L
+//                    buffer[copyCursor] = sliceBuffer[offsetCursor << 1] * m_volume;
+//                    sliceBuffer[offsetCursor << 1] += input[copyCursor++];
+//
+//                    // R
+//                    buffer[copyCursor] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
+//                    sliceBuffer[(offsetCursor << 1) + 1] += input[copyCursor++];
+//
+//                    offsetCursor += 1;
+//                }
+//
+//                m_playbackPosition += limit;
+//                len -= limit;
+//                m_farestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
+//                                             (uint32_t) m_farestPlaybackSample);
+//            }
+//
+//            // play
+//        } else {
+//            // NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Playing....");
+//            int copyCursor = 0;
+//
+//            while (len > 0) {
+//                int sampleCursor = PositionToSampleNumber(m_playbackPosition);
+//                int offsetCursor = PositionToSampleOffset(m_playbackPosition);
+//
+//                int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
+//                // Make sure there is a slice for recording
+////                if (m_trackData.size()<sampleCursor-2)
+////                    m_trackData.push_back(CTrackSlice::GetNewSlice());
+//
+//                if (m_trackData.size() > sampleCursor && m_trackData[sampleCursor]) {
+//
+//                    SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
+//                    if (!sliceBuffer)
+//                        NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+//                                           "CTrack: Playing: sliceBuffer at position % is null. trackData size= %, offsetCursor=%",
+//                                           sampleCursor, m_trackData.size(), offsetCursor);
+//
+//                    for (int i = 0; i < limit; ++i) {
+//                        // L
+//                        buffer[copyCursor++] = sliceBuffer[offsetCursor << 1] * m_volume;
+////                    sliceBuffer[offsetCursor<<1] += input[copyCursor++];
+//
+//                        // R
+//                        buffer[copyCursor++] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
+////                    sliceBuffer[(offsetCursor<<1)+1] += input[copyCursor++];
+//
+//                        offsetCursor += 1;
+//                    }
+//                }
+//// todo undo
+//                m_playbackPosition += limit;
+//                len -= limit;
+//                m_farestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
+//                                             (uint32_t) m_farestPlaybackSample);
+//            }
+//        }
+//
+//        m_recordingManipulationLock.Unlock();
+//    } else {
+//        if (m_isRecording) {
+//            if (!m_recordingEmergencyLen) {
+//                // todo emergency record
+//                NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrack: Emergency recording not implemented yet");
+//            } else {
+//                NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
+//                                   "CTrack: Recording slice failed. Emergency buffer is already full.");
+//                // todo log fail (or just add more to the buffer?)
+//            }
+//        }
+//    }
+
+
 }
 
 /*----------------------------------------------------------------------*/
@@ -153,6 +356,7 @@ void CTrack::ClearUndo() {
 /*----------------------------------------------------------------------*/
 void CTrack::StartRecording() {
     m_quedTrackManipulations.Push([&]() {
+//        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Recording started.");
         ClearUndoUnsafe();
         m_undoRecordingStartSamplePosition = PositionToSampleNumber(m_playbackPosition);
         m_isRecording = true;

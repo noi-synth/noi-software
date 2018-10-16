@@ -51,7 +51,7 @@ void CTerminalUi::UiThreadWorker() {
         // Wait...
         timespec waitingTime;
         waitingTime.tv_sec = 0;
-        waitingTime.tv_nsec = 33333333;
+        waitingTime.tv_nsec = 50000000;
         nanosleep(&waitingTime, nullptr);
     }
 

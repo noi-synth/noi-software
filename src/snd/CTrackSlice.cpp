@@ -2,8 +2,10 @@
 // Created by ddl_blue on 25.8.18.
 //
 
+#include <cstring>
 #include "../../include/snd/CTrackSlice.hpp"
 #include "../../include/msc/CMaintainer.hpp"
+#include "../../include/msc/CLogger.hpp"
 
 using namespace NSnd;
 
@@ -14,7 +16,7 @@ NMsc::CLocklessQue<CTrackSlice *> CTrackSlice::m_unusedSlices;
 SND_DATA_TYPE CTrackSlice::m_trashBuffer[NSnd::TRACK_SLICE_BUFFER_LEN];
 uint32_t CTrackSlice::m_uniqueIdCounter;
 std::map<uint32_t, CTrackSlice *> CTrackSlice::m_sliceDatabase;
-int CTrackSlice::m_workerId;
+int CTrackSlice::m_workerId = 0;
 
 /*----------------------------------------------------------------------*/
 CTrackSlice::~CTrackSlice() {
@@ -74,7 +76,7 @@ CTrackSlice *CTrackSlice::GetNewSlice() {
     }
 
     // Not enough pre-allocated slices. This should never happen.
-    // TODO RT error log, (is worker working?)
+    NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrackSlice: No free slices allocated. Is worker working?");
     slice = new CTrackSlice();
     slice->m_id = ++m_uniqueIdCounter;
     m_sliceDatabase[m_uniqueIdCounter] = slice;
@@ -103,28 +105,41 @@ void CTrackSlice::DeleteAllSlices() {
 /*----------------------------------------------------------------------*/
 CTrackSlice::CTrackSlice() {
     m_id = 0;
-    m_buffer = new SND_DATA_TYPE[NSnd::TRACK_SLICE_LEN];
+    m_buffer = new SND_DATA_TYPE[NSnd::TRACK_SLICE_BUFFER_LEN];
 }
 
 /*----------------------------------------------------------------------*/
 void CTrackSlice::StartAutomaticAllocation() {
-    if (m_workerId <= 0)
+    NMsc::CLogger::Log(NMsc::ELogType::NOTE, "CTrackSlice: Starting automatic allocation... (%)", m_workerId);
+    if (m_workerId)
         return;
 
     NMsc::CMaintainer &maintainer = NMsc::CMaintainer::GetInstance();
     m_workerId = maintainer.RegisterTask([&]() {
 
         // pre-alloc new slices
-        while (m_newUnusedSliceCnt < 15) {
-            m_newUnusedSlices.Push(new CTrackSlice());
-            ++m_newUnusedSliceCnt;
+        while (m_newUnusedSliceCnt < 64) {
+            for (int i = 0; i < 32; ++i) {
+                m_newUnusedSlices.Push(new CTrackSlice());
+                ++m_newUnusedSliceCnt;
+            }
+
+            // int sliceCnt = m_newUnusedSliceCnt;
+            // NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "New slice allocated. Count= %", sliceCnt);
         }
 
     });
+
+    NMsc::CLogger::Log(NMsc::ELogType::NOTE, "CTrackSlice: Automatic allocation started. (%)", m_workerId);
 }
 
 /*----------------------------------------------------------------------*/
 void CTrackSlice::StopAutomaticAllocation() {
     if (m_workerId > 0)
         NMsc::CMaintainer::GetInstance().UnregisterTask(m_workerId);
+}
+
+/*----------------------------------------------------------------------*/
+void CTrackSlice::ClearSample() {
+    std::memset(m_buffer, NSnd::TRACK_SLICE_LEN, sizeof(SND_DATA_TYPE));
 }

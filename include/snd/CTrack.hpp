@@ -41,7 +41,8 @@ namespace NSnd {
         void ClearUndoUnsafe();
 
         std::vector<CTrackSlice *> m_trackData;
-        uint32_t m_playbackPosition;
+        std::atomic_int m_playbackPosition;
+        std::atomic_int m_farestPlaybackSample;
 
         bool m_isRecording;
 

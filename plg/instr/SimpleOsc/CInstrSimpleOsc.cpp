@@ -12,7 +12,7 @@ using namespace NPlg::NInstr;
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CInstrSimpleOsc::CInstrSimpleOsc() : m_phase(0), m_on(false) {
+CInstrSimpleOsc::CInstrSimpleOsc() : m_on(false) {
     for (int i = 0; i < NSnd::INSTRUMENT_VOICE_NUMBER; ++i)
         m_voices.push_back(std::make_pair(ETones::NO_TONE,
                                           std::make_shared<CSimpleOscVoice>(CSimpleOscVoice(*this, ETones::NO_TONE))));
@@ -50,13 +50,13 @@ CInstrSimpleOsc::CInstrSimpleOsc() : m_phase(0), m_on(false) {
 
 /*##############################################################################*/
 
-bool CInstrSimpleOsc::CSimpleOscVoice::waveTablesInitialized;
+bool CInstrSimpleOsc::CSimpleOscVoice::waveTablesInitialized = false;
 const int CInstrSimpleOsc::CSimpleOscVoice::WAVETABLE_LEN;
 float CInstrSimpleOsc::CSimpleOscVoice::SIN_WAVE[CInstrSimpleOsc::CSimpleOscVoice::WAVETABLE_LEN];
 
 /*----------------------------------------------------------------------*/
 CInstrSimpleOsc::CSimpleOscVoice::CSimpleOscVoice(CInstrument &instrument, NSnd::ETones tone)
-        : CInstrument::CInstrumentVoice(instrument, tone) {
+        : CInstrument::CInstrumentVoice(instrument, tone), m_phase(0) {
     if (!waveTablesInitialized) {
         for (int i = 0; i < 512; ++i) {
             SIN_WAVE[i] = sin(i / (double) WAVETABLE_LEN * M_PI);
