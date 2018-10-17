@@ -19,11 +19,17 @@ namespace NSnd {
 
         ~CTrack();
 
-        void ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len);
+        void ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len, uint32_t position);
 
-        void SetPosition(uint32_t position); // clears undo
+        /***
+         * Clears undo and sets new position on next ProcessBuffer(...) call. Deferred call.
+         */
+        void SetPosition(); // clears undo
+
         void ClearUndo(); // clears undo :)
+
         void StartRecording(); // clears undo
+
         void StopRecording();
 
         void UndoRecording(); // clears undo
@@ -43,6 +49,8 @@ namespace NSnd {
         std::vector<CTrackSlice *> m_trackData;
         std::atomic_int m_playbackPosition;
         std::atomic_int m_farestPlaybackSample;
+        std::atomic_bool m_shouldUpdatePosition;
+
 
         bool m_isRecording;
 

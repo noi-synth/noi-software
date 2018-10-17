@@ -77,6 +77,7 @@ void CMaintainer::ThreadWorker() {
         // Locked part
         {
             std::lock_guard<std::mutex> guard(m_lock);
+            // Serve all the register tasks
             for (const auto &task : m_tasks) {
                 task.second();
             }

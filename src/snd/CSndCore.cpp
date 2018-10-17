@@ -131,10 +131,6 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
         memset(m_buffer, 0, sampleCnt << 1 * sizeof(SND_DATA_TYPE));
     }
 
-
-    //memset(outputBuffer, 0, sampleCnt<<1);
-    //memcpy(m_buffer, outputBuffer, sampleCnt << 1);
-
     m_trackManager->ProcessBuffer(m_buffer, outputBuffer, sampleCnt);
 
     // Metronome
@@ -146,10 +142,10 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
         if (positionInBeat < 1000) {
             if (((m_trackManager->GetPlaybackPosition() / bpmModulo) % 4) == 0)
                 for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
-                    outputBuffer[i] += (positionInBeat * 2 + i & 64) - 0.25;
+                    outputBuffer[i] += (positionInBeat * 2 + i & 64) * .25 - 0.125;
             else
                 for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
-                    outputBuffer[i] += (positionInBeat * 2 + i & 128) - 0.25;
+                    outputBuffer[i] += (positionInBeat * 2 + i & 128) * .25 - 0.125;
 
         }
     }

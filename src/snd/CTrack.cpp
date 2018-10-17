@@ -16,7 +16,8 @@ static const unsigned int TRACK_REALLOCATION_RATIO = 2;
 
 
 /*----------------------------------------------------------------------*/
-CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_volume(1), m_isRecording(false),
+CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_shouldUpdatePosition(false), m_volume(1),
+                   m_isRecording(false),
                    m_recordingEmergencyLen(0),
                    m_undoRecordingStartSamplePosition(0) {
 
@@ -28,7 +29,6 @@ CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_volume(1)
 
     m_workerId = NMsc::CMaintainer::GetInstance().RegisterTask([&]() {
         // nothing to do, no need to lock anything
-
         if (m_quedTrackManipulations.Empty() && !m_recordingEmergencyLen &&
             ((m_trackData.size() - m_farestPlaybackSample) > TRACK_REALLOCATION_THRESHOLD))
             return;
@@ -53,6 +53,7 @@ CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_volume(1)
             // todo emergency recording
         }
 
+        // Serve deferred calls.
         while (!m_quedTrackManipulations.Empty()) {
             // Pop function and CALL it.
             m_quedTrackManipulations.Pop()();
@@ -69,31 +70,32 @@ CTrack::~CTrack() {
 }
 
 /*----------------------------------------------------------------------*/
-void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len) {
+void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned long int len, std::uint32_t position) {
+
+    // todo optimise this
 
 #ifdef DEBUG
     NMsc::CDebugInfo::m_sndPositionDisplacement -= m_playbackPosition;
 #endif
 
-#ifdef DEBUG
-    float preBuffer = input[0];
-    for (int j = 0; j < 6; ++j) {
-        NMsc::CDebugInfo::m_sndLastTrackCall[j] = '-';
+    // Sync playback
+    if (m_shouldUpdatePosition) {
+        m_playbackPosition = position;
+
+        // If it's recording (this also means that recording just started), set beginning of the undo.
+        if (m_isRecording)
+            m_undoRecordingStartSamplePosition = PositionToSampleNumber(m_playbackPosition);
+
+        m_shouldUpdatePosition = false;
     }
-#endif
-
-
 
     if (m_recordingManipulationLock.TryLockRed()) {
 
         // Cursor in buffers from arguments.
         int copyCursor = 0;
 
+        // Serves each track slice separately, until whole buffer is processed.
         while (len > 0) {
-
-#ifdef DEBUG
-            NMsc::CDebugInfo::m_sndLastTrackCall[0] = 'W';
-#endif
 
             // Cursors in track slices.
             int sampleCursor = PositionToSampleNumber(m_playbackPosition);
@@ -116,27 +118,13 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
                 }
 
                 // Fill missing track slice
-#ifdef DEBUG
-                NMsc::CDebugInfo::m_sndLastTrackCall[1] = '0';
-#endif
                 if (!m_trackData[sampleCursor]) {
-#ifdef DEBUG
-                    NMsc::CDebugInfo::m_sndLastTrackCall[1] = 'S';
-#endif
                     CTrackSlice *newSlice = CTrackSlice::GetNewSlice();
                     m_trackData[sampleCursor] = newSlice;
                     // todo optimise - move this action out of RT thread?
                     newSlice->ClearSample();
                 }
             }
-
-#ifdef DEBUG
-            if (m_trackData.size() <= sampleCursor)
-                NMsc::CDebugInfo::m_sndLastTrackCall[0] = 'S';
-            else if (!m_trackData[sampleCursor])
-                NMsc::CDebugInfo::m_sndLastTrackCall[0] = 'D';
-#endif
-
 
             if (m_trackData.size() > sampleCursor && m_trackData[sampleCursor]) {
                 // Get a slice buffer
@@ -149,10 +137,6 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
                 if (m_isRecording) {
                     // Record
 
-#ifdef DEBUG
-                    NMsc::CDebugInfo::m_sndLastTrackCall[2] = 'R';
-#endif
-
                     for (int i = 0; i < limit; ++i) {
                         // L
                         buffer[copyCursor] += sliceBuffer[offsetCursor << 1] * m_volume;
@@ -161,30 +145,15 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
                         buffer[copyCursor] += sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
                         sliceBuffer[(offsetCursor << 1) + 1] += input[copyCursor++];
 
-#ifdef DEBUG
-                        NMsc::CDebugInfo::m_sndLastTrackCall[3] = fabs(buffer[copyCursor - 1]) > 0.01 ? '1' : '0';
-                        NMsc::CDebugInfo::m_sndLastTrackCall[4] =
-                                fabs(sliceBuffer[(offsetCursor << 1) + 1]) > 0.01 ? '1' : '0';
-#endif
-
                         offsetCursor += 1;
                     }
                 } else {
                     // Play
-
-#ifdef DEBUG
-                    NMsc::CDebugInfo::m_sndLastTrackCall[2] = 'P';
-#endif
-
                     for (int i = 0; i < limit; ++i) {
                         // L
                         buffer[copyCursor++] += sliceBuffer[offsetCursor << 1] * m_volume;
                         // R
                         buffer[copyCursor++] += sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
-
-#ifdef DEBUG
-                        NMsc::CDebugInfo::m_sndLastTrackCall[3] = fabs(buffer[copyCursor - 1]) > 0.01 ? '1' : '0';
-#endif
 
                         offsetCursor += 1;
                     }
@@ -215,134 +184,14 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
         }
     }
 
-#ifdef DEBUG
-    NMsc::CDebugInfo::m_sndLastTrackOutput = preBuffer - buffer[0];
-    NMsc::CDebugInfo::m_sndLastTrackManagerOutput = buffer[0];
-#endif
-
-
-    /* ------------------------- */
-//
-//    if (m_recordingManipulationLock.TryLockRed()) {
-//
-//        // todo optimise
-//        // record
-//        if (m_isRecording) {
-//            //NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Recording.... Sample %, offset %", PositionToSampleNumber(m_playbackPosition), PositionToSampleOffset(m_playbackPosition));
-//            int copyCursor = 0;
-//
-//            while (len > 0) {
-//                int sampleCursor = PositionToSampleNumber(m_playbackPosition);
-//                int offsetCursor = PositionToSampleOffset(m_playbackPosition);
-//
-//                int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
-//
-//
-//                // Make sure there is a slice for recording
-//                if (m_trackData.size() < sampleCursor + 2) {
-//                    NMsc::CLogger::Log(NMsc::ELogType::RT_WARNING,
-//                                       "CTrack: Recording - Track had to be resized in RT thread! Original size=%, sampleCursor=%",
-//                                       m_trackData.size(), sampleCursor);
-//                    m_trackData.resize(m_trackData.size() + 8, nullptr);
-//                }
-//
-//                // Fill missing track slice
-//                if (!m_trackData[sampleCursor]) {
-//                    CTrackSlice *newSlice = CTrackSlice::GetNewSlice();
-//                    m_trackData[sampleCursor] = newSlice;
-//                    // todo optimise - move this action out of RT thread?
-//                    newSlice->ClearSample();
-//                }
-//
-//                SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
-//
-//                if (!sliceBuffer)
-//                    NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
-//                                       "CTrack: Recording: sliceBuffer at position % is null. trackData size= %, offsetCursor=%",
-//                                       sampleCursor, m_trackData.size(), offsetCursor);
-//
-//                for (int i = 0; i < limit; ++i) {
-//                    // L
-//                    buffer[copyCursor] = sliceBuffer[offsetCursor << 1] * m_volume;
-//                    sliceBuffer[offsetCursor << 1] += input[copyCursor++];
-//
-//                    // R
-//                    buffer[copyCursor] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
-//                    sliceBuffer[(offsetCursor << 1) + 1] += input[copyCursor++];
-//
-//                    offsetCursor += 1;
-//                }
-//
-//                m_playbackPosition += limit;
-//                len -= limit;
-//                m_farestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
-//                                             (uint32_t) m_farestPlaybackSample);
-//            }
-//
-//            // play
-//        } else {
-//            // NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Playing....");
-//            int copyCursor = 0;
-//
-//            while (len > 0) {
-//                int sampleCursor = PositionToSampleNumber(m_playbackPosition);
-//                int offsetCursor = PositionToSampleOffset(m_playbackPosition);
-//
-//                int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
-//                // Make sure there is a slice for recording
-////                if (m_trackData.size()<sampleCursor-2)
-////                    m_trackData.push_back(CTrackSlice::GetNewSlice());
-//
-//                if (m_trackData.size() > sampleCursor && m_trackData[sampleCursor]) {
-//
-//                    SND_DATA_TYPE *sliceBuffer = m_trackData[sampleCursor]->GetBuffer();
-//                    if (!sliceBuffer)
-//                        NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
-//                                           "CTrack: Playing: sliceBuffer at position % is null. trackData size= %, offsetCursor=%",
-//                                           sampleCursor, m_trackData.size(), offsetCursor);
-//
-//                    for (int i = 0; i < limit; ++i) {
-//                        // L
-//                        buffer[copyCursor++] = sliceBuffer[offsetCursor << 1] * m_volume;
-////                    sliceBuffer[offsetCursor<<1] += input[copyCursor++];
-//
-//                        // R
-//                        buffer[copyCursor++] = sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
-////                    sliceBuffer[(offsetCursor<<1)+1] += input[copyCursor++];
-//
-//                        offsetCursor += 1;
-//                    }
-//                }
-//// todo undo
-//                m_playbackPosition += limit;
-//                len -= limit;
-//                m_farestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
-//                                             (uint32_t) m_farestPlaybackSample);
-//            }
-//        }
-//
-//        m_recordingManipulationLock.Unlock();
-//    } else {
-//        if (m_isRecording) {
-//            if (!m_recordingEmergencyLen) {
-//                // todo emergency record
-//                NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrack: Emergency recording not implemented yet");
-//            } else {
-//                NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
-//                                   "CTrack: Recording slice failed. Emergency buffer is already full.");
-//                // todo log fail (or just add more to the buffer?)
-//            }
-//        }
-//    }
-
 
 }
 
 /*----------------------------------------------------------------------*/
-void CTrack::SetPosition(uint32_t position) {
-    m_quedTrackManipulations.Push([&, position]() {
+void CTrack::SetPosition() {
+    m_quedTrackManipulations.Push([&]() {
         ClearUndoUnsafe();
-        m_playbackPosition = position;
+        m_shouldUpdatePosition = true;
     });
 }
 
@@ -358,7 +207,8 @@ void CTrack::StartRecording() {
     m_quedTrackManipulations.Push([&]() {
 //        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Recording started.");
         ClearUndoUnsafe();
-        m_undoRecordingStartSamplePosition = PositionToSampleNumber(m_playbackPosition);
+        m_shouldUpdatePosition = true;
+
         m_isRecording = true;
     });
 }

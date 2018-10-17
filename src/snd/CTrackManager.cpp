@@ -34,7 +34,7 @@ void CTrackManager::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, u
         if (m_trackLock.TryLockBlue()) {
 //            memset(buffer, 0, (len<<1) * sizeof(SND_DATA_TYPE));
             for (const auto &track : m_tracks) {
-                track->ProcessBuffer(input, buffer, len);
+                track->ProcessBuffer(input, buffer, len, m_playbackPosition);
             }
 
             m_playbackPosition += len;
@@ -53,7 +53,7 @@ bool CTrackManager::SelectTrack(const NSnd::ATrack &track) {
         if (m_selectedTrack)
             m_selectedTrack->StopRecording();
 
-        track->SetPosition(m_playbackPosition);
+        track->SetPosition();
         if (m_isRecording)
             track->StartRecording();
 
@@ -71,7 +71,7 @@ ATrack CTrackManager::CreateTrack() {
     if (m_trackLock.TryLockBlue()) {
         ATrack rtrn = std::make_shared<CTrack>();
 
-        rtrn->SetPosition(m_playbackPosition);
+        rtrn->SetPosition();
 
         m_tracks.insert(rtrn);
         m_trackLock.Unlock();
@@ -136,7 +136,7 @@ bool CTrackManager::StartRecording() {
 
     if (m_trackLock.TryLockBlue()) {
         for (const auto &track : m_tracks)
-            track->SetPosition(m_playbackPosition);
+            track->SetPosition();
 
         m_trackLock.Unlock();
     }
@@ -169,7 +169,7 @@ bool CTrackManager::StartPlayback() {
 
     if (m_trackLock.TryLockBlue()) {
         for (const auto &track : m_tracks)
-            track->SetPosition(m_playbackPosition);
+            track->SetPosition();
 
         m_trackLock.Unlock();
     }
@@ -209,7 +209,7 @@ bool CTrackManager::SetPlaybackPosition(uint32_t position) {
 
         m_playbackPosition = position;
         for (auto &&track : m_tracks) {
-            track->SetPosition(position);
+            track->SetPosition();
         }
 
         m_trackLock.Unlock();

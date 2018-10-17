@@ -46,16 +46,14 @@ void WinMain::Draw() {
                           playbackPosition
     );
 
-    gfx->DrawTextFormated(45, 5, Color::WHITE_BLACK,
-                          "DBG\n===\nLastOutput:\t%\nLastChainOutput:\t%\nLastTrackOutput:\t%\nLastTrackManagerOutput:\t%\nTrackWorkflow:\t%\nTrackSize:\t%\nPositionDisplacement:\t%",
-                          NMsc::CDebugInfo::m_sndLastOutput,
-                          NMsc::CDebugInfo::m_sndLastChainOutput,
-                          NMsc::CDebugInfo::m_sndLastTrackOutput,
-                          NMsc::CDebugInfo::m_sndLastTrackManagerOutput,
-                          NMsc::CDebugInfo::m_sndLastTrackCall,
-                          NMsc::CDebugInfo::m_sndTrackSize,
-                          NMsc::CDebugInfo::m_sndPositionDisplacement
-    );
+//    gfx->DrawTextFormated(45, 5, Color::WHITE_BLACK,
+//                          "DBG\n===\nLastOutput:\t%\nLastChainOutput:\t%\nLastTrackManagerOutput:\t%\nTrackSize:\t%\nPositionDisplacement:\t%",
+//                          NMsc::CDebugInfo::m_sndLastOutput,
+//                          NMsc::CDebugInfo::m_sndLastChainOutput,
+//                          NMsc::CDebugInfo::m_sndLastTrackManagerOutput,
+//                          NMsc::CDebugInfo::m_sndTrackSize,
+//                          NMsc::CDebugInfo::m_sndPositionDisplacement
+//    );
 
     //gfx->Update();
 }

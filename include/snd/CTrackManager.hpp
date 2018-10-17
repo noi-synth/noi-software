@@ -49,7 +49,7 @@ namespace NSnd {
 // todo mixer, chain volume vs active track volume
 // todo claiming lock just for iteration m_tracks may cause glitches, when changing position
     private:
-        uint32_t m_playbackPosition; // todo should be atomic? (SetPlaybackPosition vs ProcessBuffer)
+        std::atomic_int m_playbackPosition; // todo should be atomic? (SetPlaybackPosition vs ProcessBuffer)
         ATrack m_selectedTrack;
         // Red team = RW access (UI thread), Blue team = RO access (UI and RT thread)
         NMsc::CTeamLock m_trackLock;
