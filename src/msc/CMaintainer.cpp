@@ -13,6 +13,7 @@ CMaintainer *CMaintainer::m_instance;
 
 /*----------------------------------------------------------------------*/
 CMaintainer::CMaintainer() : m_shouldStop(false), m_uniqueIdCounter(1) {
+    // Make sure there is only one instance.
     if (m_instance)
         delete m_instance;
     m_instance = this;
@@ -51,9 +52,11 @@ void CMaintainer::Run() {
 /*----------------------------------------------------------------------*/
 int CMaintainer::RegisterTask(const std::function<void()> &task) {
     std::lock_guard<std::mutex> guard(m_lock);
-
     m_tasks[++m_uniqueIdCounter] = task;
+
+    // Run worker thread if not running.
     Run();
+
     return m_uniqueIdCounter;
 }
 
@@ -83,6 +86,10 @@ void CMaintainer::ThreadWorker() {
             }
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        // Another place for interrupting the loop.
+        if (m_shouldStop)
+            return;
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(WAIT_WOR_MILLISECONDS));
     }
 }

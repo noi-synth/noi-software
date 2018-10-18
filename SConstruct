@@ -20,9 +20,11 @@ def GetDirectoriesRecursive(directory = '.'):
 # ----------------------------------------------------------
 
 # --- CONSTANTS AND SETTINGS ---
-APP_NAME='noi'
-APP_DEST='bin/'
+APP_NAME = 'noi'
+APP_DEST = 'bin/'
+TEST_DEST = 'bin/tests/'
 SOURCE_SUBFOLDERS = ['src', 'plg']
+TEST_SUBFOLDERS = ['tst']
 INCLUDE_SUBFOLDERS = ['include', 'plg']
 libs = ["rt", "m", "asound", "pthread", "ncurses", "jack"]
 debug = True
@@ -38,7 +40,7 @@ env['ENV']['TERM'] = os.environ['TERM']
 if (debug):
     COMPILER_FLAGS.extend(["-O0", "-g"])
 else:
-    COMPILER_FLAGS.extend(["-O3"])
+    COMPILER_FLAGS.extend(["-O4"])
 env.Append( CCFLAGS=COMPILER_FLAGS )
 
 # --- Search for files and folders ---
@@ -47,11 +49,37 @@ for subfolder in SOURCE_SUBFOLDERS:
     sources.extend(GetFilesRecursive(subfolder, '*.cpp'))
 
 sources.extend(GetFilesRecursive("./lib", '*.a'))
+# Exclude main so it is not in test builds.
+sources.remove("src/main.cpp")
 
 includes = []
 for subfolder in INCLUDE_SUBFOLDERS:
     includes.extend(GetDirectoriesRecursive(subfolder))
 
+tests = []
+for subfolder in TEST_SUBFOLDERS:
+    tests.extend(GetFilesRecursive(subfolder, '*.cpp'))
+
+# print ("\n\nSOURCES")
+# print (sources)
+# print ("\n\nINCLUDES")
+# print ( includes)
+# print ("\n\nTESTS")
+# print (tests)
+# print ("\n\n")
+
 # --- Buid it! ---
-noi = env.Program(APP_DEST+APP_NAME, sources, LIBS=libs, CPPPATH=includes)
+
+# main app 
+noi = env.Program(APP_DEST+APP_NAME, sources + ["src/main.cpp"], LIBS=libs, CPPPATH=includes)
 Depends(noi, 'SConstruct')
+
+# tests
+for test in tests:
+	tstSources = sources + [test]
+	tstName = os.path.splitext(os.path.basename(test))[0]
+	env.Program(TEST_DEST + tstName, tstSources, LIBS=libs, CPPPATH=includes)
+
+
+
+

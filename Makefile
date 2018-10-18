@@ -23,5 +23,9 @@ vlg: noi
 	valgrind --suppressions=./vlgsuppress.conf ./bin/noi 2>log.log
 	less -R log.log
 
+tests: noi
+	./runTests.sh
+	less -R ./testResult.log
+
 fixterm:
 	stty sane
