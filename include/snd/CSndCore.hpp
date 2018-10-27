@@ -59,6 +59,8 @@ namespace NSnd {
 
         bool IsPlaying();
 
+        bool TrackRecordingUndo();
+
         uint32_t TrackGetPosition();
 
         bool TrackSetPosition(uint32_t position);

@@ -101,6 +101,10 @@ bool CNoiApp::IsPlaying() {
     return m_state.m_soundCore->IsPlaying();
 }
 
+/*----------------------------------------------------------------------*/
+bool CNoiApp::RecordingUndo() {
+    return m_state.m_soundCore->TrackRecordingUndo();
+}
 
 
 

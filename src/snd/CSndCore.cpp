@@ -27,6 +27,11 @@ CSndCore::CSndCore() : m_bpm(120), m_metronomeEnabled(true) {
 /*----------------------------------------------------------------------*/
 CSndCore::~CSndCore() {
     AudioDeviceStop();
+
+    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "NsdCore: Destructor.");
+
+    // Clear samples and slices.
+    CTrackSlice::DeleteAllSlices();
 }
 
 /*----------------------------------------------------------------------*/
@@ -142,10 +147,10 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
         if (positionInBeat < 1000) {
             if (((m_trackManager->GetPlaybackPosition() / bpmModulo) % 4) == 0)
                 for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
-                    outputBuffer[i] += (positionInBeat * 2 + i & 64) * .25 - 0.125;
+                    outputBuffer[i] += (positionInBeat * 2 + i & 64) / 130.0 * .25 - 0.125;
             else
                 for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
-                    outputBuffer[i] += (positionInBeat * 2 + i & 128) * .25 - 0.125;
+                    outputBuffer[i] += (positionInBeat * 2 + i & 128) / 130.0 * .25 - 0.125;
 
         }
     }
@@ -195,6 +200,11 @@ uint32_t CSndCore::TrackGetPosition() {
 /*----------------------------------------------------------------------*/
 bool CSndCore::TrackSetPosition(uint32_t position) {
     return m_trackManager->SetPlaybackPosition(position);
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackRecordingUndo() {
+    return m_trackManager->UndoRecording();
 }
 
 //TODO

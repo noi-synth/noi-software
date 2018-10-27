@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CLOCKLESSQUE_HPP
 
 #include <atomic>
+#include "CLogger.hpp"
 
 namespace NMsc {
 
@@ -30,7 +31,7 @@ namespace NMsc {
 
 
     private:
-        const static int BUFFER_SIZE = 256;
+        const static int BUFFER_SIZE = 1024;
         std::atomic_int m_head, m_tail;
         T *m_buffer;
     };
@@ -55,6 +56,8 @@ namespace NMsc {
             m_tail = m_tail < BUFFER_SIZE - 1 ? m_tail + 1 : 0;
             return true;
         }
+        // Todo check this in a code.
+        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CLocklsessQue: Push failed!");
         return false;
     }
 

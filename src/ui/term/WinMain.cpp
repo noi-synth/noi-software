@@ -7,6 +7,7 @@
 #include "../../../include/ui/term/WinAudioDevicePick.hpp"
 #include "../../../include/msc/CLogger.hpp"
 #include "../../../include/msc/CDebugInfo.hpp"
+#include "../../../include/ui/term/WinPickFromList.hpp"
 
 using namespace NUi;
 using namespace NUi::NTerm;
@@ -60,7 +61,11 @@ void WinMain::Draw() {
 
 /*----------------------------------------------------------------------*/
 NUi::ControlInput WinMain::ProcessInput(NUi::ControlInput control, NUi::ControlInputType type) {
-    AWindowManager wm;
+    AWindowManager wm = m_manager.lock();
+    if (!wm) {
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "WinMain: ProcessInput: Window manager could not be locked.");
+        return ControlInput::NONE;
+    }
 
     if (control > ControlInput::_NOTE_FIRST && control < ControlInput::_NOTE_LAST) {
         m_app->SendMidiMessage(NSnd::CMidiMsg(
@@ -73,9 +78,10 @@ NUi::ControlInput WinMain::ProcessInput(NUi::ControlInput control, NUi::ControlI
     if (type != NUi::ControlInputType::PRESS)
         return control;
 
+    WinPickFromList::items ActionList;
     switch (control) {
         case ControlInput::BTN_SHUTDOWN:
-            wm = m_manager.lock();
+
             if (wm)
                 wm->m_exiting = true;
             return ControlInput::NONE;
@@ -93,6 +99,20 @@ NUi::ControlInput WinMain::ProcessInput(NUi::ControlInput control, NUi::ControlI
                 m_app->RecordingStop();
             else
                 m_app->RecordingStart();
+            return ControlInput::NONE;
+
+        case ControlInput::BTN_NC_MENU:
+            ActionList.clear();
+            ActionList.push_back(std::make_pair("Undo recording", [=]() {
+                m_app->RecordingUndo();
+                wm->CloseTopWindowCallback();
+            }));
+            ActionList.push_back(
+                    std::make_pair("test2", [&]() { NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "test2"); }));
+            ActionList.push_back(
+                    std::make_pair("test3", [&]() { NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "test3"); }));
+            wm->OpenWindowCallback(std::make_shared<WinPickFromList>(wm, "Actions", ActionList, true));
+
             return ControlInput::NONE;
 
         default:

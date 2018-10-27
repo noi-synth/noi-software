@@ -24,7 +24,7 @@ namespace NSnd {
         /***
          * Clears undo and sets new position on next ProcessBuffer(...) call. Deferred call.
          */
-        void SetPosition(); // clears undo
+        void SetPosition();
 
         void ClearUndo(); // clears undo :)
 
@@ -48,7 +48,7 @@ namespace NSnd {
 
         std::vector<CTrackSlice *> m_trackData;
         std::atomic_int m_playbackPosition;
-        std::atomic_int m_farestPlaybackSample;
+        std::atomic_int m_farthestPlaybackSample;
         std::atomic_bool m_shouldUpdatePosition;
 
 
@@ -59,9 +59,11 @@ namespace NSnd {
         NMsc::CTeamLock m_recordingManipulationLock;
 
         std::vector<CTrackSlice *> m_undoRecording;
-        uint32_t m_undoRecordingStartSamplePosition;
+        std::atomic_int m_undoRecordingStartSamplePosition;
+        // Position 1 after the last sample.
+        std::atomic_int m_undoRecordingEndSamplePosition;
 
-        SND_DATA_TYPE m_recordingEmergencyBuffer[4096];
+        SND_DATA_TYPE m_recordingEmergencyBuffer[INTERNAL_BUFFERS_LEN * 3];
         uint32_t m_recordingEmergencyLen;
 
         int m_workerId;

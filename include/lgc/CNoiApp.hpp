@@ -28,6 +28,8 @@ namespace NLgc {
 
         bool RecordingStop();
 
+        bool RecordingUndo();
+
         bool PlaybackStart();
 
         bool PlaybackStop();

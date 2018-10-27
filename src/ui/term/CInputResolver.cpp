@@ -37,6 +37,9 @@ ControlInput CInputResolver::ResolveInput(int input) {
             return ControlInput::BTN_BACK;
         case 'q':
             return ControlInput::BTN_SHUTDOWN;
+        case 'a':
+            return ControlInput::BTN_NC_MENU;
+
 
             // Notes
         case 'w':

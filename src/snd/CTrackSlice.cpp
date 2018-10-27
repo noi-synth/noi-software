@@ -41,39 +41,36 @@ SND_DATA_TYPE *CTrackSlice::GetBuffer() {
 
 /*----------------------------------------------------------------------*/
 void CTrackSlice::Delete() {
-    if (m_sliceDatabase.find(m_id) != m_sliceDatabase.end()) {
-        m_unusedSlices.Push(this);
-        m_sliceDatabase.erase(m_id);
-        m_id = 0;
-    }
+    m_unusedSlices.Push(this);
 }
 
 /*----------------------------------------------------------------------*/
 CTrackSlice *CTrackSlice::GetSlice(int32_t id) {
-    return m_sliceDatabase[id];
+    if (m_sliceDatabase.find(id) != m_sliceDatabase.end())
+        return m_sliceDatabase[id];
+    else
+        return nullptr;
+
 }
 
 /*----------------------------------------------------------------------*/
 CTrackSlice *CTrackSlice::GetNewSlice() {
     CTrackSlice *slice = nullptr;
 
-    // Reuse slices
+    // Reuse deleted slices.
     if (!m_unusedSlices.Empty()) {
         slice = m_unusedSlices.Pop();
     }
 
-    // Pre-allocated slices
+    // New pre-allocated slices.
     if (!slice && !m_newUnusedSlices.Empty()) {
         slice = m_newUnusedSlices.Pop();
         --m_newUnusedSliceCnt;
     }
 
-    if (slice) {
-        slice->m_id = ++m_uniqueIdCounter;
-        // Register
-        m_sliceDatabase[m_uniqueIdCounter] = slice;
+    if (slice)
         return slice;
-    }
+
 
     // Not enough pre-allocated slices. This should never happen.
     NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR, "CTrackSlice: No free slices allocated. Is worker working?");
@@ -86,20 +83,37 @@ CTrackSlice *CTrackSlice::GetNewSlice() {
 /*----------------------------------------------------------------------*/
 void CTrackSlice::DeleteAllSlices() {
 
-    // Reserved unused buffers
-    while (!m_unusedSlices.Empty())
-        delete m_unusedSlices.Pop();
+    // Deleted buffers
+    m_unusedSlices.Clear();
+//    while (!m_unusedSlices.Empty())
+//        delete m_unusedSlices.Pop();
 
     // Pre-allocated buffers
-    while (!m_newUnusedSlices.Empty())
-        delete m_unusedSlices.Pop();
+    m_newUnusedSlices.Clear();
+//    while (!m_newUnusedSlices.Empty())
+//        delete m_newUnusedSlices.Pop();
     m_newUnusedSliceCnt = 0;
 
-    // Used buffers
-    for (const auto &slice : m_sliceDatabase) {
-        delete slice.second;
+    // All buffers
+    NMsc::CLogger::Log(NMsc::ELogType::NOTE, "CTrackSlice: Deleting all % slices.", m_sliceDatabase.size());
+
+    std::list<CTrackSlice *> allSlices;
+    for (auto &&slice : m_sliceDatabase) {
+        allSlices.push_back(slice.second);
     }
-    m_sliceDatabase.clear();
+
+    // Delete all the slices.
+    for (const auto &slice : allSlices) {
+        delete slice;
+    }
+
+    if (!m_sliceDatabase.empty()) {
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CTrackSlice: % slices left after DeleteAllSlices.",
+                           m_sliceDatabase.size());
+
+        m_sliceDatabase.clear();
+    }
+
 }
 
 /*----------------------------------------------------------------------*/
@@ -120,7 +134,12 @@ void CTrackSlice::StartAutomaticAllocation() {
         // pre-alloc new slices
         while (m_newUnusedSliceCnt < 64) {
             for (int i = 0; i < 32; ++i) {
-                m_newUnusedSlices.Push(new CTrackSlice());
+                CTrackSlice *slice = new CTrackSlice();
+                slice->m_id = ++m_uniqueIdCounter;
+                // Register
+                m_sliceDatabase[m_uniqueIdCounter] = slice;
+
+                m_newUnusedSlices.Push(slice);
                 ++m_newUnusedSliceCnt;
             }
 
@@ -142,4 +161,11 @@ void CTrackSlice::StopAutomaticAllocation() {
 /*----------------------------------------------------------------------*/
 void CTrackSlice::ClearSample() {
     std::memset(m_buffer, NSnd::TRACK_SLICE_LEN, sizeof(SND_DATA_TYPE));
+}
+
+/*----------------------------------------------------------------------*/
+CTrackSlice *CTrackSlice::Clone() {
+    CTrackSlice *rtrn = GetNewSlice();
+    memcpy(rtrn->m_buffer, m_buffer, sizeof(SND_DATA_TYPE) * NSnd::TRACK_SLICE_BUFFER_LEN);
+    return rtrn;
 }

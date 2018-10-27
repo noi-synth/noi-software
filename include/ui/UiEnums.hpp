@@ -39,6 +39,10 @@ namespace NUi {
 
         BTN_BACK, BTN_SHUTDOWN, BTN_OK,
 
+        // Special / nurses debug only.
+                BTN_NC_MENU,
+
+
         _BTN_LAST,
         NONE
     };

@@ -27,6 +27,8 @@ namespace NSnd {
 
         void ClearSample();
 
+        CTrackSlice *Clone();
+
         static CTrackSlice *GetSlice(int32_t id);
 
 

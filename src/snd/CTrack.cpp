@@ -16,13 +16,14 @@ static const unsigned int TRACK_REALLOCATION_RATIO = 2;
 
 
 /*----------------------------------------------------------------------*/
-CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_shouldUpdatePosition(false), m_volume(1),
+CTrack::CTrack() : m_playbackPosition(0), m_farthestPlaybackSample(0), m_shouldUpdatePosition(false), m_volume(1),
                    m_isRecording(false),
-                   m_recordingEmergencyLen(0),
-                   m_undoRecordingStartSamplePosition(0) {
+                   m_undoRecordingStartSamplePosition(0), m_undoRecordingEndSamplePosition(0),
+                   m_recordingEmergencyLen(0) {
 
     // Reserve some initial space in track (must be nonzero, otherwise multiplication by TRACK_REALLOCATION_RATIO would do nothing)
     m_trackData.resize(8, nullptr);
+    m_undoRecording.resize(8, nullptr);
 
     // Start CTrackSlice allocation
     CTrackSlice::StartAutomaticAllocation();
@@ -30,7 +31,9 @@ CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_shouldUpd
     m_workerId = NMsc::CMaintainer::GetInstance().RegisterTask([&]() {
         // nothing to do, no need to lock anything
         if (m_quedTrackManipulations.Empty() && !m_recordingEmergencyLen &&
-            ((m_trackData.size() - m_farestPlaybackSample) > TRACK_REALLOCATION_THRESHOLD))
+            ((m_trackData.size() - m_farthestPlaybackSample) > TRACK_REALLOCATION_THRESHOLD) &&
+            (m_undoRecording.size() - (m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition) >
+             TRACK_REALLOCATION_THRESHOLD))
             return;
 
         // RT thread holds the lock, try it next time
@@ -40,14 +43,18 @@ CTrack::CTrack() : m_playbackPosition(0), m_farestPlaybackSample(0), m_shouldUpd
         // Alloc more space
         // todo change this while to if - calculate the final multiplication instead of iterating
         // todo this might also create an endless loop when RPI runs out of RAM, right?
-        while ((m_trackData.size() - m_farestPlaybackSample) < TRACK_REALLOCATION_THRESHOLD) {
+        while ((m_trackData.size() - m_farthestPlaybackSample) <= TRACK_REALLOCATION_THRESHOLD)
             m_trackData.resize(m_trackData.size() * TRACK_REALLOCATION_RATIO, nullptr);
+
+        while (m_undoRecording.size() - (m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition) <=
+               TRACK_REALLOCATION_THRESHOLD)
+            m_undoRecording.resize(m_undoRecording.size() * TRACK_REALLOCATION_RATIO, nullptr);
 
 #ifdef DEBUG
             NMsc::CDebugInfo::m_sndTrackSize = m_trackData.size();
 #endif
 
-        }
+
 
         if (m_recordingEmergencyLen) {
             // todo emergency recording
@@ -83,9 +90,10 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
         m_playbackPosition = position;
 
         // If it's recording (this also means that recording just started), set beginning of the undo.
-        if (m_isRecording)
+        if (m_isRecording) {
             m_undoRecordingStartSamplePosition = PositionToSampleNumber(m_playbackPosition);
-
+            m_undoRecordingEndSamplePosition = m_undoRecordingStartSamplePosition + 1;
+        }
         m_shouldUpdatePosition = false;
     }
 
@@ -102,19 +110,51 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
             int offsetCursor = PositionToSampleOffset(m_playbackPosition);
 
             // For extension of the track slice container by maintainer.
-            m_farestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
-                                         (uint32_t) m_farestPlaybackSample);
+            m_farthestPlaybackSample = MAX(PositionToSampleNumber((uint32_t) m_playbackPosition),
+                                           (uint32_t) m_farthestPlaybackSample);
 
             // Maximum samples to be recorded/played in actual slice.
             int limit = MIN(len, TRACK_SLICE_LEN - offsetCursor);
 
-            // Make sure there is a slice for recording
+            // Make sure there is a slice for recording + undo.
             if (m_isRecording) {
                 if (m_trackData.size() < sampleCursor + 1) {
                     NMsc::CLogger::Log(NMsc::ELogType::RT_WARNING,
                                        "CTrack: Recording - Track had to be resized in RT thread! Original size=%, sampleCursor=%",
                                        m_trackData.size(), sampleCursor);
                     m_trackData.resize(MAX(m_trackData.size(), sampleCursor + 32), nullptr);
+                }
+
+                // Undo the slice if this is a first attempt to write to this slice.
+                if (!offsetCursor) {
+
+
+                    // Make sure there is enough space. It should be.
+                    if (m_undoRecording.size() <
+                        m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition + 1) {
+                        NMsc::CLogger::Log(NMsc::ELogType::RT_WARNING,
+                                           "CTrack: Recording - Undo buffer had to be resized in RT thread! Original size=%, requested size=%",
+                                           m_undoRecording.size(),
+                                           m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition);
+                        m_undoRecording.resize(MAX(m_undoRecording.size(), m_undoRecordingEndSamplePosition -
+                                                                           m_undoRecordingStartSamplePosition + 32),
+                                               nullptr);
+                    }
+
+                    // Save the copy of the slice.
+                    int slicePosition = sampleCursor - m_undoRecordingStartSamplePosition;
+                    if (m_undoRecordingEndSamplePosition != sampleCursor) {
+                        int tmp = m_undoRecordingEndSamplePosition;
+                        NMsc::CLogger::Log(NMsc::ELogType::RT_WARNING,
+                                           "CTrack: Recording - m_undoRecordingEndSamplePosition (%) != sampleCursor (%)!",
+                                           tmp, sampleCursor);
+                    }
+
+                    m_undoRecording[slicePosition] = m_trackData[sampleCursor] ? m_trackData[sampleCursor]->Clone()
+                                                                               : nullptr;
+                    m_undoRecordingEndSamplePosition = sampleCursor + 1;
+//                    int endUndo = m_undoRecordingEndSamplePosition;
+//                    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: offsetCursor = 0, m_undoRecordingEndSamplePosition set to %.", endUndo);
                 }
 
                 // Fill missing track slice
@@ -190,7 +230,9 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
 /*----------------------------------------------------------------------*/
 void CTrack::SetPosition() {
     m_quedTrackManipulations.Push([&]() {
-        ClearUndoUnsafe();
+//        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Set position.");
+        if (m_isRecording)
+            ClearUndoUnsafe();
         m_shouldUpdatePosition = true;
     });
 }
@@ -222,7 +264,30 @@ void CTrack::StopRecording() {
 
 /*----------------------------------------------------------------------*/
 void CTrack::UndoRecording() {
-    // todo
+    m_quedTrackManipulations.Push([&]() {
+        // todo do we want to undo while recording?
+        if (m_isRecording)
+            return;
+
+
+        int undoLen = m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition;
+
+        int tmp1 = m_undoRecordingStartSamplePosition;
+        int tmp2 = m_undoRecordingEndSamplePosition;
+
+//        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Undoing recording from % to % of length %.", tmp1, tmp2, undoLen);
+        for (int i = 0; i < undoLen; ++i) {
+            // Delete recorded slice.
+            if (m_trackData[m_undoRecordingStartSamplePosition])
+                m_trackData[m_undoRecordingStartSamplePosition]->Delete();
+            // Undo recording.
+            m_trackData[m_undoRecordingStartSamplePosition] = m_undoRecording[i];
+            m_undoRecording[i] = nullptr; // Might be a bit paranoid.
+            ++m_undoRecordingStartSamplePosition;
+        }
+
+        m_undoRecordingStartSamplePosition = m_undoRecordingEndSamplePosition = 0;
+    });
 }
 
 /*----------------------------------------------------------------------*/
@@ -242,11 +307,20 @@ uint32_t CTrack::SampleNumberOffsetToPosition(uint32_t sampleNumber, uint32_t sa
 
 /*----------------------------------------------------------------------*/
 void CTrack::ClearUndoUnsafe() {
-    for (const auto &undoSlice : m_undoRecording) {
-        undoSlice->Delete();
+    int undoStart = m_undoRecordingStartSamplePosition;
+    int undoEnd = m_undoRecordingEndSamplePosition;
+    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrack: Clearing undo from positions %-%.", undoStart, undoEnd);
+
+    // Delete all the slices.
+    int sliceCnt = m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition;
+    for (int i = 0; i < sliceCnt; ++i) {
+        if (m_undoRecording[i]) {
+            m_undoRecording[i]->Delete();
+            m_undoRecording[i] = nullptr; // Might be a bit paranoid.
+        }
     }
-    m_undoRecording.clear();
-    m_undoRecordingStartSamplePosition = 0;
+    m_undoRecordingStartSamplePosition = m_undoRecordingEndSamplePosition = 0;
+
 }
 
 
