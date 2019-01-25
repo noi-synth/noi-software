@@ -2,10 +2,10 @@ all: noi
 	
 
 noi:
-	scons -Q -j 8
+	scons -Q -j 4
 
 clean:
-	scons -c -j 8
+	scons -c -j 4
 	rm -rf doc
 
 run: noi
@@ -13,7 +13,7 @@ run: noi
 
 rebuild:
 	scons -c
-	scons -Q -j 8
+	scons -Q -j 4
 
 debug: noi
 	./bin/noi 2>log.log

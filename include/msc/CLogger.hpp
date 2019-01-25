@@ -12,6 +12,8 @@
 #include "Functions.hpp"
 
 static const bool COLOR_OUTPUT = true;
+
+// Prefixes and colors for log messages. Indexes depends on NMSc::ELogType.
 static const std::string LINE_PREFIXES[] = {"#TMP> ", "#NOT> ", "#WRN> ", "#ERR> ", "#RTE> ", "#RTW> "};
 static const std::string TYPE_COLORS[] = {"\u001b[32m", "\u001b[36m", "\u001b[33m", "\u001b[31m", "\u001b[35m",
                                           "\u001b[33;1m"};
@@ -19,7 +21,8 @@ static const std::string TYPE_COLOR_RESET = "\u001b[0m";
 
 namespace NMsc {
     enum ELogType {
-        TMP_DEBUG = 0,
+        // Numbers are important for log message prefix and color tables.
+                TMP_DEBUG = 0,
         NOTE = 1,
         WARNING = 2,
         ERROR = 3,

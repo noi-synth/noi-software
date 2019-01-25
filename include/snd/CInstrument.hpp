@@ -8,6 +8,7 @@
 #include "NSndConfig.hpp"
 #include "../msc/CLocklessQue.hpp"
 #include "CMidiMsg.hpp"
+#include "../lgc/CParameter.hpp"
 
 #ifndef NOI_SOFTWARE_CINSTRUMENT_HPP
 #define NOI_SOFTWARE_CINSTRUMENT_HPP
@@ -28,6 +29,8 @@ namespace NSnd {
         GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen);
 
         void ReciveMidiMsg(const CMidiMsg &msg);
+
+        void ReciveParameter(const NLgc::CParameter &parameter);
 
 
     protected:
@@ -57,6 +60,8 @@ namespace NSnd {
         };
 
         typedef std::shared_ptr<CInstrumentVoice> AInstrumentVoice;
+
+        NMsc::CLocklessQue<NLgc::CParameter> m_newParameters;
 
         std::list<CMidiMsg> m_newMidiMsg; //todo is list a good idea?
         uint32_t m_sambleFromTickCounter;
