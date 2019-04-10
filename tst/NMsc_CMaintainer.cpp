@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <unistd.h>
+#include <atomic>
 
 #include "../include/msc/CMaintainer.hpp"
 
@@ -14,7 +15,7 @@ int main(int argc, const char *argv[]) {
     NMsc::CMaintainer &maintainer = NMsc::CMaintainer::GetInstance();
     assert(&maintainer != nullptr);
 
-    std::atomic_int counter = 0;
+    std::atomic_int counter(0);
     auto counterTask = [&]() { ++counter; };
 
     int taskId = maintainer.RegisterTask(counterTask);

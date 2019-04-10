@@ -2,6 +2,7 @@
 // Created by ddl_blue on 5.5.18.
 //
 
+#include <functional>
 #include "../../include/config.hpp"
 
 #ifndef NO_RPI_HW
@@ -23,7 +24,7 @@ CI2cGpioExtenders::CI2cGpioExtenders(std::uint32_t i2cAddress, const std::functi
     m_i2cHandle = wiringPiI2CSetup(m_address);
 
     if (m_i2cHandle<0)
-        NMsc::CLogger::Log("I2C setup error.");
+        NMsc::CLogger::Log(NMsc::ELogType::WARNING, "I2C setup error.");
 
     // Set 4 pins as inputs
     wiringPiI2CWriteReg8(m_i2cHandle, 0x00, 0x0f);
@@ -46,7 +47,7 @@ void NHw::GpioExtenderCallbackFunction() {
     if (g_gpioExtenderHandler)
         g_gpioExtenderHandler->InterruptCallback();
     else
-        NMsc::CLogger::Log("I2C callback: No handler registered");
+        NMsc::CLogger::Log(NMsc::ELogType::WARNING, "I2C callback: No handler registered");
 }
 
 /*----------------------------------------------------------------------*/
@@ -62,8 +63,6 @@ void CI2cGpioExtenders::InterruptCallback() {
 
     if (diff && m_callback )
         m_callback(val, diff);
-    //else
-    //    std::cout << "Error. Diff=" << diff << " Callback=" << (m_callback ? "true" : "false") << " val=" << val << std::endl;
 }
 
 #endif // NO_RPI_HW
