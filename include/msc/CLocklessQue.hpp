@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CLOCKLESSQUE_HPP
 
 #include <atomic>
+#include <memory>
 #include "CLogger.hpp"
 
 namespace NMsc {
@@ -35,6 +36,9 @@ namespace NMsc {
         std::atomic_int m_head, m_tail;
         T *m_buffer;
     };
+
+    template<class T>
+    using ALocklessQue = std::shared_ptr<CLocklessQue<T>>;
 
 /*----------------------------------------------------------------------*/
     template<class T>

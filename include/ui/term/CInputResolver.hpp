@@ -11,7 +11,7 @@ namespace NUi {
     namespace NTerm {
         class CInputResolver {
         public:
-            static ControlInput ResolveInput(int input);
+            static EControlInput ResolveInput(int input);
         };
     }
 }

@@ -15,8 +15,8 @@ using namespace NUi::NTerm;
 /*----------------------------------------------------------------------*/
 CTerminalUi::CTerminalUi(NLgc::ANoiApp app) {
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTerminalUI constructor. app=%", app.get());
-    m_windowManager = std::make_shared<CWindowManager>(NUi::DrawingPolicy::DRAW_ALL, app);
-    m_toneState.insert(m_toneState.begin(), ControlInput::_NOTE_LAST - ControlInput::_NOTE_FIRST, true);
+    m_windowManager = std::make_shared<CWindowManager>(NUi::EDrawingPolicy::DRAW_ALL, app);
+    m_toneState.insert(m_toneState.begin(), EControlInput::_NOTE_LAST - EControlInput::_NOTE_FIRST, true);
 }
 
 /*----------------------------------------------------------------------*/
@@ -32,15 +32,15 @@ void CTerminalUi::UiThreadWorker() {
 
         // Get and process input
         int rawInput = ncurses->GetInput();
-        ControlInput input = CInputResolver::ResolveInput(rawInput);
+        EControlInput input = CInputResolver::ResolveInput(rawInput);
 
         // Notes are in toggle mode
-        ControlInputType inputType = ControlInputType::PRESS;
-        if (input > ControlInput::_NOTE_FIRST && input < ControlInput::_NOTE_LAST)
-            if (m_toneState[input - ControlInput::_NOTE_FIRST] = !m_toneState[input - ControlInput::_NOTE_FIRST])
-                inputType = ControlInputType::RELEASE;
+        EControlInputType inputType = EControlInputType::PRESS;
+        if (input > EControlInput::_NOTE_FIRST && input < EControlInput::_NOTE_LAST)
+            if (m_toneState[input - EControlInput::_NOTE_FIRST] = !m_toneState[input - EControlInput::_NOTE_FIRST])
+                inputType = EControlInputType::RELEASE;
 
-        if (input != ControlInput::NONE)
+        if (input != EControlInput::NONE)
             m_windowManager->ProcessControlInput(input, inputType);
 
         m_windowManager->Update();

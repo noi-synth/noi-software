@@ -19,7 +19,7 @@ namespace NUi {
             WinPickFromList(WWindowManager manager, std::string title,
                             std::vector<std::pair<std::string, std::function<void()>>> &items, bool canExit);
 
-            ControlInput ProcessInput(ControlInput control, ControlInputType type) override;
+            EControlInput ProcessInput(EControlInput control, EControlInputType type) override;
 
             void Draw() override;
 

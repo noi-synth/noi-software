@@ -13,7 +13,7 @@ namespace NUi {
         public:
             explicit WinMain(WWindowManager windowManager);
 
-            virtual ControlInput ProcessInput(ControlInput control, ControlInputType type) override;
+            virtual EControlInput ProcessInput(EControlInput control, EControlInputType type) override;
 
             virtual void Draw() override;
 

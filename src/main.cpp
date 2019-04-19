@@ -16,7 +16,7 @@
 #include "../include/msc/CMaintainer.hpp"
 #include "../include/msc/CTeam3Lock.hpp"
 #include "../include/msc/CTeamLock.hpp"
-#include "../include/hw/CPhysicalInputHandler.hpp"
+#include "../include/hw/CNoiZeroHw.hpp"
 
 uint8_t tn;
 
@@ -164,7 +164,7 @@ int main(int argc, const char *argv[]) {
 
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
-    NHw::CPhysicalInputHandler physicalInput;
+    NHw::CNoiZeroHw physicalInput;
     physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
         app->SendMidiMessage(msg);
     }));

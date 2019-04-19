@@ -18,7 +18,7 @@ namespace NUi {
 
             //void Update() override;
 
-            ControlInput ProcessInput(ControlInput control, ControlInputType type) override;
+            EControlInput ProcessInput(EControlInput control, EControlInputType type) override;
 
             void Init() override;
 

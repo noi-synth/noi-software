@@ -28,7 +28,7 @@ namespace NUi {
 
         virtual void Deactivate();
 
-        virtual ControlInput ProcessInput(ControlInput control, ControlInputType type);
+        virtual EControlInput ProcessInput(EControlInput control, EControlInputType type);
 
         virtual void Draw();
 
