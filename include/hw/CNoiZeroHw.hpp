@@ -9,6 +9,10 @@
 #include <vector>
 #include <functional>
 #include "../config.hpp"
+
+#ifndef NO_RPI_HW
+
+
 #include "CI2CGpioExtender.hpp"
 #include "../snd/CMidiMsg.hpp"
 #include "../msc/CLocklessQue.hpp"
@@ -91,10 +95,13 @@ namespace NHw {
         NUi::EControlInput CONTROLS[EXTENDER_CNT * 16];
 
         // I2C
-#ifndef NO_RPI_HW
         std::vector<CI2cGpioExtender> m_extenders;
-#endif
+
     };
+
+    typename std::shared_ptr<CNoiZeroHw> ANoiZeroHw;
 }
+
+#endif /* NO_RPI_HW */
 
 #endif //NOI_SOFTWARE_CNOIZEROHW_HPP

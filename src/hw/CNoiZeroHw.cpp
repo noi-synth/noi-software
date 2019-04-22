@@ -5,6 +5,8 @@
 #include "../../include/hw/CNoiZeroHw.hpp"
 #include "../../include/hw/CWiringPiHandler.hpp"
 
+#ifndef NO_RPI_HW
+
 #include <iostream>
 #include <functional>
 
@@ -221,3 +223,5 @@ void CNoiZeroHw::SendControl(NUi::CInptutEventInfo control) {
         output->Push(control);
     }
 }
+
+#endif /* NO_RPI_HW */
