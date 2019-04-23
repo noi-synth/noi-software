@@ -38,19 +38,24 @@ using namespace NHw;
 
 /*----------------------------------------------------------------------*/
 CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
-                           m_extenders(std::vector<CI2cGpioExtender>({CI2cGpioExtender(0x20, 0xffff, 0x0000), // A
-                                                                      CI2cGpioExtender(0x21, 0xffff, 0x0000), // D
-                                                                      CI2cGpioExtender(0x22, 0x03ff, 0xFC00), // C
-                                                                      CI2cGpioExtender(0x23, 0x0000, 0xFFFF), // E
-                                                                      CI2cGpioExtender(0x24, 0x0000, 0xFFFF)})) { // B
+                           m_extenders(std::vector<CI2cGpioExtender>(
+                                   {
+                                           CI2cGpioExtender(0x20, 0x00ff, 0xff00), // A
+                                           CI2cGpioExtender(0x21, 0xffff, 0x0000), // D
+                                           CI2cGpioExtender(0x22, 0x03ff, 0xFC00), // C
+                                           CI2cGpioExtender(0x23, 0x0000, 0xFFFF), // E
+                                           CI2cGpioExtender(0x24, 0x0000, 0xFFFF)  // B
+
+                                   })) {
     // Initialize wiringPi
     NHw::CWiringPiHandler::Init();
 
     // LED positions
-    LED_POSITIONS[ELedId::S0] = CPinPosition(EExtenderId::A, 0);
+    LED_POSITIONS[ELedId::S0] = CPinPosition(EExtenderId::A, 15);
 
     // CONTROL positions
-
+    CONTROL_POSITIONS[NUi::EControlInput::ROT_0] = CPinPosition(EExtenderId::A, 0);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_OK] = CPinPosition(EExtenderId::A, 2);
 
     // Inverted table
     for (uint32_t i = 0; i < EXTENDER_CNT; ++i) {

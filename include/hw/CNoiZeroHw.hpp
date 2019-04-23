@@ -99,7 +99,7 @@ namespace NHw {
 
     };
 
-    typename std::shared_ptr<CNoiZeroHw> ANoiZeroHw;
+    typedef std::shared_ptr<CNoiZeroHw> ANoiZeroHw;
 }
 
 #endif /* NO_RPI_HW */

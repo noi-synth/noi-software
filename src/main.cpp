@@ -162,9 +162,26 @@ int main(int argc, const char *argv[]) {
 
     signal(SIGSEGV, signalHandler);
 
+
+
+    /*--------------------------------*/
+    NHw::CNoiZeroHw physicalInput;
+    NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
+    physicalInput.AttachControlOutput(q);
+
+    while (42) {
+        if (!q->Empty()) {
+            NUi::CInptutEventInfo info = q->Pop();
+            std::cout << "Recived " << info.m_type << " from " << info.m_input << std::endl;
+        }
+    }
+
+    /*--------------------------------*/
+
+
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
-    NHw::CNoiZeroHw physicalInput;
+    //NHw::CNoiZeroHw physicalInput;
     physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
         app->SendMidiMessage(msg);
     }));

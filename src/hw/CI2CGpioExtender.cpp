@@ -102,6 +102,9 @@ CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint
     if (m_i2cHandle < 0)
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "I2C setup error for address %.", i2cAddress);
 
+    // Config IOCON
+    wiringPiI2CWriteReg8(m_i2cHandle, 0x08, 0b01101000);
+
     // Set pin direction on bank
     // bank A
     wiringPiI2CWriteReg8(m_i2cHandle, 0x00, m_inptutMask & 0xff);
