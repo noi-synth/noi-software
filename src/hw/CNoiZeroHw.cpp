@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <functional>
+#include <unistd.h>
 
 using namespace NHw;
 
@@ -66,6 +67,9 @@ CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
             CONTROLS[CONTROL_POSITIONS[i].GetGlobalPortNumber()] = (NUi::EControlInput) i;
     }
 
+    // Pin 7 as input
+    pinMode(7, INPUT);
+
     // Start worker thread
     m_worker = std::thread([&]() { WorkerMethod(); });
     // todo make thread high priority
@@ -121,12 +125,16 @@ void CNoiZeroHw::SetLedOutput(NHw::ELedId ledId, NHw::ELedColor color) {
 /*----------------------------------------------------------------------*/
 void CNoiZeroHw::WorkerMethod() {
     while (!m_stopWorker) {
-        int res = waitForInterrupt(7, m_msWaiting);
+        //int res = waitForInterrupt(7, m_msWaiting);
 
-        if (res < 0) {
-            NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CNoiZeroHw: GPIO interrupt error.");
+        usleep(300);
+        int res = digitalRead(7);
+        res = 1 - res;
+
+        /*if (res < 0) {
+            NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CNoiZeroHw: GPIO interrupt error %.", res);
             continue;
-        }
+        }*/
 
         uint16_t value, diff, preValue, preDiff;
         EExtenderId extenderId = EExtenderId::A;

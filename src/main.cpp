@@ -169,6 +169,8 @@ int main(int argc, const char *argv[]) {
     NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
     physicalInput.AttachControlOutput(q);
 
+    physicalInput.SetLedOutput(NHw::ELedId::S0, NHw::ELedColor::YELLOW);
+
     while (42) {
         if (!q->Empty()) {
             NUi::CInptutEventInfo info = q->Pop();
