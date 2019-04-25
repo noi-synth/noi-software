@@ -12,31 +12,6 @@
 #include <unistd.h>
 
 using namespace NHw;
-
-/*----------------------------------------------------------------------*/
-/*CNoiZeroHw::CNoiZeroHw()
-#ifndef NO_RPI_HW
-        : m_extenders(0x20, 0xf, 0x0, [this]( std::uint16_t preVal, std::uint16_t preDiff, std::uint16_t val, std::uint16_t diff) {
-
-    for (int i = 0; i < 4; ++i) {
-        if (diff & 1) {
-            for (const auto &midiOutput : m_midiOutputs) {
-
-                NSnd::CMidiMsg msg(((val & 1) ? NSnd::EMidiMsgType::NOTE_OFF : NSnd::EMidiMsgType::NOTE_ON),
-                                   (NSnd::ETones) (NSnd::ETones::C4 + i), 255);
-                midiOutput(msg);
-            }
-        }
-    diff >>= 1;
-    val >>= 1;
-    }
-
-})
-#endif
-{
-
-}*/
-
 /*----------------------------------------------------------------------*/
 CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
                            m_extenders(std::vector<CI2cGpioExtender>(
@@ -52,14 +27,14 @@ CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
     NHw::CWiringPiHandler::Init();
 
     // LED positions
-    LED_POSITIONS[ELedId::S0] = CPinPosition(EExtenderId::A, 15);
+    LED_POSITIONS[ELedId::S0] = CPinPosition(EExtenderId::A, 8);
 
     // CONTROL positions
     CONTROL_POSITIONS[NUi::EControlInput::ROT_0] = CPinPosition(EExtenderId::A, 0);
     CONTROL_POSITIONS[NUi::EControlInput::BTN_OK] = CPinPosition(EExtenderId::A, 2);
 
     // Inverted table
-    for (uint32_t i = 0; i < EXTENDER_CNT; ++i) {
+    for (uint32_t i = 0; i < EXTENDER_CNT * 16; ++i) {
         CONTROLS[i] = NUi::EControlInput::NONE;
     }
     for (uint32_t i = 0; i < NUi::EControlInput::_CONTROL_LAST; ++i) {
@@ -125,21 +100,14 @@ void CNoiZeroHw::SetLedOutput(NHw::ELedId ledId, NHw::ELedColor color) {
 /*----------------------------------------------------------------------*/
 void CNoiZeroHw::WorkerMethod() {
     while (!m_stopWorker) {
-        //int res = waitForInterrupt(7, m_msWaiting);
 
         usleep(300);
         int res = digitalRead(7);
-        res = 1 - res;
-
-        /*if (res < 0) {
-            NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CNoiZeroHw: GPIO interrupt error %.", res);
-            continue;
-        }*/
 
         uint16_t value, diff, preValue, preDiff;
         EExtenderId extenderId = EExtenderId::A;
         // Did interrupt come?
-        if (res) {
+        if (!res) {
             m_msWaiting = MIN_WAITING;
             for (auto &extender : m_extenders) {
                 // Get values from extender
@@ -152,24 +120,7 @@ void CNoiZeroHw::WorkerMethod() {
                 // Next extender...
                 extenderId = static_cast<EExtenderId >(extenderId + 1);
             }
-
-        } else {
-            if (m_msWaiting < MAX_WAITING) {
-                m_msWaiting += STEP_WAITING;
-            }
-
-            for (auto &extender : m_extenders) {
-                // Get values from extender
-                extender.UpdateInput(value, diff);
-
-                // Process them
-                ProcessReadTimeValues(extenderId, value, diff);
-
-                // Next extender...
-                extenderId = static_cast<EExtenderId >(extenderId + 1);
-            }
         }
-
 
         // Update outputs
         for (auto &extender : m_extenders) {
@@ -183,7 +134,14 @@ void CNoiZeroHw::WorkerMethod() {
 void CNoiZeroHw::ProcessReadTimeValues(NHw::EExtenderId extenderId, uint16_t value, uint16_t diff,
                                        bool interruptTimeValues) {
 
-    for (uint32_t i = 0; i < 16; ++i) {
+    for (uint32_t i = 0; i < 16 && diff; ++i) {
+
+        // Next pin
+        if (i) {
+            value >>= 1;
+            diff >>= 1;
+        }
+
         if (diff & 1) {
 
             CPinPosition position(extenderId, i);
@@ -193,7 +151,7 @@ void CNoiZeroHw::ProcessReadTimeValues(NHw::EExtenderId extenderId, uint16_t val
                 continue;
 
             // Knobs
-            if (input > NUi::EControlInput::_ROT_FIRST && input < NUi::EControlInput::_BTN_LAST) {
+            if (input > NUi::EControlInput::_ROT_FIRST && input < NUi::EControlInput::_ROT_LAST) {
 
                 // Only evaluate knobs from interrupt-time values.
                 if (interruptTimeValues && (value & 1)) {
@@ -216,10 +174,6 @@ void CNoiZeroHw::ProcessReadTimeValues(NHw::EExtenderId extenderId, uint16_t val
             SendControl(NUi::CInptutEventInfo(input, (value & 1) ? NUi::EControlInputType::PRESS
                                                                  : NUi::EControlInputType::RELEASE));
         }
-
-        // Next pin
-        value >>= 1;
-        diff >>= 1;
     }
 }
 

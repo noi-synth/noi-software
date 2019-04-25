@@ -169,12 +169,32 @@ int main(int argc, const char *argv[]) {
     NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
     physicalInput.AttachControlOutput(q);
 
-    physicalInput.SetLedOutput(NHw::ELedId::S0, NHw::ELedColor::YELLOW);
+    int col = 0;
+
+
+    int counter = 0;
 
     while (42) {
         if (!q->Empty()) {
             NUi::CInptutEventInfo info = q->Pop();
             std::cout << "Recived " << info.m_type << " from " << info.m_input << std::endl;
+
+            if (info.m_type == NUi::EControlInputType::SCROLL_DOWN) {
+                ++counter;
+                std::cout << "+" << std::endl;
+            }
+
+            if (info.m_type == NUi::EControlInputType::SCROLL_UP) {
+                --counter;
+                std::cout << "-" << std::endl;
+            }
+
+            std::cout << "CNT = " << counter << std::endl;
+
+
+            physicalInput.SetLedOutput(NHw::ELedId::S0, (NHw::ELedColor) col);
+            std::cout << "Led set to color " << col << std::endl;
+            col = (col + 1) & 7;
         }
     }
 
