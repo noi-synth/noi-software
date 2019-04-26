@@ -17,6 +17,7 @@
 #include "../include/msc/CTeam3Lock.hpp"
 #include "../include/msc/CTeamLock.hpp"
 #include "../include/hw/CNoiZeroHw.hpp"
+#include "../include/msc/CSerializationNode.hpp"
 
 uint8_t tn;
 
@@ -43,6 +44,34 @@ void signalHandler(int signum) {
 }
 
 int main(int argc, const char *argv[]) {
+
+    NMsc::ASerializationNode n = NMsc::CSerializationNode::GetNewTopNode();
+
+
+    n->SerializeString("str1", "lol");
+
+    NMsc::ASerializationNode b = n->GetNewSubNode("bagr");
+    b->SerializeInt("minusJednicka", -1);
+    b->SerializeBool("Lez", false);
+    b->SerializeDouble("pi", 3.14);
+
+    std::vector<int64_t> cisla = {1, 2, 3, 4, 5};
+    b->SerializeIntArray("SeznamCisel", cisla);
+
+    n->AddNodeToArray("Arr1");
+    NMsc::ASerializationNode q = n->AddNodeToArray("Arr1");
+    n->AddNodeToArray("Arr1");
+
+    q->SerializeInt("Answer", 42);
+
+    std::cout << n->Dump() << std::endl;
+
+
+    std::cout << n->GetPath() << std::endl;
+    std::cout << b->GetPath() << std::endl;
+    std::cout << q->GetPath() << std::endl;
+    return 0;
+
 
     /*NMsc::CTeamLock lock2;
 
@@ -165,7 +194,7 @@ int main(int argc, const char *argv[]) {
 
 
     /*--------------------------------*/
-    NHw::CNoiZeroHw physicalInput;
+    /*NHw::CNoiZeroHw physicalInput;
     NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
     physicalInput.AttachControlOutput(q);
 
@@ -197,24 +226,24 @@ int main(int argc, const char *argv[]) {
             col = (col + 1) & 7;
         }
     }
-
+*/
     /*--------------------------------*/
 
 
-    NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
+    /* NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
-    //NHw::CNoiZeroHw physicalInput;
-    physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
-        app->SendMidiMessage(msg);
-    }));
+     //NHw::CNoiZeroHw physicalInput;
+     physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
+         app->SendMidiMessage(msg);
+     }));
 
-    NUi::NTerm::CTerminalUi Ui(app);
-    Ui.Run();
+     NUi::NTerm::CTerminalUi Ui(app);
+     Ui.Run();
 
-    Ui.WaitForStop();
+     Ui.WaitForStop();
 
-    NMsc::CMaintainer::GetInstance().Stop();
-
+     NMsc::CMaintainer::GetInstance().Stop();
+ */
     return 0;
 /*
 

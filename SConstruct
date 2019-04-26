@@ -26,7 +26,7 @@ TEST_DEST = 'bin/tests/'
 SOURCE_SUBFOLDERS = ['src', 'plg']
 TEST_SUBFOLDERS = ['tst']
 INCLUDE_SUBFOLDERS = ['include', 'plg']
-libs = ["rt", "m", "asound", "pthread", "ncurses", "jack", "wiringPi"]
+libs = ["rt", "m", "asound", "pthread", "ncurses", "jack"]
 debug = True
 COMPILER_FLAGS = ["-std=c++17", "-Wall", "-pedantic", "-Wextra"]
 # Setup enviroment
