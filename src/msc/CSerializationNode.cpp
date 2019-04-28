@@ -80,8 +80,9 @@ void CSerializationNode::SerializeString(const std::string name, std::string &&v
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeIntArray(const std::string name, const std::vector<int64_t> &value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeIntArray(const std::string name, const std::vector<int64_t> &value,
+                                           bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value int array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -91,8 +92,9 @@ void CSerializationNode::SerializeIntArray(const std::string name, const std::ve
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeDoubleArray(const std::string name, const std::vector<double> &value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeDoubleArray(const std::string name, const std::vector<double> &value,
+                                              bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value double array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -102,8 +104,9 @@ void CSerializationNode::SerializeDoubleArray(const std::string name, const std:
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeBoolArray(const std::string name, const std::vector<bool> &value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeBoolArray(const std::string name, const std::vector<bool> &value,
+                                            bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value bool array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -113,8 +116,9 @@ void CSerializationNode::SerializeBoolArray(const std::string name, const std::v
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeStringArray(const std::string name, const std::vector<std::string> &value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeStringArray(const std::string name, const std::vector<std::string> &value,
+                                              bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value string array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -124,8 +128,9 @@ void CSerializationNode::SerializeStringArray(const std::string name, const std:
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeIntArray(const std::string name, std::vector<int64_t> &&value) {
-    if (!RegisterName(name)) {
+void
+CSerializationNode::SerializeIntArray(const std::string name, std::vector<int64_t> &&value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value int array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -135,8 +140,9 @@ void CSerializationNode::SerializeIntArray(const std::string name, std::vector<i
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeDoubleArray(const std::string name, std::vector<double> &&value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeDoubleArray(const std::string name, std::vector<double> &&value,
+                                              bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value double array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -146,8 +152,9 @@ void CSerializationNode::SerializeDoubleArray(const std::string name, std::vecto
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeBoolArray(const std::string name, std::vector<bool> &&value) {
-    if (!RegisterName(name)) {
+void
+CSerializationNode::SerializeBoolArray(const std::string name, std::vector<bool> &&value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value bool array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -157,8 +164,9 @@ void CSerializationNode::SerializeBoolArray(const std::string name, std::vector<
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeStringArray(const std::string name, std::vector<std::string> &&value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeStringArray(const std::string name, std::vector<std::string> &&value,
+                                              bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value string array.\n\tName=%\n\tPath=%", name,
                            GetPath());
@@ -525,3 +533,93 @@ void CSerializationNode::Dump(rapidjson::Value &node, rapidjson::Document &docum
 
 }
 
+/*----------------------------------------------------------------------*/
+void CSerializationNode::Deserialize(rapidjson::Value &node) {
+    for (auto &val : node.GetObject()) {
+
+        // todo nejednoznačnost
+        // Int
+        if (val.value.IsInt())
+            SerializeInt(val.name.GetString(), val.value.GetInt64());
+            // Double
+        else if (val.value.IsDouble())
+            SerializeDouble(val.name.GetString(), val.value.GetDouble());
+        // Bool
+        if (val.value.IsBool())
+            SerializeBool(val.name.GetString(), val.value.GetBool());
+        // String
+        if (val.value.IsString())
+            SerializeString(val.name.GetString(), val.value.GetString());
+        // Subnode
+        if (val.value.IsObject()) {
+            ASerializationNode newSubnode = GetNewSubNode(val.name.GetString());
+            newSubnode->Deserialize(val.value);
+        } else if (val.value.IsArray()) {
+            rapidjson::Value &arr = val.value;
+
+            // register name
+            if (!RegisterName(val.name.GetString())) {
+                NMsc::CLogger::Log(NMsc::ELogType::ERROR,
+                                   "CSerializationNode: Deserialization: duplicate name of an array.\n\tName=%\n\tPath=%",
+                                   val.name.GetString(),
+                                   GetPath());
+            }
+
+
+            // Filter array types
+            bool intArr, doubleArr, boolArr, stringArr, nodeArr;
+            intArr = doubleArr = boolArr = stringArr = nodeArr = true;
+
+            for (auto &arrVal : arr.GetArray()) {
+                intArr &= arrVal.IsInt64();
+                doubleArr &= arrVal.IsDouble();
+                boolArr &= arrVal.IsBool();
+                stringArr &= arrVal.IsString();
+                nodeArr &= arrVal.IsObject();
+            }
+
+            if (!(intArr || doubleArr || boolArr || stringArr || nodeArr)) {
+                NMsc::CLogger::Log(NMsc::ELogType::WARNING,
+                                   "CSerializationNode: Deserialization: Array is not homogeneous, skipping.  \n\tName=%\n\tPath=%",
+                                   val.name.GetString(),
+                                   GetPath());
+                continue;
+            }
+
+            // Int array
+            if (intArr) {
+                std::vector<int64_t> vctr;
+                vctr.reserve(arr.Size());
+                // Copy all values.
+                for (auto &arrVal : arr.GetArray()) {
+                    vctr.push_back(arrVal.GetInt64());
+                }
+                SerializeIntArray(val.name.GetString(), std::move(vctr), true);
+            }
+
+            // Double array
+            if (doubleArr) {
+                std::vector<double> vctr;
+                vctr.reserve(arr.Size());
+                // Copy all values.
+                for (auto &arrVal : arr.GetArray()) {
+                    vctr.push_back(arrVal.GetDouble());
+                }
+                SerializeDoubleArray(val.name.GetString(), std::move(vctr), true);
+            }
+
+            // Double array
+            if (doubleArr) {
+                std::vector<double> vctr;
+                vctr.reserve(arr.Size());
+                // Copy all values.
+                for (auto &arrVal : arr.GetArray()) {
+                    vctr.push_back(arrVal.GetDouble());
+                }
+                SerializeDoubleArray(val.name.GetString(), std::move(vctr), true);
+            }
+
+        }
+
+    }
+}

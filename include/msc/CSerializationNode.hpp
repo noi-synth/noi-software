@@ -39,21 +39,27 @@ namespace NMsc {
 
         void SerializeString(const std::string name, std::string &&value);
 
-        void SerializeIntArray(const std::string name, const std::vector<int64_t> &value);
+        void
+        SerializeIntArray(const std::string name, const std::vector<int64_t> &value, bool skipNameRegistration = false);
 
-        void SerializeDoubleArray(const std::string name, const std::vector<double> &value);
+        void SerializeDoubleArray(const std::string name, const std::vector<double> &value,
+                                  bool skipNameRegistration = false);
 
-        void SerializeBoolArray(const std::string name, const std::vector<bool> &value);
+        void
+        SerializeBoolArray(const std::string name, const std::vector<bool> &value, bool skipNameRegistration = false);
 
-        void SerializeStringArray(const std::string name, const std::vector<std::string> &value);
+        void SerializeStringArray(const std::string name, const std::vector<std::string> &value,
+                                  bool skipNameRegistration = false);
 
-        void SerializeIntArray(const std::string name, std::vector<int64_t> &&value);
+        void SerializeIntArray(const std::string name, std::vector<int64_t> &&value, bool skipNameRegistration = false);
 
-        void SerializeDoubleArray(const std::string name, std::vector<double> &&value);
+        void
+        SerializeDoubleArray(const std::string name, std::vector<double> &&value, bool skipNameRegistration = false);
 
-        void SerializeBoolArray(const std::string name, std::vector<bool> &&value);
+        void SerializeBoolArray(const std::string name, std::vector<bool> &&value, bool skipNameRegistration = false);
 
-        void SerializeStringArray(const std::string name, std::vector<std::string> &&value);
+        void SerializeStringArray(const std::string name, std::vector<std::string> &&value,
+                                  bool skipNameRegistration = false);
 
         ASerializationNode AddNodeToArray(std::string arrayName);
 
@@ -95,6 +101,8 @@ namespace NMsc {
         bool RegisterName(std::string name);
 
         void Dump(rapidjson::Value &node, rapidjson::Document &document);
+
+        void Deserialize(rapidjson::Value &node);
 
         // Just for debug
         std::string m_name;
