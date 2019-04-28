@@ -210,12 +210,12 @@ int main(int argc, const char *argv[]) {
 
             if (info.m_type == NUi::EControlInputType::SCROLL_DOWN) {
                 --counter;
-                std::cout << "+" << counter << std::endl;
+                std::cout << "-: " << counter << std::endl;
             }
 
             if (info.m_type == NUi::EControlInputType::SCROLL_UP) {
                 ++counter;
-                std::cout << "-" << counter << std::endl;
+                std::cout << "+: " << counter << std::endl;
             }
 
         }

@@ -162,6 +162,10 @@ void CNoiZeroHw::WorkerMethod() {
         usleep(300);
         int res = digitalRead(7);
 
+        if (!res) {
+            std::cout << "INT" << std::endl;
+        }
+
         uint16_t value, diff, preValue, preDiff;
         EExtenderId extenderId = EExtenderId::A;
         // Did interrupt come?

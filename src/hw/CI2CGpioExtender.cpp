@@ -42,7 +42,7 @@ CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "I2C setup error for address %.", i2cAddress);
 
     // Config IOCON
-    wiringPiI2CWriteReg8(m_i2cHandle, 0x08, 0b01101000);
+    wiringPiI2CWriteReg8(m_i2cHandle, 0x08, 0b01101100);
 
     // Set pin direction on bank
     // bank A
@@ -76,10 +76,10 @@ CI2cGpioExtender::~CI2cGpioExtender() = default;
 /*----------------------------------------------------------------------*/
 void CI2cGpioExtender::UpdateInput(uint16_t &value, uint16_t &diff) {
     // No inputs
-    if (!m_inptutMask) {
+    /*if (!m_inptutMask) {
         value = diff = 0;
         return;
-    }
+    }*/
 
     // Load current values
     value = (std::uint16_t) wiringPiI2CReadReg8(m_i2cHandle, 0x13) << 8;
@@ -94,10 +94,10 @@ void CI2cGpioExtender::UpdateInput(uint16_t &value, uint16_t &diff) {
 void CI2cGpioExtender::UpdateInputAfterInterrupt(uint16_t &preValue, uint16_t &preDiff, uint16_t &value,
                                                  uint16_t &diff) {
     // No inputs
-    if (!m_inptutMask) {
+    /*if (!m_inptutMask) {
         value = diff = preDiff = preValue = 0;
         return;
-    }
+    }*/
 
     // load interrupt-time values for bank B and A
     preValue = (std::uint16_t) wiringPiI2CReadReg8(m_i2cHandle, 0x11) << 8;
