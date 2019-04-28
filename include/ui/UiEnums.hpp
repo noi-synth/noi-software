@@ -43,7 +43,8 @@ namespace NUi {
 
         BTN_LEFT, BTN_DOWN, BTN_RIGHT, BTN_UP,
 
-
+        // Fn keys
+                BTN_FN_0, BTN_FN_1, BTN_FN_2, BTN_FN_3, BTN_FN_4, BTN_FN_5, BTN_FN_6, BTN_FN_7,
 
         // Special / nurses debug only.
                 BTN_NC_MENU,

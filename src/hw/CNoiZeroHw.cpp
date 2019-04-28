@@ -16,22 +16,80 @@ using namespace NHw;
 CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
                            m_extenders(std::vector<CI2cGpioExtender>(
                                    {
-                                           CI2cGpioExtender(0x20, 0x00ff, 0xff00), // A
-                                           CI2cGpioExtender(0x21, 0xffff, 0x0000), // D
-                                           CI2cGpioExtender(0x22, 0x03ff, 0xFC00), // C
-                                           CI2cGpioExtender(0x23, 0x0000, 0xFFFF), // E
-                                           CI2cGpioExtender(0x24, 0x0000, 0xFFFF)  // B
+                                           CI2cGpioExtender(0x20, 0xFFFF, 0x0000), // A 1111 1111 1111 1111
+                                           CI2cGpioExtender(0x21, 0x01FF, 0x7E00), // B x000 0001 1111 1111
+                                           CI2cGpioExtender(0x22, 0xFFFF, 0x0000), // C 1111 1111 1111 1111
+                                           CI2cGpioExtender(0x23, 0x0000, 0x7FFF), // D x000 0000 0000 0000
+                                           CI2cGpioExtender(0x24, 0x0000, 0x7FFF)  // E x000 0000 0000 0000
 
                                    })) {
     // Initialize wiringPi
     NHw::CWiringPiHandler::Init();
 
-    // LED positions
-    LED_POSITIONS[ELedId::S0] = CPinPosition(EExtenderId::A, 8);
+    // LED positions ----
+    // Status LEDs
+    LED_POSITIONS[ELedId::S0] = CPinPosition(EExtenderId::E, 9);
+    LED_POSITIONS[ELedId::S1] = CPinPosition(EExtenderId::E, 12);
+    LED_POSITIONS[ELedId::S2] = CPinPosition(EExtenderId::B, 9);
+    LED_POSITIONS[ELedId::S3] = CPinPosition(EExtenderId::B, 12);
 
-    // CONTROL positions
-    CONTROL_POSITIONS[NUi::EControlInput::ROT_0] = CPinPosition(EExtenderId::A, 0);
-    CONTROL_POSITIONS[NUi::EControlInput::BTN_OK] = CPinPosition(EExtenderId::A, 2);
+    // Function LEDs
+    LED_POSITIONS[ELedId::F0] = CPinPosition(EExtenderId::E, 6);
+    LED_POSITIONS[ELedId::F1] = CPinPosition(EExtenderId::E, 3);
+    LED_POSITIONS[ELedId::F2] = CPinPosition(EExtenderId::E, 0);
+    LED_POSITIONS[ELedId::F3] = CPinPosition(EExtenderId::D, 12);
+    LED_POSITIONS[ELedId::F4] = CPinPosition(EExtenderId::D, 9);
+    LED_POSITIONS[ELedId::F5] = CPinPosition(EExtenderId::D, 6);
+    LED_POSITIONS[ELedId::F6] = CPinPosition(EExtenderId::D, 3);
+    LED_POSITIONS[ELedId::F7] = CPinPosition(EExtenderId::D, 0);
+
+    // CONTROL positions ----
+    //note keys
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_0] = CPinPosition(EExtenderId::B, 0);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_1] = CPinPosition(EExtenderId::A, 0);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_2] = CPinPosition(EExtenderId::A, 1);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_3] = CPinPosition(EExtenderId::A, 2);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_4] = CPinPosition(EExtenderId::A, 3);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_5] = CPinPosition(EExtenderId::A, 4);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_6] = CPinPosition(EExtenderId::A, 5);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_7] = CPinPosition(EExtenderId::A, 6);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_8] = CPinPosition(EExtenderId::A, 7);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_9] = CPinPosition(EExtenderId::A, 8);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_10] = CPinPosition(EExtenderId::A, 9);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_11] = CPinPosition(EExtenderId::A, 10);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_12] = CPinPosition(EExtenderId::A, 11);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_13] = CPinPosition(EExtenderId::A, 12);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_14] = CPinPosition(EExtenderId::A, 13);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_15] = CPinPosition(EExtenderId::A, 14);
+    CONTROL_POSITIONS[NUi::EControlInput::NOTE_16] = CPinPosition(EExtenderId::A, 15);
+
+    // Function keys
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_0] = CPinPosition(EExtenderId::C, 8);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_1] = CPinPosition(EExtenderId::C, 9);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_2] = CPinPosition(EExtenderId::C, 10);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_3] = CPinPosition(EExtenderId::C, 11);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_4] = CPinPosition(EExtenderId::C, 12);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_5] = CPinPosition(EExtenderId::C, 13);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_6] = CPinPosition(EExtenderId::C, 14);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_FN_7] = CPinPosition(EExtenderId::C, 15);
+
+    // Control keys
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_PAGE] = CPinPosition(EExtenderId::B, 8);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_METRONOME] = CPinPosition(EExtenderId::B, 7);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_PLAY] = CPinPosition(EExtenderId::B, 6);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_REC] = CPinPosition(EExtenderId::B, 5);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_UNDO] = CPinPosition(EExtenderId::B, 4);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_SHIFT] = CPinPosition(EExtenderId::B, 3);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_LEFT] = CPinPosition(EExtenderId::B, 2);
+    CONTROL_POSITIONS[NUi::EControlInput::BTN_RIGHT] = CPinPosition(EExtenderId::B, 1);
+
+    // Knobs
+    CONTROL_POSITIONS[NUi::EControlInput::ROT_0] = CPinPosition(EExtenderId::C, 0);
+    CONTROL_POSITIONS[NUi::EControlInput::ROT_1] = CPinPosition(EExtenderId::C, 2);
+    CONTROL_POSITIONS[NUi::EControlInput::ROT_2] = CPinPosition(EExtenderId::C, 4);
+    CONTROL_POSITIONS[NUi::EControlInput::ROT_3] = CPinPosition(EExtenderId::C, 6);
+
+
 
     // Inverted table
     for (uint32_t i = 0; i < EXTENDER_CNT * 16; ++i) {

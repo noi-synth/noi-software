@@ -45,7 +45,7 @@ void signalHandler(int signum) {
 
 int main(int argc, const char *argv[]) {
 
-    NMsc::ASerializationNode n = NMsc::CSerializationNode::GetNewTopNode();
+    /*NMsc::ASerializationNode n = NMsc::CSerializationNode::GetNewTopNode();
 
 
     n->SerializeString("str1", "lol");
@@ -70,7 +70,7 @@ int main(int argc, const char *argv[]) {
     std::cout << n->GetPath() << std::endl;
     std::cout << b->GetPath() << std::endl;
     std::cout << q->GetPath() << std::endl;
-    return 0;
+    return 0;*/
 
 
     /*NMsc::CTeamLock lock2;
@@ -194,7 +194,7 @@ int main(int argc, const char *argv[]) {
 
 
     /*--------------------------------*/
-    /*NHw::CNoiZeroHw physicalInput;
+    NHw::CNoiZeroHw physicalInput;
     NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
     physicalInput.AttachControlOutput(q);
 
@@ -209,24 +209,18 @@ int main(int argc, const char *argv[]) {
             std::cout << "Recived " << info.m_type << " from " << info.m_input << std::endl;
 
             if (info.m_type == NUi::EControlInputType::SCROLL_DOWN) {
-                ++counter;
-                std::cout << "+" << std::endl;
+                --counter;
+                std::cout << "+" << counter << std::endl;
             }
 
             if (info.m_type == NUi::EControlInputType::SCROLL_UP) {
-                --counter;
-                std::cout << "-" << std::endl;
+                ++counter;
+                std::cout << "-" << counter << std::endl;
             }
 
-            std::cout << "CNT = " << counter << std::endl;
-
-
-            physicalInput.SetLedOutput(NHw::ELedId::S0, (NHw::ELedColor) col);
-            std::cout << "Led set to color " << col << std::endl;
-            col = (col + 1) & 7;
         }
     }
-*/
+
     /*--------------------------------*/
 
 
