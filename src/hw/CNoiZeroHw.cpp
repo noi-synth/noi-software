@@ -18,7 +18,8 @@ CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
                                    {
                                            CI2cGpioExtender(0x20, 0xFFFF, 0x0000), // A 1111 1111 1111 1111
                                            CI2cGpioExtender(0x21, 0x01FF, 0x7E00), // B x000 0001 1111 1111
-                                           CI2cGpioExtender(0x22, 0xFFFF, 0x0000), // C 1111 1111 1111 1111
+                                           CI2cGpioExtender(0x22, 0xFFFF, 0x0000,
+                                                            0b0000000010101010), // C 1111 1111 1111 1111
                                            CI2cGpioExtender(0x23, 0x0000, 0x7FFF), // D x000 0000 0000 0000
                                            CI2cGpioExtender(0x24, 0x0000, 0x7FFF)  // E x000 0000 0000 0000
 

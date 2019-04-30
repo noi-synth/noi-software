@@ -31,7 +31,8 @@ namespace NHw {
         /* CI2cGpioExtender(std::uint32_t i2cAddress, std::uint16_t inputMask, std::uint16_t outputMask,
                           const std::function<void(std::uint16_t, std::uint16_t, std::uint16_t, std::uint16_t )> &callback);*/
 
-        CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint16_t outputMask);
+        CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint16_t outputMask,
+                         uint16_t interruptIgnoreMask = 0);
 
         ~CI2cGpioExtender();
 
@@ -50,6 +51,8 @@ namespace NHw {
         // 0bBBBBBBBBAAAAAAAA
         uint16_t m_inptutMask;
         uint16_t m_outputMask;
+        uint16_t m_interruptIgnoreMask;
+
 
 
         uint16_t m_lastStatus;

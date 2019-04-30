@@ -18,9 +18,10 @@ using namespace NHw;
 AI2cGpioExtender g_gpioExtenderHandler;
 
 
-
-CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint16_t outputMask)
-        : m_address(i2cAddress), m_inptutMask(inputMask), m_outputMask(outputMask) {
+CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint16_t outputMask,
+                                   uint16_t interruptIgnoreMask)
+        : m_address(i2cAddress), m_inptutMask(inputMask), m_outputMask(outputMask),
+          m_interruptIgnoreMask(interruptIgnoreMask) {
 
     // are any ports declared as both inputs and outputs?
     if (inputMask & outputMask) {
@@ -42,7 +43,7 @@ CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "I2C setup error for address %.", i2cAddress);
 
     // Config IOCON
-    wiringPiI2CWriteReg8(m_i2cHandle, 0x08, 0b01101100);
+    wiringPiI2CWriteReg8(m_i2cHandle, 0x0A, 0b01101100);
 
     // Set pin direction on bank
     // bank A
@@ -52,9 +53,9 @@ CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint
 
     // Enable interrupts fot inputs
     // bank A
-    wiringPiI2CWriteReg8(m_i2cHandle, 0x04, m_inptutMask & 0xFF);
+    wiringPiI2CWriteReg8(m_i2cHandle, 0x04, m_inptutMask & (~m_interruptIgnoreMask) & 0xFF);
     // bank B
-    wiringPiI2CWriteReg8(m_i2cHandle, 0x05, (m_inptutMask & 0xFF00) >> 8);
+    wiringPiI2CWriteReg8(m_i2cHandle, 0x05, (m_inptutMask & (~m_interruptIgnoreMask) & 0xFF00) >> 8);
 
     // Interrupt on change
     wiringPiI2CWriteReg8(m_i2cHandle, 0x08, 0x00);
