@@ -54,5 +54,4 @@ int CChain::ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputB
         return m_instrument->GenerateBuffer(inputBuff, outputBuff, buffLen);
 
     return 0; // todo what should I return?
-
 }

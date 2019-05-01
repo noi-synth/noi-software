@@ -194,7 +194,7 @@ int main(int argc, const char *argv[]) {
 
 
     /*--------------------------------*/
-    NHw::CNoiZeroHw physicalInput;
+    /*NHw::CNoiZeroHw physicalInput;
     NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
     physicalInput.AttachControlOutput(q);
 
@@ -219,14 +219,14 @@ int main(int argc, const char *argv[]) {
             }
 
         }
-    }
+    }*/
 
     /*--------------------------------*/
 
 
-    /* NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
+    NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
-     //NHw::CNoiZeroHw physicalInput;
+    NHw::CNoiZeroHw physicalInput;
      physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
          app->SendMidiMessage(msg);
      }));
@@ -234,10 +234,35 @@ int main(int argc, const char *argv[]) {
      NUi::NTerm::CTerminalUi Ui(app);
      Ui.Run();
 
+    /*NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
+    physicalInput.AttachControlOutput(q);*/
+
+    /*int col = 0;
+    int sld = 0;
+
+     while(Ui.IsRunning()){
+
+
+         if (! q->Empty()){
+             NUi::CInptutEventInfo info = q->Pop();
+             std::cout << "Recived " << info.m_type << " from " << info.m_input << std::endl;
+             
+             if (info.m_type == NUi::EControlInputType::PRESS){
+                 ++col;
+                 for (int i = 0; i < 8; ++i) {
+                     physicalInput.SetLedOutput( (NHw::ELedId) (((int)NHw::ELedId::F0) + i), (NHw::ELedColor)(col & 7));
+                 }
+                 sld = (sld+1) & 3;
+                 physicalInput.SetLedOutput( (NHw::ELedId) (((int)NHw::ELedId::S0) + sld), (NHw::ELedColor)(col & 7));
+             }
+             
+         }
+     }*/
+
      Ui.WaitForStop();
 
      NMsc::CMaintainer::GetInstance().Stop();
- */
+
     return 0;
 /*
 

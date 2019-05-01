@@ -58,6 +58,9 @@ bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "SndCore not set");
         return false;
     }
+
+    message.m_tone = (NSnd::ETones) (((int) message.m_tone) + 48);
+
     return m_state.m_soundCore->ReciveMidiMsg(message);
 }
 

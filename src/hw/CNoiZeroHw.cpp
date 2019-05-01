@@ -229,13 +229,13 @@ void CNoiZeroHw::ProcessReadTimeValues(NHw::EExtenderId extenderId, uint16_t val
             // Note keys
             if (input > NUi::EControlInput::_NOTE_FIRST && input < NUi::EControlInput::_NOTE_LAST) {
                 NSnd::ETones tone = static_cast<NSnd::ETones>(input - NUi::EControlInput::_NOTE_FIRST);
-                SendMidiMsg(NSnd::CMidiMsg((value & 1) ? NSnd::EMidiMsgType::NOTE_ON : NSnd::EMidiMsgType::NOTE_OFF,
+                SendMidiMsg(NSnd::CMidiMsg((value & 1) ? NSnd::EMidiMsgType::NOTE_OFF : NSnd::EMidiMsgType::NOTE_ON,
                                            tone, 255));
             }
 
             // Send control message
-            SendControl(NUi::CInptutEventInfo(input, (value & 1) ? NUi::EControlInputType::PRESS
-                                                                 : NUi::EControlInputType::RELEASE));
+            SendControl(NUi::CInptutEventInfo(input, (value & 1) ? NUi::EControlInputType::RELEASE
+                                                                 : NUi::EControlInputType::PRESS));
         }
     }
 }

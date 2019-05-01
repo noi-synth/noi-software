@@ -20,8 +20,8 @@ AI2cGpioExtender g_gpioExtenderHandler;
 
 CI2cGpioExtender::CI2cGpioExtender(uint32_t i2cAddress, uint16_t inputMask, uint16_t outputMask,
                                    uint16_t interruptIgnoreMask)
-        : m_address(i2cAddress), m_inptutMask(inputMask), m_outputMask(outputMask),
-          m_interruptIgnoreMask(interruptIgnoreMask) {
+        : m_output(0), m_address(i2cAddress), m_inptutMask(inputMask), m_outputMask(outputMask),
+          m_interruptIgnoreMask(interruptIgnoreMask), m_lastStatus(0) {
 
     // are any ports declared as both inputs and outputs?
     if (inputMask & outputMask) {
@@ -77,10 +77,10 @@ CI2cGpioExtender::~CI2cGpioExtender() = default;
 /*----------------------------------------------------------------------*/
 void CI2cGpioExtender::UpdateInput(uint16_t &value, uint16_t &diff) {
     // No inputs
-    /*if (!m_inptutMask) {
+    if (!m_inptutMask) {
         value = diff = 0;
         return;
-    }*/
+    }
 
     // Load current values
     value = (std::uint16_t) wiringPiI2CReadReg8(m_i2cHandle, 0x13) << 8;
@@ -95,10 +95,10 @@ void CI2cGpioExtender::UpdateInput(uint16_t &value, uint16_t &diff) {
 void CI2cGpioExtender::UpdateInputAfterInterrupt(uint16_t &preValue, uint16_t &preDiff, uint16_t &value,
                                                  uint16_t &diff) {
     // No inputs
-    /*if (!m_inptutMask) {
+    if (!m_inptutMask) {
         value = diff = preDiff = preValue = 0;
         return;
-    }*/
+    }
 
     // load interrupt-time values for bank B and A
     preValue = (std::uint16_t) wiringPiI2CReadReg8(m_i2cHandle, 0x11) << 8;
@@ -121,10 +121,6 @@ void CI2cGpioExtender::UpdateOutput() {
     uint16_t desiredOutput = m_output & m_outputMask;
 
     if (actualOutput != desiredOutput) {
-
-
-        std::cout << "Extender " << m_address << ": changing output from " << std::hex << actualOutput << " to "
-                  << desiredOutput << std::dec << std::endl;
 
         // Write A value
         wiringPiI2CWriteReg8(m_i2cHandle, 0x14, desiredOutput & 0xFF);

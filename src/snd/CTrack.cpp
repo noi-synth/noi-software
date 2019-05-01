@@ -179,7 +179,8 @@ void CTrack::ProcessBuffer(SND_DATA_TYPE *input, SND_DATA_TYPE *buffer, unsigned
 
                     for (int i = 0; i < limit; ++i) {
                         // L
-                        buffer[copyCursor] += sliceBuffer[offsetCursor << 1] * m_volume;
+                        buffer[copyCursor] +=
+                                sliceBuffer[offsetCursor << 1] * m_volume; // todo should not I divide instead?
                         sliceBuffer[offsetCursor << 1] += input[copyCursor++];
                         // R
                         buffer[copyCursor] += sliceBuffer[(offsetCursor << 1) + 1] * m_volume;
