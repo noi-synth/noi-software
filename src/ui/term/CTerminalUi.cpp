@@ -41,7 +41,7 @@ void CTerminalUi::UiThreadWorker() {
                 inputType = EControlInputType::RELEASE;
 
         if (input != EControlInput::NONE)
-            m_windowManager->ProcessControlInput(input, inputType);
+            m_windowManager->ProcessControlInput(CInptutEventInfo(input, inputType, false));
 
         m_windowManager->Update();
 

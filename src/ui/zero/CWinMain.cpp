@@ -4,6 +4,7 @@
 
 #include "../../../include/ui/zero/CWinMain.hpp"
 #include "../../../include/ui/zero/CNoiZeroCommunicator.hpp"
+#include "../../../include/ui/zero/CWinPgPick.hpp"
 
 using namespace NUi::NZero;
 
@@ -34,58 +35,63 @@ void CWinMain::Draw() {
 }
 
 /*----------------------------------------------------------------------*/
-NUi::EControlInput CWinMain::ProcessInput(NUi::EControlInput control, NUi::EControlInputType type) {
+NUi::CInptutEventInfo CWinMain::ProcessInput(CInptutEventInfo input) {
+
+    AWindowManager manager = m_manager.lock();
+    if (!manager) {
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CWinMain: Manager not found.");
+        return input;
+    }
 
     //NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CWinMain: Got input %", control);
 
-    if (type == EControlInputType::PRESS) {
-        switch (control) {
+    if (input.m_type == EControlInputType::PRESS) {
+        switch (input.m_input) {
             case NUi::EControlInput::BTN_PLAY :
                 if (m_app->IsPlaying())
                     m_app->PlaybackStop();
                 else
                     m_app->PlaybackStart();
-
-                return NUi::EControlInput::NONE;
+                return CInptutEventInfo();
 
             case NUi::EControlInput::BTN_REC:
                 if (m_app->IsRecording())
                     m_app->RecordingStop();
                 else
                     m_app->RecordingStart();
-
-                return NUi::EControlInput::NONE;
+                return CInptutEventInfo();
 
             case NUi::EControlInput::BTN_METRONOME:
                 m_metronom = !m_metronom;
                 m_app->MetronomeSet(m_metronom);
-
-                return NUi::EControlInput::NONE;
+                return CInptutEventInfo();
 
             case NUi::EControlInput::BTN_LEFT:
                 if (m_octave > 0) {
                     --m_octave;
                     m_app->SetOctave(m_octave + 1);
                 }
-
-                return NUi::EControlInput::NONE;
+                return CInptutEventInfo();
 
             case NUi::EControlInput::BTN_RIGHT:
                 if (m_octave < 6) {
                     ++m_octave;
                     m_app->SetOctave(m_octave + 1);
                 }
+                return CInptutEventInfo();
 
-                return NUi::EControlInput::NONE;
+            case NUi::EControlInput::BTN_PAGE:
+                manager->OpenWindowCallback(std::make_shared<CWinPgPick>(m_manager));
+                return CInptutEventInfo();
+
 
             default:
-                return control;
+                return input;
 
         }
     }
 
-
-    return control;
+    return input;
 }
 
 /*----------------------------------------------------------------------*/

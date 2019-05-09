@@ -121,15 +121,15 @@ void CWindowManager::Redraw() {
 }
 
 /*----------------------------------------------------------------------*/
-void CWindowManager::ProcessControlInput(NUi::EControlInput control, NUi::EControlInputType type) {
+void CWindowManager::ProcessControlInput(CInptutEventInfo input) {
     auto it = m_windows.begin();
     m_breakWindowIteration = false;
 
-    while (control != EControlInput::NONE && it != m_windows.end() && !m_breakWindowIteration)
-        control = (*it)->ProcessInput(control, type);
+    while (input.m_input != EControlInput::NONE && it != m_windows.end() && !m_breakWindowIteration)
+        input = (*it)->ProcessInput(input);
 
-    if (control != EControlInput::NONE && m_mainWindow && !m_breakWindowIteration)
-        m_mainWindow->ProcessInput(control, type);
+    if (input.m_input != EControlInput::NONE && m_mainWindow && !m_breakWindowIteration)
+        m_mainWindow->ProcessInput(input);
 }
 
 /*----------------------------------------------------------------------*/

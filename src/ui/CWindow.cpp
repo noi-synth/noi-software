@@ -21,8 +21,8 @@ void CWindow::Deactivate() {
 }
 
 /*----------------------------------------------------------------------*/
-EControlInput CWindow::ProcessInput(NUi::EControlInput control, NUi::EControlInputType type) {
-    return control;
+CInptutEventInfo CWindow::ProcessInput(CInptutEventInfo input) {
+    return input;
 }
 
 /*----------------------------------------------------------------------*/

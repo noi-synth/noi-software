@@ -37,6 +37,11 @@ namespace NMsc {
             return (T) (((int32_t) (first) + second));
         }
 
+        template<typename T>
+        static int32_t EnumSub(T first, T second) {
+            return (int32_t) (first - second);
+        }
+
         /*std::string FormatToString(const char * format){
             return format;
         }

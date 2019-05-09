@@ -18,16 +18,14 @@ namespace NUi {
         public:
             explicit CWinPgPick(WWindowManager windowManager);
 
-            virtual EControlInput ProcessInput(EControlInput control, EControlInputType type) override;
+            virtual CInptutEventInfo ProcessInput(CInptutEventInfo input) override;
 
             virtual void Draw() override;
 
-            void Update() override;
+            //void Update() override;
 
-            void Init() override;
+            //void Init() override;
 
-        private:
-            NLgc::ANoiApp m_app;
         };
     }
 }

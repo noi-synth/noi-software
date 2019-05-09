@@ -21,16 +21,16 @@ WinPickFromList::WinPickFromList(NUi::WWindowManager manager, std::string title,
 
 /*----------------------------------------------------------------------*/
 /*----------------------------------------------------------------------*/
-EControlInput WinPickFromList::ProcessInput(EControlInput control, EControlInputType type) {
+CInptutEventInfo WinPickFromList::ProcessInput(CInptutEventInfo input) {
 
     AWindowManager wm = m_manager.lock();
 
     if (m_isActive)
-        switch (control) {
+        switch (input.m_input) {
             case EControlInput::BTN_SHUTDOWN:
                 if (m_canExit)
                     wm->CloseTopWindowCallback();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             case EControlInput::BTN_UP:
                 if (m_position == m_items.begin())
@@ -38,20 +38,20 @@ EControlInput WinPickFromList::ProcessInput(EControlInput control, EControlInput
                 else
                     --m_position;
                 RequestRedraw();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             case EControlInput::BTN_DOWN:
                 if (++m_position == m_items.end())
                     m_position = m_items.begin();
                 RequestRedraw();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             case BTN_OK:
                 m_position->second();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             default:
-                return EControlInput::NONE;
+                return CInptutEventInfo();
         }
 }
 

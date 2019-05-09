@@ -60,31 +60,31 @@ void WinMain::Draw() {
 }
 
 /*----------------------------------------------------------------------*/
-NUi::EControlInput WinMain::ProcessInput(NUi::EControlInput control, NUi::EControlInputType type) {
+NUi::CInptutEventInfo WinMain::ProcessInput(CInptutEventInfo input) {
     AWindowManager wm = m_manager.lock();
     if (!wm) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "WinMain: ProcessInput: Window manager could not be locked.");
-        return EControlInput::NONE;
+        return CInptutEventInfo();
     }
 
-    if (control > EControlInput::_NOTE_FIRST && control < EControlInput::_NOTE_LAST) {
+    if (input.m_input > EControlInput::_NOTE_FIRST && input.m_input < EControlInput::_NOTE_LAST) {
         m_app->SendMidiMessage(NSnd::CMidiMsg(
-                type == EControlInputType::PRESS ? NSnd::EMidiMsgType::NOTE_ON : NSnd::EMidiMsgType::NOTE_OFF,
-                (NSnd::ETones) (NSnd::ETones::C3 + (control - EControlInput::_NOTE_FIRST)),
+                input.m_type == EControlInputType::PRESS ? NSnd::EMidiMsgType::NOTE_ON : NSnd::EMidiMsgType::NOTE_OFF,
+                (NSnd::ETones) (NSnd::ETones::C3 + (input.m_input - EControlInput::_NOTE_FIRST)),
                 255));
-        return EControlInput::NONE;
+        return CInptutEventInfo();
     }
 
-    if (type != NUi::EControlInputType::PRESS)
-        return control;
+    if (input.m_type != NUi::EControlInputType::PRESS)
+        return CInptutEventInfo();
 
     WinPickFromList::items ActionList;
-    switch (control) {
+    switch (input.m_input) {
         case EControlInput::BTN_SHUTDOWN:
 
             if (wm)
                 wm->m_exiting = true;
-            return EControlInput::NONE;
+            return CInptutEventInfo();
 
         case EControlInput::BTN_PLAY:
             if (m_app->IsPlaying()) {
@@ -92,14 +92,14 @@ NUi::EControlInput WinMain::ProcessInput(NUi::EControlInput control, NUi::EContr
                 m_app->PlaybackSetPosition(0);
             } else
                 m_app->PlaybackStart();
-            return EControlInput::NONE;
+            return CInptutEventInfo();
 
         case EControlInput::BTN_REC:
             if (m_app->IsRecording())
                 m_app->RecordingStop();
             else
                 m_app->RecordingStart();
-            return EControlInput::NONE;
+            return CInptutEventInfo();
 
         case EControlInput::BTN_NC_MENU:
             ActionList.clear();
@@ -113,10 +113,10 @@ NUi::EControlInput WinMain::ProcessInput(NUi::EControlInput control, NUi::EContr
                     std::make_pair("test3", [&]() { NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "test3"); }));
             wm->OpenWindowCallback(std::make_shared<WinPickFromList>(wm, "Actions", ActionList, true));
 
-            return EControlInput::NONE;
+            return CInptutEventInfo();
 
         default:
-            return control;
+            return input;
     }
 }
 

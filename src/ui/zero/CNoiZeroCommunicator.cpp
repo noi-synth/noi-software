@@ -11,7 +11,8 @@ CNoiZeroCommunicator *CNoiZeroCommunicator::m_instance;
 
 /*----------------------------------------------------------------------*/
 CNoiZeroCommunicator::CNoiZeroCommunicator(NHw::ANoiZeroHw hw, NUi::NZero::AZeroUi ui) : m_hw(hw), m_ui(ui),
-                                                                                         m_blinkCounter(0) {
+                                                                                         m_blinkCounter(0),
+                                                                                         m_shift(false) {
     m_instance = this;
     m_inputQue = std::make_shared<NMsc::CLocklessQue<CInptutEventInfo>>();
     m_hw->AttachControlOutput(m_inputQue);
@@ -86,6 +87,14 @@ void CNoiZeroCommunicator::Update() {
 
 
     while (!m_inputQue->Empty()) {
-        m_ui->ProcessInput(m_inputQue->Pop());
+        CInptutEventInfo input = m_inputQue->Pop();
+
+        // Shift
+        if (input.m_input == EControlInput::BTN_SHIFT) {
+            m_shift = input.m_type == EControlInputType::PRESS;
+        }
+        input.m_shift = m_shift;
+
+        m_ui->ProcessInput(input);
     }
 }

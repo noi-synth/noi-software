@@ -15,15 +15,15 @@ using Color = NGfx::CNcurses::ColorPair;
 WinAudioDevicePick::WinAudioDevicePick(NUi::WWindowManager manager) : CWindow(manager), m_selectedDevice(0) {}
 
 /*----------------------------------------------------------------------*/
-EControlInput WinAudioDevicePick::ProcessInput(EControlInput control, EControlInputType type) {
+CInptutEventInfo WinAudioDevicePick::ProcessInput(CInptutEventInfo input) {
 
     AWindowManager wm = m_manager.lock();
 
     if (m_isActive)
-        switch (control) {
+        switch (input.m_input) {
             case EControlInput::BTN_SHUTDOWN:
                 wm->CloseTopWindowCallback();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             case EControlInput::BTN_UP:
                 if (m_selectedDevice == 0)
@@ -31,20 +31,20 @@ EControlInput WinAudioDevicePick::ProcessInput(EControlInput control, EControlIn
                 else
                     --m_selectedDevice;
                 RequestRedraw();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             case EControlInput::BTN_DOWN:
                 m_selectedDevice = (m_selectedDevice + 1) % m_devCnt;
                 RequestRedraw();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             case BTN_OK:
                 SetPaDevice();
                 wm->CloseTopWindowCallback();
-                return EControlInput::NONE;
+                return CInptutEventInfo();
 
             default:
-                return EControlInput::NONE;
+                return CInptutEventInfo();
         }
 }
 

@@ -63,6 +63,7 @@ namespace NUi::NZero {
 
         const uint32_t BLINK_MASK = 1;
 
+        bool m_shift;
 
     };
 

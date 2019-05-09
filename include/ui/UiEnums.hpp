@@ -60,6 +60,7 @@ namespace NUi {
 
     /*----------------------------------------------------------------------*/
     enum EControlInputType {
+        NO_TYPE,
         PRESS,
         RELEASE,
         SCROLL_UP,

@@ -8,6 +8,8 @@
 #include <list>
 #include <memory>
 
+#include "CInputEventInfo.hpp"
+
 namespace NUi {
     class CWindowManager;
 
@@ -36,7 +38,7 @@ namespace NUi {
 
         void CloseTopWindowCallback();
 
-        void ProcessControlInput(EControlInput control, EControlInputType type);
+        void ProcessControlInput(CInptutEventInfo input);
 
         void RequestRedraw();
 

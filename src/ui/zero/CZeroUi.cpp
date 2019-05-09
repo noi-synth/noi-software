@@ -45,5 +45,5 @@ void CZeroUi::UiThreadWorker() {
 
 /*----------------------------------------------------------------------*/
 void CZeroUi::ProcessInput(NUi::CInptutEventInfo input) {
-    m_windowManager->ProcessControlInput(input.m_input, input.m_type);
+    m_windowManager->ProcessControlInput(input);
 }
