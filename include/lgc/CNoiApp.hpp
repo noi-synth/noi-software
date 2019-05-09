@@ -44,10 +44,13 @@ namespace NLgc {
 
         bool MetronomeSet(bool enable);
 
+        bool SetOctave(uint32_t octave);
+
         bool SendMidiMessage(NSnd::CMidiMsg message);
 
     private:
         CAppState m_state;
+        uint32_t m_octave;
     };
 
     typedef std::shared_ptr<CNoiApp> ANoiApp;

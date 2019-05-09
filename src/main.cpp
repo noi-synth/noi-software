@@ -18,6 +18,8 @@
 #include "../include/msc/CTeamLock.hpp"
 #include "../include/hw/CNoiZeroHw.hpp"
 #include "../include/msc/CSerializationNode.hpp"
+#include "../include/ui/zero/CZeroUi.hpp"
+#include "../include/ui/zero/CNoiZeroCommunicator.hpp"
 
 uint8_t tn;
 
@@ -226,13 +228,32 @@ int main(int argc, const char *argv[]) {
 
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
-    NHw::CNoiZeroHw physicalInput;
-     physicalInput.AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
+    NHw::ANoiZeroHw physicalInput = std::make_shared<NHw::CNoiZeroHw>();
+
+
+    physicalInput->AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
          app->SendMidiMessage(msg);
      }));
 
      NUi::NTerm::CTerminalUi Ui(app);
      Ui.Run();
+
+    NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
+
+    NUi::NZero::CNoiZeroCommunicator communicator(physicalInput, ZeroUi);
+
+    ZeroUi->Run();
+
+    Ui.WaitForStop();
+
+    ZeroUi->Stop();
+
+    ZeroUi->WaitForStop();
+
+
+    NMsc::CMaintainer::GetInstance().Stop();
+
+    return 0;
 
     /*NMsc::ALocklessQue<NUi::CInptutEventInfo> q = std::make_shared<NMsc::CLocklessQue<NUi::CInptutEventInfo>>();
     physicalInput.AttachControlOutput(q);*/
@@ -246,7 +267,7 @@ int main(int argc, const char *argv[]) {
          if (! q->Empty()){
              NUi::CInptutEventInfo info = q->Pop();
              std::cout << "Recived " << info.m_type << " from " << info.m_input << std::endl;
-             
+
              if (info.m_type == NUi::EControlInputType::PRESS){
                  ++col;
                  for (int i = 0; i < 8; ++i) {
@@ -255,15 +276,11 @@ int main(int argc, const char *argv[]) {
                  sld = (sld+1) & 3;
                  physicalInput.SetLedOutput( (NHw::ELedId) (((int)NHw::ELedId::S0) + sld), (NHw::ELedColor)(col & 7));
              }
-             
+
          }
      }*/
 
-     Ui.WaitForStop();
 
-     NMsc::CMaintainer::GetInstance().Stop();
-
-    return 0;
 /*
 
     NGfx::CNcurses *gfx = NGfx::CNcurses::GetInstance();

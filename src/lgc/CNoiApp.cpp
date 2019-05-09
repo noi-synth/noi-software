@@ -9,7 +9,7 @@
 using namespace NLgc;
 
 /*----------------------------------------------------------------------*/
-CNoiApp::CNoiApp() {
+CNoiApp::CNoiApp() : m_octave(3) {
     // Create SndCore
     m_state.m_soundCore = std::make_shared<NSnd::CSndCore>();
 
@@ -59,7 +59,7 @@ bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
         return false;
     }
 
-    message.m_tone = (NSnd::ETones) (((int) message.m_tone) + 48);
+    message.m_tone = (NSnd::ETones) (((int) message.m_tone) + m_octave * 12);
 
     return m_state.m_soundCore->ReciveMidiMsg(message);
 }
@@ -109,6 +109,16 @@ bool CNoiApp::RecordingUndo() {
     return m_state.m_soundCore->TrackRecordingUndo();
 }
 
+/*----------------------------------------------------------------------*/
+bool CNoiApp::SetOctave(uint32_t octave) {
+    m_octave = octave;
+    return true;
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::MetronomeSet(bool enable) {
+    m_state.m_soundCore->SetMetronome(enable);
+}
 
 
 

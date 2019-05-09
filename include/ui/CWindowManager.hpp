@@ -54,6 +54,7 @@ namespace NUi {
         bool m_redrawRequested;
         bool m_breakWindowIteration;
         std::list<AWindow> m_windows;
+        std::list<AWindow> m_deletedWindows;
         AWindow m_mainWindow;
         NLgc::ANoiApp m_app;
     };

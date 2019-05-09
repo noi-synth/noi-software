@@ -34,6 +34,8 @@ namespace NSnd {
 
         void UndoRecording(); // clears undo
 
+        bool CanUndo();
+
         float m_volume;
 
         static inline uint32_t PositionToSampleNumber(uint32_t position);

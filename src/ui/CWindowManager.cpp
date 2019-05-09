@@ -43,6 +43,7 @@ void CWindowManager::ReplaceTopWindowCallback(NUi::AWindow window) {
         return;
     }
     m_windows.front()->Deactivate();
+    m_deletedWindows.push_back(m_windows.front());
     m_windows.front() = window;
     m_windows.front()->Activate();
     RequestRedraw();
@@ -75,7 +76,8 @@ void CWindowManager::OpenSingleWindowCallback(NUi::AWindow window) {
     else if (m_mainWindow)
         m_mainWindow->Deactivate();
 
-    m_windows.clear();
+    m_deletedWindows.splice(m_deletedWindows.end(), m_windows);
+
     m_windows.push_front(window);
     window->Activate();
     RequestRedraw();
@@ -86,6 +88,7 @@ void CWindowManager::CloseTopWindowCallback() {
     m_breakWindowIteration = true;
     if (!m_windows.empty()) {
         m_windows.front()->Deactivate();
+        m_deletedWindows.push_back(m_windows.front());
         m_windows.pop_front();
         if (!m_windows.empty())
             m_windows.front()->Activate();
@@ -146,9 +149,14 @@ void CWindowManager::Update() {
         m_mainWindow->Update();
     for (auto &&window : m_windows) {
         window->Update();
+        if (m_breakWindowIteration)
+            break;
     }
     if (m_redrawRequested) {
         Redraw();
         m_redrawRequested = false;
     }
+
+    // Destroy deleted windows
+    m_deletedWindows.clear();
 }

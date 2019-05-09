@@ -65,6 +65,8 @@ namespace NSnd {
 
         bool TrackSetPosition(uint32_t position);
 
+        bool SetMetronome(bool enabled);
+
 
     private:
 

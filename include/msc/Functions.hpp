@@ -32,6 +32,10 @@ namespace NMsc {
             stream << format;
         }
 
+        template<typename T>
+        static T EnumAdd(T first, int32_t second) {
+            return (T) (((int32_t) (first) + second));
+        }
 
         /*std::string FormatToString(const char * format){
             return format;

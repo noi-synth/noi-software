@@ -324,7 +324,10 @@ void CTrack::ClearUndoUnsafe() {
 
 }
 
-
+/*----------------------------------------------------------------------*/
+bool CTrack::CanUndo() {
+    return m_undoRecordingStartSamplePosition == m_undoRecordingEndSamplePosition;
+}
 
 
 

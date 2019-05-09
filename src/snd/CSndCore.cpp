@@ -144,7 +144,7 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
         int positionInBeat = m_trackManager->GetPlaybackPosition() % bpmModulo;
 
         // todo do this properly
-        if (positionInBeat < 1000) {
+        if (m_metronomeEnabled && positionInBeat < 1000) {
             if (((m_trackManager->GetPlaybackPosition() / bpmModulo) % 4) == 0)
                 for (unsigned int i = 0; i < sampleCnt * 2 && i < 1000; ++i)
                     outputBuffer[i] += (positionInBeat * 2 + i & 64) / 130.0 * .25 - 0.125;
@@ -205,6 +205,12 @@ bool CSndCore::TrackSetPosition(uint32_t position) {
 /*----------------------------------------------------------------------*/
 bool CSndCore::TrackRecordingUndo() {
     return m_trackManager->UndoRecording();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::SetMetronome(bool enabled) {
+    m_metronomeEnabled = enabled;
+    return true;
 }
 
 //TODO
