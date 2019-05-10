@@ -213,6 +213,21 @@ bool CSndCore::SetMetronome(bool enabled) {
     return true;
 }
 
+/*----------------------------------------------------------------------*/
+void CSndCore::BpmSet(uint32_t bpm) {
+    m_bpm = bpm;
+}
+
+/*----------------------------------------------------------------------*/
+ATrack CSndCore::TrackCreate() {
+    return m_trackManager->CreateTrack();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackSetActive(NSnd::ATrack track) {
+    return m_trackManager->SelectTrack(track);
+}
+
 //TODO
 
 

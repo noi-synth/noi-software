@@ -4,6 +4,7 @@
 
 #include "../../../include/ui/zero/CWinPgPick.hpp"
 #include "../../../include/ui/zero/CNoiZeroCommunicator.hpp"
+#include "../../../include/ui/zero/CWinPgPlayback.hpp"
 
 using namespace NUi::NZero;
 
@@ -15,11 +16,14 @@ CWinPgPick::CWinPgPick(NUi::WWindowManager windowManager) : CWindow(windowManage
 
 /*----------------------------------------------------------------------*/
 NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
+
+
     AWindowManager manager = m_manager.lock();
     if (!manager) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CWinPgPick: Manager not found.");
         return input;
     }
+
 
     // Close this window
     if (input.m_input == EControlInput::BTN_PAGE && input.m_type == EControlInputType::RELEASE) {
@@ -36,8 +40,12 @@ NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
     uint32_t pgNumber = NMsc::Functions::EnumSub(input.m_input, EControlInput::BTN_FN_0);
 
     switch (pgNumber) {
+        case 0:
+            manager->OpenSingleWindowCallback(std::make_shared<CWinPgPlayback>(m_manager));
+            break;
+
         default:
-            NMsc::CLogger::Log(NMsc::ELogType::WARNING, "CWinPgPick: Page number % not implemented");
+            NMsc::CLogger::Log(NMsc::ELogType::WARNING, "CWinPgPick: Page number % not implemented", pgNumber);
             manager->CloseTopWindowCallback();
     }
 
@@ -48,6 +56,8 @@ NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
 
 /*----------------------------------------------------------------------*/
 void CWinPgPick::Draw() {
+
+
     CNoiZeroCommunicator *g = CNoiZeroCommunicator::GetInstance();
     if (!g) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CWinPgPick: No CNoiZeroCommunicator found.");

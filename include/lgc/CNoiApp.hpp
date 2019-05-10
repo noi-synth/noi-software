@@ -30,23 +30,37 @@ namespace NLgc {
 
         bool RecordingUndo();
 
+        bool RecordingGetCanUndo();
+
         bool PlaybackStart();
 
         bool PlaybackStop();
 
         bool PlaybackSetPosition(uint32_t position);
 
+        bool PlaybaclSetPositionBeats(uint32_t beat);
+
         uint32_t PlaybackGetPosition();
+
+        uint32_t PlaybackGetPositionBeats();
 
         bool IsPlaying();
 
-        bool BpmSet(int bpm);
+        bool BpmSet(uint32_t bpm);
+
+        uint32_t BpmGet();
 
         bool MetronomeSet(bool enable);
 
         bool SetOctave(uint32_t octave);
 
         bool SendMidiMessage(NSnd::CMidiMsg message);
+
+        NSnd::ATrack TrackCreate();
+
+        bool TrackActiveSet(NSnd::ATrack track);
+
+        const std::vector<NSnd::ATrack> TracksGet();
 
     private:
         CAppState m_state;

@@ -42,6 +42,11 @@ namespace NMsc {
             return (int32_t) (first - second);
         }
 
+        template<typename T>
+        static T EnumOr(T first, T second) {
+            return (T) (((uint32_t) first) | ((uint32_t) second));
+        }
+
         /*std::string FormatToString(const char * format){
             return format;
         }

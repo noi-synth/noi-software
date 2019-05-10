@@ -5,11 +5,13 @@
 #include "../../../include/ui/zero/CWinMain.hpp"
 #include "../../../include/ui/zero/CNoiZeroCommunicator.hpp"
 #include "../../../include/ui/zero/CWinPgPick.hpp"
+#include "../../../include/ui/zero/CWinPgPlayback.hpp"
 
 using namespace NUi::NZero;
 
 /*----------------------------------------------------------------------*/
-CWinMain::CWinMain(NUi::WWindowManager windowManager) : CWindow(windowManager), m_metronom(false), m_octave(2) {
+CWinMain::CWinMain(NUi::WWindowManager windowManager) : CWindow(windowManager), m_metronom(false), m_octave(2),
+                                                        m_undoBlinkCountdown(0) {
     AWindowManager manager = windowManager.lock();
     m_app = manager->GetApp();
 }
@@ -30,7 +32,16 @@ void CWinMain::Draw() {
 
         g.SetStatusLed(EStatusLed::PLAY, m_app->IsPlaying() ? ELedState::ON : ELedState::OFF, playCol);
 
+        // Octave LED
         g.SetStatusLed(EStatusLed::OCTAVE, ELedState::ON, g.COL_GRADIENT_LONG[m_octave]);
+
+        // Undo LED
+        if (m_undoBlinkCountdown)
+            g.SetStatusLed(EStatusLed::UNDO, ELedState::BLINKING, NHw::ELedColor::GREEN);
+        else
+            g.SetStatusLed(EStatusLed::UNDO, m_app->RecordingGetCanUndo() ? ELedState::ON : ELedState::OFF,
+                           NHw::ELedColor::BLUE);
+
     }
 }
 
@@ -43,7 +54,6 @@ NUi::CInptutEventInfo CWinMain::ProcessInput(CInptutEventInfo input) {
         return input;
     }
 
-    //NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CWinMain: Got input %", control);
 
     if (input.m_type == EControlInputType::PRESS) {
         switch (input.m_input) {
@@ -84,6 +94,11 @@ NUi::CInptutEventInfo CWinMain::ProcessInput(CInptutEventInfo input) {
                 manager->OpenWindowCallback(std::make_shared<CWinPgPick>(m_manager));
                 return CInptutEventInfo();
 
+            case NUi::EControlInput::BTN_UNDO:
+                if (m_app->RecordingUndo())
+                    m_undoBlinkCountdown = 10;
+                return CInptutEventInfo();
+
 
             default:
                 return input;
@@ -96,11 +111,27 @@ NUi::CInptutEventInfo CWinMain::ProcessInput(CInptutEventInfo input) {
 
 /*----------------------------------------------------------------------*/
 void CWinMain::Init() {
-    // todo open a page
+    AWindowManager manager = m_manager.lock();
+    if (!manager) {
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CWinMain: Manager not found.");
+        return;
+    }
+
+    manager->OpenWindowCallback(std::make_shared<CWinPgPlayback>(m_manager));
+
+    // Add tracks to the app
+    for (int i = 0; i < 4; ++i) {
+        m_app->TrackCreate();
+    }
+    m_app->TrackActiveSet(m_app->TracksGet()[0]);
+
 }
 
 /*----------------------------------------------------------------------*/
 void CWinMain::Update() {
+    if (m_undoBlinkCountdown)
+        --m_undoBlinkCountdown;
+
     RequestRedraw();
 }
 

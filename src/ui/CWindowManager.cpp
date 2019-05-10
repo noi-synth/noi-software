@@ -104,7 +104,7 @@ void CWindowManager::Redraw() {
         case EDrawingPolicy::DRAW_ALL:
             if (m_mainWindow)
                 m_mainWindow->Draw();
-            for (auto it = m_windows.rbegin(); it != m_windows.rend(); --it)
+            for (auto it = m_windows.rbegin(); it != m_windows.rend(); ++it)
                 (*it)->Draw();
             break;
 
@@ -122,14 +122,19 @@ void CWindowManager::Redraw() {
 
 /*----------------------------------------------------------------------*/
 void CWindowManager::ProcessControlInput(CInptutEventInfo input) {
+
+
     auto it = m_windows.begin();
     m_breakWindowIteration = false;
 
-    while (input.m_input != EControlInput::NONE && it != m_windows.end() && !m_breakWindowIteration)
+    while (input.m_input != EControlInput::NONE && it != m_windows.end() && !m_breakWindowIteration) {
         input = (*it)->ProcessInput(input);
+        ++it;
+    }
 
     if (input.m_input != EControlInput::NONE && m_mainWindow && !m_breakWindowIteration)
         m_mainWindow->ProcessInput(input);
+
 }
 
 /*----------------------------------------------------------------------*/

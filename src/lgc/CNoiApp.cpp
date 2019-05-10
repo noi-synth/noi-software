@@ -13,6 +13,13 @@ CNoiApp::CNoiApp() : m_octave(3) {
     // Create SndCore
     m_state.m_soundCore = std::make_shared<NSnd::CSndCore>();
 
+    m_state.m_bpm = 120;
+    m_state.m_soundCore->BpmSet(m_state.m_bpm);
+
+    /*for (int i = 0; i < 4; ++i) {
+        TrackCreate();
+    }*/
+
     // Create instrument and chain
     NSnd::AInstrument instrument = std::make_shared<NPlg::NInstr::CInstrSimpleOsc>();
     m_state.m_chains.push_back(std::make_shared<NSnd::CChain>(instrument));
@@ -91,7 +98,15 @@ bool CNoiApp::PlaybackStop() {
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::PlaybackSetPosition(uint32_t position) {
+    if (IsRecording())
+        RecordingStop();
+
     m_state.m_soundCore->TrackSetPosition(position);
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::PlaybaclSetPositionBeats(uint32_t beat) {
+    PlaybackSetPosition(NSnd::SAMPLE_RATE * 60 / m_state.m_bpm * beat);
 }
 
 /*----------------------------------------------------------------------*/
@@ -100,13 +115,44 @@ uint32_t CNoiApp::PlaybackGetPosition() {
 }
 
 /*----------------------------------------------------------------------*/
+uint32_t CNoiApp::PlaybackGetPositionBeats() {
+    return m_state.m_soundCore->TrackGetPosition() / 60 * m_state.m_bpm / NSnd::SAMPLE_RATE;
+}
+
+/*----------------------------------------------------------------------*/
 bool CNoiApp::IsPlaying() {
     return m_state.m_soundCore->IsPlaying();
 }
 
 /*----------------------------------------------------------------------*/
+bool CNoiApp::BpmSet(uint32_t bpm) {
+    m_state.m_bpm = bpm;
+    m_state.m_soundCore->BpmSet(bpm);
+    return true;
+}
+
+/*----------------------------------------------------------------------*/
+uint32_t CNoiApp::BpmGet() {
+    return m_state.m_bpm;
+}
+
+/*----------------------------------------------------------------------*/
 bool CNoiApp::RecordingUndo() {
-    return m_state.m_soundCore->TrackRecordingUndo();
+    if (!m_state.m_activeTrack || !RecordingGetCanUndo())
+        return false;
+
+    m_state.m_activeTrack->UndoRecording();
+
+    return true;
+    //return m_state.m_soundCore->TrackRecordingUndo();
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::RecordingGetCanUndo() {
+    if (!m_state.m_activeTrack)
+        return false;
+
+    return m_state.m_activeTrack->CanUndo();
 }
 
 /*----------------------------------------------------------------------*/
@@ -120,15 +166,26 @@ bool CNoiApp::MetronomeSet(bool enable) {
     m_state.m_soundCore->SetMetronome(enable);
 }
 
+/*----------------------------------------------------------------------*/
+NSnd::ATrack CNoiApp::TrackCreate() {
 
+    NSnd::ATrack track = m_state.m_soundCore->TrackCreate();
+    if (track)
+        m_state.m_tracks.push_back(track);
 
+    return track;
+}
 
+/*----------------------------------------------------------------------*/
+bool CNoiApp::TrackActiveSet(NSnd::ATrack track) {
+    if (m_state.m_soundCore->TrackSetActive(track)) {
+        m_state.m_activeTrack = track;
+        return true;
+    }
+    return false;
+}
 
-
-
-
-
-
-
-
-
+/*----------------------------------------------------------------------*/
+const std::vector<NSnd::ATrack> CNoiApp::TracksGet() {
+    return m_state.m_tracks;
+}

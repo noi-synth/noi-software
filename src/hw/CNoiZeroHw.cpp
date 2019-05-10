@@ -218,8 +218,8 @@ void CNoiZeroHw::ProcessReadTimeValues(NHw::EExtenderId extenderId, uint16_t val
 
                 // Only evaluate knobs from interrupt-time values.
                 if (interruptTimeValues && (value & 1)) {
-                    SendControl(NUi::CInptutEventInfo(input, (value & 2) ? NUi::EControlInputType::SCROLL_UP
-                                                                         : NUi::EControlInputType::SCROLL_DOWN, false));
+                    SendControl(NUi::CInptutEventInfo(input, (value & 2) ? NUi::EControlInputType::SCROLL_DOWN
+                                                                         : NUi::EControlInputType::SCROLL_UP, false));
                 }
 
                 // Don't send knob updates either as note keys or button presses.

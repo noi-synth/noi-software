@@ -63,9 +63,15 @@ namespace NSnd {
 
         uint32_t TrackGetPosition();
 
+        ATrack TrackCreate();
+
+        bool TrackSetActive(ATrack track);
+
         bool TrackSetPosition(uint32_t position);
 
         bool SetMetronome(bool enabled);
+
+        void BpmSet(uint32_t bpm);
 
 
     private:

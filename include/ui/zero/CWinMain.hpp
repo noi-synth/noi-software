@@ -26,6 +26,8 @@ namespace NUi {
 
             bool m_metronom;
             uint32_t m_octave;
+
+            uint32_t m_undoBlinkCountdown;
         };
     }
 }
