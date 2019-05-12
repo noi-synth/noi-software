@@ -28,6 +28,9 @@ namespace NUi {
             uint32_t m_octave;
 
             uint32_t m_undoBlinkCountdown;
+
+            uint32_t m_lastBeat;
+            uint32_t m_beatBlinkCountdown;
         };
     }
 }

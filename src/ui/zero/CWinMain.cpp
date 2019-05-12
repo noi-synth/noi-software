@@ -11,7 +11,8 @@ using namespace NUi::NZero;
 
 /*----------------------------------------------------------------------*/
 CWinMain::CWinMain(NUi::WWindowManager windowManager) : CWindow(windowManager), m_metronom(false), m_octave(2),
-                                                        m_undoBlinkCountdown(0) {
+                                                        m_undoBlinkCountdown(0), m_lastBeat(0),
+                                                        m_beatBlinkCountdown(0) {
     AWindowManager manager = windowManager.lock();
     m_app = manager->GetApp();
 }
@@ -27,8 +28,12 @@ void CWinMain::Draw() {
 
         // Play LED
         NHw::ELedColor playCol = NHw::ELedColor::GREEN;
+
         if (m_app->IsRecording())
             playCol = NHw::ELedColor::RED;
+
+        if (m_beatBlinkCountdown)
+            playCol = NHw::ELedColor::WHITE;
 
         g.SetStatusLed(EStatusLed::PLAY, m_app->IsPlaying() ? ELedState::ON : ELedState::OFF, playCol);
 
@@ -131,6 +136,15 @@ void CWinMain::Init() {
 void CWinMain::Update() {
     if (m_undoBlinkCountdown)
         --m_undoBlinkCountdown;
+
+    if (m_beatBlinkCountdown)
+        --m_beatBlinkCountdown;
+
+    uint32_t beat = m_app->PlaybackGetPositionBeats();
+    if (beat != m_lastBeat) {
+        m_lastBeat = beat;
+        m_beatBlinkCountdown = beat % 4 ? 1 : 4;
+    }
 
     RequestRedraw();
 }
