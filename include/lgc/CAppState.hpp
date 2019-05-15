@@ -24,6 +24,7 @@ namespace NLgc {
         //NSnd::AInstrument m_instrument;
         int m_chainId;
         NSnd::ATrack m_activeTrack;
+        NSnd::AChain m_activeChain;
         NSnd::ASndCore m_soundCore;
     };
 }

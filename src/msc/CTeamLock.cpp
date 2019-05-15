@@ -20,7 +20,6 @@ bool CTeamLock::TryLockBlue() {
         // One step closer to get the lock
         ++m_teamScore;
     }
-    //m_teamScore = 1000000;
     return true;
 }
 
@@ -33,7 +32,6 @@ bool CTeamLock::TryLockRed() {
         // One step closer to get the lock
         --m_teamScore;
     }
-    //m_teamScore = -1000000;
     return true;
 }
 

@@ -60,7 +60,16 @@ namespace NLgc {
 
         bool TrackActiveSet(NSnd::ATrack track);
 
-        const std::vector<NSnd::ATrack> TracksGet();
+        NSnd::ATrack TrackActiveGet();
+
+        std::vector<NSnd::ATrack> TracksGet();
+
+        bool ChainActiveSet(NSnd::AChain chain);
+
+        NSnd::AChain ChainActiveGet();
+
+        std::vector<NSnd::AChain> ChainsGet();
+
 
     private:
         CAppState m_state;

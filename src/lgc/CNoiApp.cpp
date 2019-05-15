@@ -24,7 +24,8 @@ CNoiApp::CNoiApp() : m_octave(3) {
     NSnd::AInstrument instrument = std::make_shared<NPlg::NInstr::CInstrSimpleOsc>();
     m_state.m_chains.push_back(std::make_shared<NSnd::CChain>(instrument));
     //m_state.m_soundCore.get();
-    m_state.m_soundCore->ChainSelect(m_state.m_chains[0]);
+    ChainActiveSet(m_state.m_chains[0]);
+    //m_state.m_soundCore->ChainSelect(m_state.m_chains[0]);
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "App constructor. m_sndCore = %", m_state.m_soundCore.get());
 
 
@@ -177,6 +178,11 @@ NSnd::ATrack CNoiApp::TrackCreate() {
 }
 
 /*----------------------------------------------------------------------*/
+NSnd::ATrack CNoiApp::TrackActiveGet() {
+    return m_state.m_activeTrack;
+}
+
+/*----------------------------------------------------------------------*/
 bool CNoiApp::TrackActiveSet(NSnd::ATrack track) {
     if (m_state.m_soundCore->TrackSetActive(track)) {
         m_state.m_activeTrack = track;
@@ -186,6 +192,32 @@ bool CNoiApp::TrackActiveSet(NSnd::ATrack track) {
 }
 
 /*----------------------------------------------------------------------*/
-const std::vector<NSnd::ATrack> CNoiApp::TracksGet() {
+bool CNoiApp::ChainActiveSet(NSnd::AChain chain) {
+    if (m_state.m_soundCore->ChainSelect(chain)) {
+        m_state.m_activeChain = chain;
+        return true;
+    }
+
+    return false;
+}
+
+
+/*----------------------------------------------------------------------*/
+std::vector<NSnd::ATrack> CNoiApp::TracksGet() {
     return m_state.m_tracks;
 }
+
+/*----------------------------------------------------------------------*/
+NSnd::AChain CNoiApp::ChainActiveGet() {
+    return m_state.m_activeChain;
+}
+
+/*----------------------------------------------------------------------*/
+std::vector<NSnd::AChain> CNoiApp::ChainsGet() {
+    return m_state.m_chains;
+}
+
+
+
+
+

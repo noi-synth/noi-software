@@ -129,6 +129,8 @@ void CWindowManager::ProcessControlInput(CInptutEventInfo input) {
 
     while (input.m_input != EControlInput::NONE && it != m_windows.end() && !m_breakWindowIteration) {
         input = (*it)->ProcessInput(input);
+        if (m_breakWindowIteration)
+            break;
         ++it;
     }
 

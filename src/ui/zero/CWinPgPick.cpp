@@ -5,6 +5,7 @@
 #include "../../../include/ui/zero/CWinPgPick.hpp"
 #include "../../../include/ui/zero/CNoiZeroCommunicator.hpp"
 #include "../../../include/ui/zero/CWinPgPlayback.hpp"
+#include "../../../include/ui/zero/CWinPgEffects.hpp"
 
 using namespace NUi::NZero;
 
@@ -43,6 +44,9 @@ NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
         case 0:
             manager->OpenSingleWindowCallback(std::make_shared<CWinPgPlayback>(m_manager));
             break;
+        case 4:
+            manager->OpenSingleWindowCallback(std::make_shared<CWinPgEffects>(m_manager));
+            break;
 
         default:
             NMsc::CLogger::Log(NMsc::ELogType::WARNING, "CWinPgPick: Page number % not implemented", pgNumber);
@@ -52,6 +56,7 @@ NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
     // Open picker on top
     manager->OpenWindowCallback(std::make_shared<CWinPgPick>(m_manager));
 
+    return CInptutEventInfo();
 }
 
 /*----------------------------------------------------------------------*/

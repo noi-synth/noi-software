@@ -59,7 +59,8 @@ CInstrSimpleOsc::CSimpleOscVoice::CSimpleOscVoice(CInstrument &instrument, NSnd:
         : CInstrument::CInstrumentVoice(instrument, tone), m_phase(0) {
     if (!waveTablesInitialized) {
         for (int i = 0; i < 512; ++i) {
-            SIN_WAVE[i] = sin(i / (double) WAVETABLE_LEN * M_PI);
+            //SIN_WAVE[i] = sin(i / (double) WAVETABLE_LEN * M_PI);
+            SIN_WAVE[i] = (i < WAVETABLE_LEN / 2) ? 1 : -1;
         }
 
         waveTablesInitialized = true;
