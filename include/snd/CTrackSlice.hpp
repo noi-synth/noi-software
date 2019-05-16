@@ -24,7 +24,7 @@ namespace NSnd {
          * Get unique ID of this slice
          * @return unique ID
          */
-        uint32_t GetId();
+        uint64_t GetId();
 
         /**
          * Get raw audio buffer of this slice
@@ -79,6 +79,18 @@ namespace NSnd {
          * Stop an automatic allocation of free unused slices.
          */
         static void StopAutomaticAllocation();
+
+        /**
+         * Write all slices to binary output
+         * @param output Write target
+         */
+        static void SerializeAllUsedSlices(std::ostream &output);
+
+        /**
+         * Deserialize all slices from input
+         * @param input Data source
+         */
+        static void DeserializeSlices(std::istream &input);
 
     private:
 

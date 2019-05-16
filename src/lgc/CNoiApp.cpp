@@ -2,9 +2,11 @@
 // Created by ddl_blue on 2.8.18.
 //
 
+#include <fstream>
 #include "../../include/lgc/CNoiApp.hpp"
 #include "../../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/msc/CSerializationNode.hpp"
 
 using namespace NLgc;
 
@@ -217,7 +219,41 @@ std::vector<NSnd::AChain> CNoiApp::ChainsGet() {
     return m_state.m_chains;
 }
 
+/*----------------------------------------------------------------------*/
+bool CNoiApp::SaveProject(std::string name) {
+    std::ofstream project(name + ".noiProj");
+    std::ofstream data(name + ".noiDat");
 
+    // serialize track data
+    NSnd::CTrackSlice::SerializeAllUsedSlices(data);
+
+    NMsc::ASerializationNode rootNode = NMsc::CSerializationNode::GetNewTopNode();
+
+    m_state.Serialize(rootNode);
+
+    project << rootNode->Dump();
+
+    project.close();
+    data.close();
+
+}
+
+/*----------------------------------------------------------------------*/
+bool CNoiApp::LoadProject(std::string name) {
+    std::ifstream project(name + ".noiProj");
+    std::ifstream data(name + ".noiDat");
+
+    // Deserialize track data
+    NSnd::CTrackSlice::DeserializeSlices(data);
+
+    // Load project
+
+    NMsc::ASerializationNode projNode = NMsc::CSerializationNode::Deserialize(project);
+    m_state = CAppState(projNode);
+
+    project.close();
+    data.close();
+}
 
 
 

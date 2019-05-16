@@ -28,47 +28,47 @@ CTrack::CTrack() : m_playbackPosition(0), m_farthestPlaybackSample(0), m_shouldU
     // Start CTrackSlice allocation
     CTrackSlice::StartAutomaticAllocation();
 
-    m_workerId = NMsc::CMaintainer::GetInstance().RegisterTask([&]() {
-        // nothing to do, no need to lock anything
-        if (m_quedTrackManipulations.Empty() && !m_recordingEmergencyLen &&
-            ((m_trackData.size() - m_farthestPlaybackSample) > TRACK_REALLOCATION_THRESHOLD) &&
-            (m_undoRecording.size() - (m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition) >
-             TRACK_REALLOCATION_THRESHOLD))
-            return;
+    RegisterWorkerTask();
 
-        // RT thread holds the lock, try it next time
-        if (!m_recordingManipulationLock.TryLockBlue())
-            return;
+}
 
-        // Alloc more space
-        // todo change this while to if - calculate the final multiplication instead of iterating
-        // todo this might also create an endless loop when RPI runs out of RAM, right?
-        while ((m_trackData.size() - m_farthestPlaybackSample) <= TRACK_REALLOCATION_THRESHOLD)
-            m_trackData.resize(m_trackData.size() * TRACK_REALLOCATION_RATIO, nullptr);
+/*----------------------------------------------------------------------*/
+CTrack::CTrack(NMsc::ASerializationNode node) : m_playbackPosition(0), m_farthestPlaybackSample(0),
+                                                m_shouldUpdatePosition(false), m_volume(1),
+                                                m_isRecording(false),
+                                                m_undoRecordingStartSamplePosition(0),
+                                                m_undoRecordingEndSamplePosition(0),
+                                                m_recordingEmergencyLen(0) {
 
-        while (m_undoRecording.size() - (m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition) <=
-               TRACK_REALLOCATION_THRESHOLD)
-            m_undoRecording.resize(m_undoRecording.size() * TRACK_REALLOCATION_RATIO, nullptr);
+    m_undoRecording.resize(8, nullptr);
 
-#ifdef DEBUG
-            NMsc::CDebugInfo::m_sndTrackSize = m_trackData.size();
-#endif
+    std::vector<int64_t> track = node->GetIntArray("slices");
+    m_trackData.reserve(track.size());
 
-
-
-        if (m_recordingEmergencyLen) {
-            // todo emergency recording
+    // Load all slices
+    if (track.size()) {
+        for (auto item : track) {
+            if (item) {
+                CTrackSlice *slice = CTrackSlice::GetSlice(item);
+                if (slice)
+                    m_trackData.push_back(slice);
+                else {
+                    NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CTrack: Slice ID % not found!", item);
+                    m_trackData.push_back(nullptr);
+                }
+            }
         }
+    } else {
+        m_trackData.resize(8, nullptr);
+        NMsc::CLogger::Log(NMsc::ELogType::WARNING, "CTrack: Loaded track with 0 slices.");
+    }
 
-        // Serve deferred calls.
-        while (!m_quedTrackManipulations.Empty()) {
-            // Pop function and CALL it.
-            m_quedTrackManipulations.Pop()();
-        }
+    m_farthestPlaybackSample = m_trackData.size() + 10;
 
-        m_recordingManipulationLock.Unlock();
+    // Start CTrackSlice allocation
+    CTrackSlice::StartAutomaticAllocation();
 
-    });
+    RegisterWorkerTask();
 }
 
 /*----------------------------------------------------------------------*/
@@ -329,9 +329,64 @@ bool CTrack::CanUndo() {
     return m_undoRecordingStartSamplePosition != m_undoRecordingEndSamplePosition;
 }
 
+/*----------------------------------------------------------------------*/
+void CTrack::Serialize(NMsc::ASerializationNode &node) const {
+    std::vector<int64_t> track;
+    track.reserve(m_trackData.size());
+
+    for (const auto &slice : m_trackData) {
+        if (slice)
+            track.push_back(slice->GetId());
+        else
+            track.push_back(0);
+    }
+
+    node->SerializeIntArray("slices", std::move(track));
+}
+
+/*----------------------------------------------------------------------*/
+void CTrack::RegisterWorkerTask() {
+    m_workerId = NMsc::CMaintainer::GetInstance().RegisterTask([&]() {
+        // nothing to do, no need to lock anything
+        if (m_quedTrackManipulations.Empty() && !m_recordingEmergencyLen &&
+            ((m_trackData.size() - m_farthestPlaybackSample) > TRACK_REALLOCATION_THRESHOLD) &&
+            (m_undoRecording.size() - (m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition) >
+             TRACK_REALLOCATION_THRESHOLD))
+            return;
+
+        // RT thread holds the lock, try it next time
+        if (!m_recordingManipulationLock.TryLockBlue())
+            return;
+
+        // Alloc more space
+        // todo change this while to if - calculate the final multiplication instead of iterating
+        // todo this might also create an endless loop when RPI runs out of RAM, right?
+        while ((m_trackData.size() - m_farthestPlaybackSample) <= TRACK_REALLOCATION_THRESHOLD)
+            m_trackData.resize(m_trackData.size() * TRACK_REALLOCATION_RATIO, nullptr);
+
+        while (m_undoRecording.size() - (m_undoRecordingEndSamplePosition - m_undoRecordingStartSamplePosition) <=
+               TRACK_REALLOCATION_THRESHOLD)
+            m_undoRecording.resize(m_undoRecording.size() * TRACK_REALLOCATION_RATIO, nullptr);
+
+#ifdef DEBUG
+        NMsc::CDebugInfo::m_sndTrackSize = m_trackData.size();
+#endif
 
 
+        if (m_recordingEmergencyLen) {
+            // todo emergency recording
+        }
 
+        // Serve deferred calls.
+        while (!m_quedTrackManipulations.Empty()) {
+            // Pop function and CALL it.
+            m_quedTrackManipulations.Pop()();
+        }
+
+        m_recordingManipulationLock.Unlock();
+
+    });
+}
 
 
 

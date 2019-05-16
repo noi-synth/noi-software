@@ -108,6 +108,16 @@ NUi::CInptutEventInfo WinMain::ProcessInput(CInptutEventInfo input) {
                 wm->CloseTopWindowCallback();
             }));
             ActionList.push_back(
+                    std::make_pair("Save", [&]() {
+                        m_app->SaveProject("lulz");
+                    }));
+
+            ActionList.push_back(
+                    std::make_pair("Load", [&]() {
+                        m_app->LoadProject("lulz");
+                    }));
+
+            ActionList.push_back(
                     std::make_pair("test2", [&]() { NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "test2"); }));
             ActionList.push_back(
                     std::make_pair("test3", [&]() { NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "test3"); }));

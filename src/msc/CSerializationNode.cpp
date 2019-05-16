@@ -334,8 +334,20 @@ std::string CSerializationNode::Dump() {
 
 /*----------------------------------------------------------------------*/
 ASerializationNode CSerializationNode::Deserialize(std::istream &input) {
-    // todo
-    return nullptr;
+
+    std::string json((std::istreambuf_iterator<char>(input)),
+                     std::istreambuf_iterator<char>());
+
+    rapidjson::Document document;
+    document.Parse(json.c_str());
+
+    ASerializationNode root = GetNewTopNode();
+
+    root->Deserialize(document);
+
+    ASerializationNode rootSubnode = root->GetSubnode("root");
+
+    return rootSubnode;
 }
 
 /*----------------------------------------------------------------------*/
@@ -537,22 +549,25 @@ void CSerializationNode::Dump(rapidjson::Value &node, rapidjson::Document &docum
 void CSerializationNode::Deserialize(rapidjson::Value &node) {
     for (auto &val : node.GetObject()) {
 
-        // todo nejednoznačnost
         // Int
         if (val.value.IsInt())
-            SerializeInt(val.name.GetString(), val.value.GetInt64());
-            // Double
-        else if (val.value.IsDouble())
-            SerializeDouble(val.name.GetString(), val.value.GetDouble());
+            SerializeInt(val.name.GetString(), val.value.GetInt64(), true);
+
+        // Double
+        if (val.value.IsDouble())
+            SerializeDouble(val.name.GetString(), val.value.GetDouble(), true);
+
         // Bool
         if (val.value.IsBool())
-            SerializeBool(val.name.GetString(), val.value.GetBool());
+            SerializeBool(val.name.GetString(), val.value.GetBool(), true);
+
         // String
         if (val.value.IsString())
-            SerializeString(val.name.GetString(), val.value.GetString());
+            SerializeString(val.name.GetString(), val.value.GetString(), true);
+
         // Subnode
         if (val.value.IsObject()) {
-            ASerializationNode newSubnode = GetNewSubNode(val.name.GetString());
+            ASerializationNode newSubnode = GetNewSubNode(val.name.GetString(), true);
             newSubnode->Deserialize(val.value);
         } else if (val.value.IsArray()) {
             rapidjson::Value &arr = val.value;

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include "../snd/CSndCore.hpp"
+#include "../msc/CSerializationNode.hpp"
 
 namespace NLgc {
     /**
@@ -16,6 +17,15 @@ namespace NLgc {
     class CAppState {
     public:
 
+        CAppState() = default;
+
+        CAppState(NMsc::ASerializationNode &node);
+
+        /**
+         * Serialize app state
+         * @param node Node for serialization
+         */
+        void Serialize(NMsc::ASerializationNode &node);
 
         // Serialized
         /**

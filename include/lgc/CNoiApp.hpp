@@ -196,6 +196,19 @@ namespace NLgc {
          */
         std::vector<NSnd::AChain> ChainsGet();
 
+        /**
+         * Saves current project to disk.
+         * @param name Name of the project file
+         * @return True on success
+         */
+        bool SaveProject(std::string name);
+
+        /**
+         * Destroys current project and loads a project from disk.
+         * @param name Name of the project file
+         * @return  True on success
+         */
+        bool LoadProject(std::string name);
 
     private:
         /**

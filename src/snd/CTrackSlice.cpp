@@ -14,8 +14,8 @@ NMsc::CLocklessQue<CTrackSlice *> CTrackSlice::m_newUnusedSlices;
 std::atomic_int CTrackSlice::m_newUnusedSliceCnt;
 NMsc::CLocklessQue<CTrackSlice *> CTrackSlice::m_unusedSlices;
 SND_DATA_TYPE CTrackSlice::m_trashBuffer[NSnd::TRACK_SLICE_BUFFER_LEN];
-uint32_t CTrackSlice::m_uniqueIdCounter;
-std::map<uint32_t, CTrackSlice *> CTrackSlice::m_sliceDatabase;
+uint64_t CTrackSlice::m_uniqueIdCounter;
+std::map<uint64_t, CTrackSlice *> CTrackSlice::m_sliceDatabase;
 int CTrackSlice::m_workerId = 0;
 
 /*----------------------------------------------------------------------*/
@@ -30,7 +30,7 @@ CTrackSlice::~CTrackSlice() {
 }
 
 /*----------------------------------------------------------------------*/
-uint32_t CTrackSlice::GetId() {
+uint64_t CTrackSlice::GetId() {
     return m_id;
 }
 
@@ -168,4 +168,78 @@ CTrackSlice *CTrackSlice::Clone() {
     CTrackSlice *rtrn = GetNewSlice();
     memcpy(rtrn->m_buffer, m_buffer, sizeof(SND_DATA_TYPE) * NSnd::TRACK_SLICE_BUFFER_LEN);
     return rtrn;
+}
+
+/*----------------------------------------------------------------------*/
+void CTrackSlice::SerializeAllUsedSlices(std::ostream &output) {
+
+    union IdNumberUni {
+        uint64_t ID;
+        char data[sizeof(ID)];
+    };
+
+    union SoundDataUni {
+        SND_DATA_TYPE sound[NSnd::TRACK_SLICE_BUFFER_LEN];
+        char data[sizeof(SND_DATA_TYPE) * NSnd::TRACK_SLICE_BUFFER_LEN];
+    };
+
+    // Save ID counter
+    IdNumberUni maxId;
+    maxId.ID = m_uniqueIdCounter;
+    output.write(maxId.data, sizeof(maxId));
+
+    for (const auto &slice : m_sliceDatabase) {
+        IdNumberUni id;
+        SoundDataUni sound;
+
+        id.ID = slice.first;
+        std::memcpy(sound.sound, slice.second->m_buffer, sizeof(SoundDataUni));
+
+        // Write to file
+        output.write(id.data, sizeof(id));
+        output.write(sound.data, sizeof(sound));
+
+        if (!output.good()) {
+            NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CTrackSlice: Serialization failed, output is not \"good\".");
+            return;
+        }
+    }
+}
+
+/*----------------------------------------------------------------------*/
+void CTrackSlice::DeserializeSlices(std::istream &input) {
+    union IdNumberUni {
+        uint64_t ID;
+        char data[sizeof(ID)];
+    };
+
+    union SoundDataUni {
+        SND_DATA_TYPE sound[NSnd::TRACK_SLICE_BUFFER_LEN];
+        char data[sizeof(SND_DATA_TYPE) * NSnd::TRACK_SLICE_BUFFER_LEN];
+    };
+
+    DeleteAllSlices();
+
+    // Get ID counter
+    IdNumberUni maxId;
+    input.read(maxId.data, sizeof(maxId));
+    m_uniqueIdCounter = maxId.ID;
+
+    while (input.good()) {
+        IdNumberUni id;
+        SoundDataUni sound;
+
+        input.read(id.data, sizeof(id));
+        input.read(sound.data, sizeof(sound));
+
+        if (!input.good())
+            break;
+
+        CTrackSlice *newSlice = new CTrackSlice();
+
+        newSlice->m_id = id.ID;
+        std::memcpy(newSlice->m_buffer, sound.sound, sizeof(SoundDataUni));
+
+        m_sliceDatabase.insert(std::make_pair(id.ID, newSlice));
+    }
 }

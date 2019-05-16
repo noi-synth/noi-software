@@ -11,6 +11,7 @@
 #include "../msc/CTeamLock.hpp"
 #include "../msc/CLocklessQue.hpp"
 #include "CTrackSlice.hpp"
+#include "../msc/CSerializationNode.hpp"
 
 namespace NSnd {
     /**
@@ -19,6 +20,8 @@ namespace NSnd {
     class CTrack {
     public:
         CTrack();
+
+        CTrack(NMsc::ASerializationNode node);
 
         ~CTrack();
 
@@ -89,7 +92,18 @@ namespace NSnd {
          */
         static inline uint32_t SampleNumberOffsetToPosition(uint32_t sampleNumber, uint32_t sampleOffset);
 
+        /**
+         * Serialize this track
+         * @param node Node for serialization
+         */
+        void Serialize(NMsc::ASerializationNode &node) const;
+
     private:
+
+        /**
+         * Registers a worker task that takes care of track space allocation
+         */
+        void RegisterWorkerTask();
 
         /**
          * Clears undo. Intended for use in RT thread.
