@@ -10,6 +10,9 @@
 
 namespace NUi {
     namespace NTerm {
+        /**
+         * Window for picking audio device
+         */
         class WinAudioDevicePick : public CWindow {
 
         public:
@@ -24,11 +27,19 @@ namespace NUi {
 
             void Draw() override;
 
+            /**
+             * Set chosen audio device
+             */
             void SetPaDevice();
 
         private:
+            /// Found devices
             std::vector<NSnd::CAudioDeviceInfo> m_devices;
+
+            /// Index of selected device
             int m_selectedDevice;
+
+            /// Number of found devices
             int m_devCnt;
         };
     }

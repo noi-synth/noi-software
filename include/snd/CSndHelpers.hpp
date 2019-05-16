@@ -10,8 +10,17 @@
 #include "NSndConfig.hpp"
 
 namespace NSnd {
+    /**
+     * Helper functions
+     */
     class CSndHelpers {
     public:
+        /**
+         * Get step that you should play a sample to get a note
+         * @param tone Tone you want to play
+         * @param sampleLen Sample length (assuming sample has one period of sound only)
+         * @return Step (speed) you should play sample at
+         */
         static double GetSampleStep(ETones tone, int sampleLen);
 
     };

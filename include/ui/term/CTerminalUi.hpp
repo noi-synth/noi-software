@@ -10,6 +10,9 @@
 
 namespace NUi {
     namespace NTerm {
+        /**
+         * NCurses based terminal UI for debug purpose.
+         */
         class CTerminalUi : public CUi {
         public:
             CTerminalUi(NLgc::ANoiApp app);
@@ -17,6 +20,7 @@ namespace NUi {
         private:
             virtual void UiThreadWorker() override;
 
+            /// Used for toggling notes
             std::vector<bool> m_toneState;
         };
     }

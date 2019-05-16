@@ -9,10 +9,21 @@
 #include "../CInputEventInfo.hpp"
 
 namespace NUi::NZero {
+    /**
+     * Represent NoiZero UI
+     */
     class CZeroUi : public CUi {
     public:
+        /**
+         * Constructor
+         * @param app Reference to main App class
+         */
         CZeroUi(NLgc::ANoiApp app);
 
+        /**
+         * Send user input to widnows
+         * @param input User input
+         */
         void ProcessInput(CInptutEventInfo input);
 
     private:

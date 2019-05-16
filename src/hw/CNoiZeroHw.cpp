@@ -13,7 +13,7 @@
 
 using namespace NHw;
 /*----------------------------------------------------------------------*/
-CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false), m_msWaiting(1),
+CNoiZeroHw::CNoiZeroHw() : m_stopWorker(false),
                            m_extenders(std::vector<CI2cGpioExtender>(
                                    {
                                            CI2cGpioExtender(0x20, 0xFFFF, 0x0000), // A 1111 1111 1111 1111
@@ -171,7 +171,6 @@ void CNoiZeroHw::WorkerMethod() {
         EExtenderId extenderId = EExtenderId::A;
         // Did interrupt come?
         if (!res) {
-            m_msWaiting = MIN_WAITING;
             for (auto &extender : m_extenders) {
                 // Get values from extender
                 extender.UpdateInputAfterInterrupt(preValue, preDiff, value, diff);

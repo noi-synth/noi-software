@@ -8,8 +8,15 @@
 #include "../CWindow.hpp"
 
 namespace NUi::NZero {
+    /**
+     * Page for playback control and track position seeking
+     */
     class CWinPgPlayback : public CWindow {
     public:
+        /**
+         * Constructor
+         * @param windowManager Parent window manager
+         */
         explicit CWinPgPlayback(WWindowManager windowManager);
 
         virtual CInptutEventInfo ProcessInput(CInptutEventInfo input) override;
@@ -21,7 +28,9 @@ namespace NUi::NZero {
         //void Init() override;
 
     private:
+        /// Reference to main App class
         NLgc::ANoiApp m_app;
+        /// Current beat of playback
         uint32_t m_currentBeat;
     };
 }

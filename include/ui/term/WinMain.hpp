@@ -9,6 +9,9 @@
 
 namespace NUi {
     namespace NTerm {
+        /**
+         * Main window of terminal UI
+         */
         class WinMain : public CWindow {
         public:
             explicit WinMain(WWindowManager windowManager);
@@ -22,9 +25,12 @@ namespace NUi {
             void Init() override;
 
         private:
+            /// Reference to main app
             NLgc::ANoiApp m_app;
+
+            /// number of frames requested from latest RT thread call
             int m_frameBufferLength;
-            int m_position;
+            // int m_position;
         };
     }
 

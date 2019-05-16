@@ -10,21 +10,41 @@
 #include "../snd/CSndCore.hpp"
 
 namespace NLgc {
+    /**
+     * Represents a current state of the app. Holds information about current project.
+     */
     class CAppState {
     public:
 
 
         // Serialized
+        /**
+         * All chains in the project
+         */
         std::vector<NSnd::AChain> m_chains;
+        /**
+         * All tracks in the project
+         */
         std::vector<NSnd::ATrack> m_tracks;
-        // Track BPM
+        /**
+         * Track BPM
+         */
         int m_bpm;
 
         // Not serialized
-        //NSnd::AInstrument m_instrument;
-        int m_chainId;
+
+        //int m_chainId;
+        /**
+         * track currently active for recording
+         */
         NSnd::ATrack m_activeTrack;
+        /**
+         * Currently active chain
+         */
         NSnd::AChain m_activeChain;
+        /**
+         * Reference to the sound core
+         */
         NSnd::ASndCore m_soundCore;
     };
 }

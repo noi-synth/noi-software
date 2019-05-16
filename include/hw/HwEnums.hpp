@@ -6,6 +6,9 @@
 #define NOI_SOFTWARE_HWENUMS_HPP
 namespace NHw {
 
+    /**
+     * All possible colors of RGB LED
+     */
     enum ELedColor {
         BLACK = 0b000,
         RED = 0b001,
@@ -18,6 +21,9 @@ namespace NHw {
     };
 
     /*----------------------------------------------------------------------*/
+    /**
+     * All LEDs connected to Noi Zero
+     */
     enum ELedId {
         S0, S1, S2, S3,
         F0, F1, F2, F3, F4, F5, F6, F7,
@@ -25,6 +31,9 @@ namespace NHw {
     };
 
     /*----------------------------------------------------------------------*/
+    /**
+     * All GPIO extenders connected to the device
+     */
     enum EExtenderId {
         A, B, C, D, E
     };

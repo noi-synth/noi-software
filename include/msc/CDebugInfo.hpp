@@ -10,6 +10,9 @@
 #include <atomic>
 
 namespace NMsc {
+    /**
+     * Holds temporaly globally some random info. For debug purposes only. Not documented, not an actual part of the app.
+     */
     class CDebugInfo {
     public:
         static std::atomic_int m_lastAudioBufferLen;

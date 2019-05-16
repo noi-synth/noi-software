@@ -115,16 +115,16 @@ bool CTrackManager::RemoveAllTracks() {
     return false;
 }
 
-/*----------------------------------------------------------------------*/
-bool CTrackManager::UndoRecording() {
-    if (m_trackLock.TryLockBlue()) {
-        if (m_selectedTrack)
-            m_selectedTrack->UndoRecording();
-        m_trackLock.Unlock();
-        return true;
-    }
-    return false;
-}
+///*----------------------------------------------------------------------*/
+//bool CTrackManager::UndoRecording() {
+//    if (m_trackLock.TryLockBlue()) {
+//        if (m_selectedTrack)
+//            m_selectedTrack->UndoRecording();
+//        m_trackLock.Unlock();
+//        return true;
+//    }
+//    return false;
+//}
 
 /*----------------------------------------------------------------------*/
 bool CTrackManager::StartRecording() {

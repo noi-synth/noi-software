@@ -84,16 +84,16 @@ bool CSndCore::ChainSelect(NSnd::AChain &chain) {
     return m_newSelectedChain.Push(chain);
 }
 
-/*----------------------------------------------------------------------*/
-void CSndCore::ChainClearAllActive() {
-    m_shouldClearActiveCHains = true;
-}
+///*----------------------------------------------------------------------*/
+//void CSndCore::ChainClearAllActive() {
+//    m_shouldClearActiveCHains = true;
+//}
 
 /*----------------------------------------------------------------------*/
 void CSndCore::Panic() {
     AudioDeviceStop();
     m_newSelectedChain.Clear();
-    m_activeChains.clear();
+    //m_activeChains.clear();
     m_selectedChain.reset();
 }
 
@@ -203,9 +203,9 @@ bool CSndCore::TrackSetPosition(uint32_t position) {
 }
 
 /*----------------------------------------------------------------------*/
-bool CSndCore::TrackRecordingUndo() {
-    return m_trackManager->UndoRecording();
-}
+//bool CSndCore::TrackRecordingUndo() {
+//    return m_trackManager->UndoRecording();
+//}
 
 /*----------------------------------------------------------------------*/
 bool CSndCore::SetMetronome(bool enabled) {

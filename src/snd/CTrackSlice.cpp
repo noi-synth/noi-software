@@ -84,12 +84,12 @@ CTrackSlice *CTrackSlice::GetNewSlice() {
 void CTrackSlice::DeleteAllSlices() {
 
     // Deleted buffers
-    m_unusedSlices.Clear();
+    m_unusedSlices.Clear(); //todo memory leak
 //    while (!m_unusedSlices.Empty())
 //        delete m_unusedSlices.Pop();
 
     // Pre-allocated buffers
-    m_newUnusedSlices.Clear();
+    m_newUnusedSlices.Clear(); //todo memory leak?
 //    while (!m_newUnusedSlices.Empty())
 //        delete m_newUnusedSlices.Pop();
     m_newUnusedSliceCnt = 0;

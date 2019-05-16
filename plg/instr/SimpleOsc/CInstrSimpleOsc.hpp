@@ -12,12 +12,16 @@ namespace NPlg {
     namespace NInstr {
         //TODO plugin logic
         //TODO implement ticks and everything
+        /**
+         * Oscillator instrument
+         */
         class CInstrSimpleOsc : public NSnd::CInstrument {
         public:
             CInstrSimpleOsc();
 
 
         protected:
+
             bool m_on;
 
             class CSimpleOscVoice : public CInstrument::CInstrumentVoice {
@@ -31,14 +35,19 @@ namespace NPlg {
 
             protected:
 
+                /// Phase of the oscillation
                 double m_phase;
 
+                /// Step
                 double m_sampleStep;
 
+                /// true if wave tables were initialized
                 static bool waveTablesInitialized;
 
+                /// Length of wave tables
                 static const int WAVETABLE_LEN = 512;
 
+                /// Sin wave table
                 static float SIN_WAVE[WAVETABLE_LEN];
             };
 

@@ -9,8 +9,16 @@
 
 namespace NUi {
     namespace NTerm {
+        /**
+         * Translates computer key press into internal input event
+         */
         class CInputResolver {
         public:
+            /**
+             * Translates computer key press into internal input event
+             * @param input Pressed character
+             * @return Internal input event
+             */
             static EControlInput ResolveInput(int input);
         };
     }

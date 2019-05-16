@@ -23,6 +23,10 @@ namespace NMsc {
     public:
         ~CMaintainer();
 
+        /**
+         * Get the singleton instance of the class.
+         * @return CMaintainer instance
+         */
         static CMaintainer &GetInstance();
 
         /**

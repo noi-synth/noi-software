@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_SNDENUMS_HPP
 namespace NSnd {
 /*----------------------------------------------------------------------*/
+    /// Music tones
     enum ETones {
         Cn1, Csn1, Dn1, Dsn1, En1, Fn1, Fsn1, Gn1, Gsn1, An1, Asn1, Bn1,
         C0, Cs0, D0, Ds0, E0, F0, Fs0, G0, Gs0, A0, As0, B0,
@@ -21,11 +22,13 @@ namespace NSnd {
     };
 
 /*----------------------------------------------------------------------*/
+    /// Type of midi message
     enum EMidiMsgType {
         NOTE_OFF, NOTE_ON, BEND_ON, BEND_OFF, ALL_OFF
     };
 
 /*----------------------------------------------------------------------*/
+    /// Mode of instrument. Affects polyphony.
     enum EInstrumentMode {
         POLYPHONE,
         MONOPHONE,

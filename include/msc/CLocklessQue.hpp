@@ -14,6 +14,10 @@ namespace NMsc {
 // TODO do more in depth test of this, research atomic int under ARM
 // TODO investigate destructor behaviour in the cirrcle buffer. pop, push, rewriting, etc 
 /*############################################################################################################################*/
+    /**
+     * Generic lockless que. For two threads. One thread can push, the other one can pop.
+     * @tparam T Data type in the que
+     */
     template<class T>
     class CLocklessQue {
     public:
@@ -22,12 +26,28 @@ namespace NMsc {
 
         ~CLocklessQue();
 
+        /**
+         * Push new item into the que
+         * @param item Item pushed into the que
+         * @return True on success
+         */
         bool Push(const T &item);
 
+        /**
+         * Pop last element in the que
+         * @return Removed element
+         */
         T Pop();
 
+        /**
+         * Is que empty?
+         * @return True if empty
+         */
         bool Empty() const;
 
+        /**
+         * Clears the que
+         */
         void Clear();
 
 

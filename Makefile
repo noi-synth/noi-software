@@ -19,6 +19,9 @@ debug: noi
 	./bin/noi 2>log.log
 	less -R log.log
 
+doc:
+	doxygen Doxyfile
+
 vlg: noi
 	valgrind --suppressions=./vlgsuppress.conf ./bin/noi 2>log.log
 	less -R log.log

@@ -8,10 +8,24 @@
 #include <string>
 
 namespace NSnd {
+    /**
+     * Basic info about an audio device
+     */
     class CAudioDeviceInfo {
     public:
+        /**
+         * Index in the device table
+         */
         int m_index;
+
+        /**
+         * Latency of the device
+         */
         double m_latency;
+
+        /**
+         * Name of the device
+         */
         std::string m_name;
     };
 }

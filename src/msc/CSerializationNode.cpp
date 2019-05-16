@@ -17,8 +17,8 @@ ASerializationNode CSerializationNode::GetNewTopNode() {
 }
 
 /*----------------------------------------------------------------------*/
-ASerializationNode CSerializationNode::GetNewSubNode(const std::string name) {
-    if (!RegisterName(name)) {
+ASerializationNode CSerializationNode::GetNewSubNode(const std::string name, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "CSerializationNode: duplicate name of subnode.\n\tName=%\n\tPath=%",
                            name, GetPath());
         return nullptr;
@@ -30,8 +30,8 @@ ASerializationNode CSerializationNode::GetNewSubNode(const std::string name) {
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeInt(const std::string name, int64_t value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeInt(const std::string name, int64_t value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value int.\n\tName=%\n\tPath=%", name, GetPath());
         return;
@@ -40,8 +40,8 @@ void CSerializationNode::SerializeInt(const std::string name, int64_t value) {
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeDouble(const std::string name, double value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeDouble(const std::string name, double value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value double.\n\tName=%\n\tPath=%", name, GetPath());
         return;
@@ -50,8 +50,8 @@ void CSerializationNode::SerializeDouble(const std::string name, double value) {
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeBool(const std::string name, bool value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeBool(const std::string name, bool value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value bool.\n\tName=%\n\tPath=%", name, GetPath());
         return;
@@ -60,8 +60,8 @@ void CSerializationNode::SerializeBool(const std::string name, bool value) {
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeString(const std::string name, const std::string &value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeString(const std::string name, const std::string &value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value string.\n\tName=%\n\tPath=%", name, GetPath());
         return;
@@ -70,8 +70,8 @@ void CSerializationNode::SerializeString(const std::string name, const std::stri
 }
 
 /*----------------------------------------------------------------------*/
-void CSerializationNode::SerializeString(const std::string name, std::string &&value) {
-    if (!RegisterName(name)) {
+void CSerializationNode::SerializeString(const std::string name, std::string &&value, bool skipNameRegistration) {
+    if (!skipNameRegistration && !RegisterName(name)) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR,
                            "CSerializationNode: duplicate name of value string.\n\tName=%\n\tPath=%", name, GetPath());
         return;

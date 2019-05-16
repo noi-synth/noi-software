@@ -8,8 +8,15 @@
 #include "../CWindow.hpp"
 
 namespace NUi::NZero {
+    /**
+     * Page for effect manipulation
+     */
     class CWinPgEffects : public CWindow {
     public:
+        /**
+         * Constructor
+         * @param windowManager Parent window manager
+         */
         explicit CWinPgEffects(WWindowManager windowManager);
 
         virtual CInptutEventInfo ProcessInput(CInptutEventInfo input) override;
@@ -17,7 +24,10 @@ namespace NUi::NZero {
         virtual void Draw() override;
 
     private:
+        /// Reference to main App class
         NLgc::ANoiApp m_app;
+
+        /// Effect that is being being currently edited.
         NSnd::AEffect m_editingEffect;
     };
 }

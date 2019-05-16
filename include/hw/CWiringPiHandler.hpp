@@ -11,9 +11,15 @@ namespace NHw {
      */
     class CWiringPiHandler {
     public:
+        /**
+         * Make sure that WiringPi library is initialized
+         */
         static void Init();
 
     private:
+        /**
+         * Is WiringPi already initialized?
+         */
         static bool s_isInitialized;
     };
 }

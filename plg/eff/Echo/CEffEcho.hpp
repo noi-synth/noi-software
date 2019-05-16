@@ -8,6 +8,9 @@
 #include "../../../include/snd/CEffect.hpp"
 
 namespace NPlg::NEcho {
+    /**
+     * Implemets reverb and delay effect
+     */
     class CEffEcho : public NSnd::CEffect {
     public:
         CEffEcho();
@@ -19,11 +22,17 @@ namespace NPlg::NEcho {
 
     private:
 
-        // Cursor
+
+        /// Cursor in circle buffers
         uint32_t m_buffCursor;
+
+        /// Size parameter
         double m_size;
+        /// Delay size parameter
         double m_delaySize;
+        /// Absorbtion parameter
         double m_absorbtion;
+        /// Changes the ratio between reverb and delay
         double m_reverbPortion;
 
         // Buffer sizes
@@ -32,6 +41,7 @@ namespace NPlg::NEcho {
         constexpr static uint32_t LONG_BUFF_LEN = 1 << LONG_BUFF_EXPONENT;
         constexpr static uint32_t SHORT_BUFF_LEN = 1 << SHORT_BUFF_EXPONENT;
 
+        // Sound buffers for all the walls
         SND_DATA_TYPE m_buffAr[LONG_BUFF_LEN];
         SND_DATA_TYPE m_buffBr[SHORT_BUFF_LEN];
         SND_DATA_TYPE m_buffCr[SHORT_BUFF_LEN];

@@ -8,22 +8,22 @@
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CChain::CChain(const AInstrument &instr) : m_instrument(instr), m_active(false), m_uiInstrument(instr) {
+CChain::CChain(const AInstrument &instr) : m_instrument(instr), /*m_active(false), */m_uiInstrument(instr) {
     m_uiEffectChain = m_effectChain = std::make_shared<std::vector<AEffect>>();
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CChain constructor");
 
 }
 
-/*----------------------------------------------------------------------*/
-void CChain::MakrActive() {
-    //TODO make sure this mechanic is used properly
-    m_active = true;
-}
-
-/*----------------------------------------------------------------------*/
-void CChain::MarkInactive() {
-    m_active = false;
-}
+///*----------------------------------------------------------------------*/
+//void CChain::MakrActive() {
+//    //TODO make sure this mechanic is used properly
+//    m_active = true;
+//}
+//
+///*----------------------------------------------------------------------*/
+//void CChain::MarkInactive() {
+//    m_active = false;
+//}
 
 /*----------------------------------------------------------------------*/
 bool CChain::InstrumentChange(const NSnd::AInstrument &instrument) {
@@ -42,7 +42,7 @@ bool CChain::ReciveMidiMsg(const NSnd::CMidiMsg &message) {
 
 /*----------------------------------------------------------------------*/
 int CChain::ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) {
-    m_active = true;
+    // m_active = true;
 
     //todo do this at tick
     // Replace instrument with ne one

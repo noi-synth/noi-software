@@ -8,6 +8,9 @@
 namespace NUi {
 
     /*----------------------------------------------------------------------*/
+    /**
+     * Affects what windows will recive Draw method calls
+     */
     enum EDrawingPolicy {
         DRAW_ALL,
         DRAW_TOP,
@@ -15,11 +18,14 @@ namespace NUi {
     };
 
     /*----------------------------------------------------------------------*/
+    /**
+     * All possible controls for user
+     */
     enum EControlInput {
         _CONTROL_FIRST,
 
         // Note keys
-        _NOTE_FIRST,
+                _NOTE_FIRST,
         NOTE_0, NOTE_1, NOTE_2, NOTE_3, NOTE_4, NOTE_5, NOTE_6, NOTE_7, NOTE_8, NOTE_9,
         NOTE_10, NOTE_11, NOTE_12, NOTE_13, NOTE_14, NOTE_15, NOTE_16, NOTE_17, NOTE_18, NOTE_19,
         NOTE_20, NOTE_21, NOTE_22, NOTE_23, NOTE_24, NOTE_25, NOTE_26, NOTE_27, NOTE_28, NOTE_29,
@@ -59,6 +65,9 @@ namespace NUi {
     };
 
     /*----------------------------------------------------------------------*/
+    /**
+     * Types of control inputs
+     */
     enum EControlInputType {
         NO_TYPE,
         PRESS,

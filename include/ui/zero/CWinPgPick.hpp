@@ -14,8 +14,15 @@
 
 namespace NUi {
     namespace NZero {
+        /**
+         * Window that allows page change.
+         */
         class CWinPgPick : public CWindow {
         public:
+            /**
+             * Constructor
+             * @param windowManager Parent window manager
+             */
             explicit CWinPgPick(WWindowManager windowManager);
 
             virtual CInptutEventInfo ProcessInput(CInptutEventInfo input) override;
