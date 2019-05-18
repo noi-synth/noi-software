@@ -124,12 +124,6 @@ void CWinMain::Init() {
 
     manager->OpenWindowCallback(std::make_shared<CWinPgPlayback>(m_manager));
 
-    // Add tracks to the app
-    for (int i = 0; i < 4; ++i) {
-        m_app->TrackCreate();
-    }
-    m_app->TrackActiveSet(m_app->TracksGet()[0]);
-
 }
 
 /*----------------------------------------------------------------------*/

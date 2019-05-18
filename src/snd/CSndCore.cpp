@@ -203,6 +203,16 @@ bool CSndCore::TrackSetPosition(uint32_t position) {
 }
 
 /*----------------------------------------------------------------------*/
+bool CSndCore::TrackDeleteAll() {
+    return m_trackManager->RemoveAllTracks();
+}
+
+/*----------------------------------------------------------------------*/
+bool CSndCore::TrackInsert(ATrack track) {
+    return m_trackManager->InsertTrack(track);
+}
+
+/*----------------------------------------------------------------------*/
 //bool CSndCore::TrackRecordingUndo() {
 //    return m_trackManager->UndoRecording();
 //}

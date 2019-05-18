@@ -13,10 +13,10 @@ using namespace NLgc;
 /*----------------------------------------------------------------------*/
 CNoiApp::CNoiApp() : m_octave(3) {
     // Create SndCore
-    m_state.m_soundCore = std::make_shared<NSnd::CSndCore>();
+    m_soundCore = std::make_shared<NSnd::CSndCore>();
 
     m_state.m_bpm = 120;
-    m_state.m_soundCore->BpmSet(m_state.m_bpm);
+    m_soundCore->BpmSet(m_state.m_bpm);
 
     /*for (int i = 0; i < 4; ++i) {
         TrackCreate();
@@ -25,37 +25,37 @@ CNoiApp::CNoiApp() : m_octave(3) {
     // Create instrument and chain
     NSnd::AInstrument instrument = std::make_shared<NPlg::NInstr::CInstrSimpleOsc>();
     m_state.m_chains.push_back(std::make_shared<NSnd::CChain>(instrument));
-    //m_state.m_soundCore.get();
+    //m_soundCore.get();
     ChainActiveSet(m_state.m_chains[0]);
-    //m_state.m_soundCore->ChainSelect(m_state.m_chains[0]);
-    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "App constructor. m_sndCore = %", m_state.m_soundCore.get());
+    //m_soundCore->ChainSelect(m_state.m_chains[0]);
+    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "App constructor. m_sndCore = %", m_soundCore.get());
 
 
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::AudioDeviceSet(NSnd::AAudioDevice device) {
-    m_state.m_soundCore->AudioDeviceSet(device);
+    m_soundCore->AudioDeviceSet(device);
 }
 
 /*----------------------------------------------------------------------*/
 void CNoiApp::AudioDeviceUnset() {
-    m_state.m_soundCore->AudioDeviceUnset();
+    m_soundCore->AudioDeviceUnset();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::AudioStart() {
-    return m_state.m_soundCore->AudioDeviceStart();
+    return m_soundCore->AudioDeviceStart();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::AudioStop() {
-    return m_state.m_soundCore->AudioDeviceStop();
+    return m_soundCore->AudioDeviceStop();
 }
 
 /*----------------------------------------------------------------------*/
 void CNoiApp::AudioPanic() {
-    m_state.m_soundCore->Panic();
+    m_soundCore->Panic();
 }
 
 /*----------------------------------------------------------------------*/
@@ -64,39 +64,39 @@ bool CNoiApp::SendMidiMessage(NSnd::CMidiMsg message) {
     /*NMsc::CLogger::Log("CNoiApp: SendMidiMsg; This = %", this);
     NMsc::CLogger::Log("CNoiApp: SendMidiMsg; m_state = %", &m_state);*/
 
-    if (!m_state.m_soundCore) {
+    if (!m_soundCore) {
         NMsc::CLogger::Log(NMsc::ELogType::ERROR, "SndCore not set");
         return false;
     }
 
     message.m_tone = (NSnd::ETones) (((int) message.m_tone) + m_octave * 12);
 
-    return m_state.m_soundCore->ReciveMidiMsg(message);
+    return m_soundCore->ReciveMidiMsg(message);
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::IsRecording() {
-    return m_state.m_soundCore->IsRecording();
+    return m_soundCore->IsRecording();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::RecordingStart() {
-    return m_state.m_soundCore->TrackRecordingStart();
+    return m_soundCore->TrackRecordingStart();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::RecordingStop() {
-    return m_state.m_soundCore->TrackRecordingStop();
+    return m_soundCore->TrackRecordingStop();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::PlaybackStart() {
-    return m_state.m_soundCore->TrackPlaybackStart();
+    return m_soundCore->TrackPlaybackStart();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::PlaybackStop() {
-    return m_state.m_soundCore->TrackPlaybackStop();
+    return m_soundCore->TrackPlaybackStop();
 }
 
 /*----------------------------------------------------------------------*/
@@ -104,7 +104,7 @@ bool CNoiApp::PlaybackSetPosition(uint32_t position) {
     if (IsRecording())
         RecordingStop();
 
-    m_state.m_soundCore->TrackSetPosition(position);
+    m_soundCore->TrackSetPosition(position);
 }
 
 /*----------------------------------------------------------------------*/
@@ -114,23 +114,23 @@ bool CNoiApp::PlaybaclSetPositionBeats(uint32_t beat) {
 
 /*----------------------------------------------------------------------*/
 uint32_t CNoiApp::PlaybackGetPosition() {
-    return m_state.m_soundCore->TrackGetPosition();
+    return m_soundCore->TrackGetPosition();
 }
 
 /*----------------------------------------------------------------------*/
 uint32_t CNoiApp::PlaybackGetPositionBeats() {
-    return m_state.m_soundCore->TrackGetPosition() / 60 * m_state.m_bpm / NSnd::SAMPLE_RATE;
+    return m_soundCore->TrackGetPosition() / 60 * m_state.m_bpm / NSnd::SAMPLE_RATE;
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::IsPlaying() {
-    return m_state.m_soundCore->IsPlaying();
+    return m_soundCore->IsPlaying();
 }
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::BpmSet(uint32_t bpm) {
     m_state.m_bpm = bpm;
-    m_state.m_soundCore->BpmSet(bpm);
+    m_soundCore->BpmSet(bpm);
     return true;
 }
 
@@ -147,7 +147,7 @@ bool CNoiApp::RecordingUndo() {
     m_state.m_activeTrack->UndoRecording();
 
     return true;
-    //return m_state.m_soundCore->TrackRecordingUndo();
+    //return m_soundCore->TrackRecordingUndo();
 }
 
 /*----------------------------------------------------------------------*/
@@ -166,13 +166,13 @@ bool CNoiApp::SetOctave(uint32_t octave) {
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::MetronomeSet(bool enable) {
-    m_state.m_soundCore->SetMetronome(enable);
+    m_soundCore->SetMetronome(enable);
 }
 
 /*----------------------------------------------------------------------*/
 NSnd::ATrack CNoiApp::TrackCreate() {
 
-    NSnd::ATrack track = m_state.m_soundCore->TrackCreate();
+    NSnd::ATrack track = m_soundCore->TrackCreate();
     if (track)
         m_state.m_tracks.push_back(track);
 
@@ -186,7 +186,7 @@ NSnd::ATrack CNoiApp::TrackActiveGet() {
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::TrackActiveSet(NSnd::ATrack track) {
-    if (m_state.m_soundCore->TrackSetActive(track)) {
+    if (m_soundCore->TrackSetActive(track)) {
         m_state.m_activeTrack = track;
         return true;
     }
@@ -195,7 +195,7 @@ bool CNoiApp::TrackActiveSet(NSnd::ATrack track) {
 
 /*----------------------------------------------------------------------*/
 bool CNoiApp::ChainActiveSet(NSnd::AChain chain) {
-    if (m_state.m_soundCore->ChainSelect(chain)) {
+    if (m_soundCore->ChainSelect(chain)) {
         m_state.m_activeChain = chain;
         return true;
     }
@@ -250,6 +250,12 @@ bool CNoiApp::LoadProject(std::string name) {
 
     NMsc::ASerializationNode projNode = NMsc::CSerializationNode::Deserialize(project);
     m_state = CAppState(projNode);
+
+    // Apply the project to sound core
+    m_soundCore->TrackDeleteAll();
+    for (auto &track : m_state.m_tracks) {
+        m_soundCore->TrackInsert(track);
+    }
 
     project.close();
     data.close();

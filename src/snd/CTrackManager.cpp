@@ -115,6 +115,18 @@ bool CTrackManager::RemoveAllTracks() {
     return false;
 }
 
+/*----------------------------------------------------------------------*/
+bool CTrackManager::InsertTrack(NSnd::ATrack track) {
+    if (m_trackLock.TryLockBlue()) {
+
+        m_tracks.insert(track);
+        m_trackLock.Unlock();
+        return true;
+    }
+    return false;
+}
+
+
 ///*----------------------------------------------------------------------*/
 //bool CTrackManager::UndoRecording() {
 //    if (m_trackLock.TryLockBlue()) {

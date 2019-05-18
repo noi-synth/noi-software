@@ -52,10 +52,6 @@ namespace NLgc {
          * Currently active chain
          */
         NSnd::AChain m_activeChain;
-        /**
-         * Reference to the sound core
-         */
-        NSnd::ASndCore m_soundCore;
     };
 }
 

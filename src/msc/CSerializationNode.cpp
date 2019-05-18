@@ -311,16 +311,16 @@ std::string CSerializationNode::Dump() {
     document.SetObject();
 
     // Create root node
-    rapidjson::Value rootName;
+    /*rapidjson::Value rootName;
     rootName.SetString(m_name.c_str(), m_name.length(), document.GetAllocator());
     rapidjson::Value rootNode;
-    rootNode.SetObject();
+    rootNode.SetObject();*/
 
     // Dump CSerializationNode tree into rapidJson tree
-    Dump(rootNode, document);
+    Dump(document, document);
 
     // Add root node to document
-    document.AddMember(rootName, rootNode, document.GetAllocator());
+    //document.AddMember(rootName, rootNode, document.GetAllocator());
 
     // Get string
     rapidjson::StringBuffer buffer;
@@ -345,9 +345,7 @@ ASerializationNode CSerializationNode::Deserialize(std::istream &input) {
 
     root->Deserialize(document);
 
-    ASerializationNode rootSubnode = root->GetSubnode("root");
-
-    return rootSubnode;
+    return root;
 }
 
 /*----------------------------------------------------------------------*/
@@ -593,6 +591,12 @@ void CSerializationNode::Deserialize(rapidjson::Value &node) {
                 nodeArr &= arrVal.IsObject();
             }
 
+            NMsc::CLogger::Log(NMsc::ELogType::NOTE,
+                               "CSerializationNode: Got array that is int %, double %, bool %, string %, node %, \n\tName=%\n\tPath=%",
+                               intArr, doubleArr, boolArr, stringArr, nodeArr,
+                               val.name.GetString(),
+                               GetPath());
+
             if (!(intArr || doubleArr || boolArr || stringArr || nodeArr)) {
                 NMsc::CLogger::Log(NMsc::ELogType::WARNING,
                                    "CSerializationNode: Deserialization: Array is not homogeneous, skipping.  \n\tName=%\n\tPath=%",
@@ -632,6 +636,36 @@ void CSerializationNode::Deserialize(rapidjson::Value &node) {
                     vctr.push_back(arrVal.GetDouble());
                 }
                 SerializeDoubleArray(val.name.GetString(), std::move(vctr), true);
+            }
+
+            // Bool array
+            if (boolArr) {
+                std::vector<bool> vctr;
+                vctr.reserve(arr.Size());
+                // Copy all values.
+                for (auto &arrVal : arr.GetArray()) {
+                    vctr.push_back(arrVal.GetBool());
+                }
+                SerializeBoolArray(val.name.GetString(), std::move(vctr), true);
+            }
+
+            // String array
+            if (stringArr) {
+                std::vector<std::string> vctr;
+                vctr.reserve(arr.Size());
+                // Copy all values.
+                for (auto &arrVal : arr.GetArray()) {
+                    vctr.push_back(arrVal.GetString());
+                }
+                SerializeStringArray(val.name.GetString(), std::move(vctr), true);
+            }
+
+            // Subnode array
+            if (nodeArr) {
+                for (auto &arrVal : arr.GetArray()) {
+                    ASerializationNode arrNode = AddNodeToArray(val.name.GetString());
+                    arrNode->Deserialize(arrVal);
+                }
             }
 
         }

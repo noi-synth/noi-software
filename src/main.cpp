@@ -229,6 +229,13 @@ int main(int argc, const char *argv[]) {
 
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
+    // Add tracks to the app
+    for (int i = 0; i < 4; ++i) {
+        app->TrackCreate();
+    }
+    app->TrackActiveSet(app->TracksGet()[0]);
+
+
 #ifndef NO_RPI_HW
     NHw::ANoiZeroHw physicalInput = std::make_shared<NHw::CNoiZeroHw>();
 

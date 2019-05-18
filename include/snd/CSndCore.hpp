@@ -145,6 +145,19 @@ namespace NSnd {
         bool TrackSetPosition(uint32_t position);
 
         /**
+         * Remove all tracks
+         * @return True on success
+         */
+        bool TrackDeleteAll();
+
+        /**
+         * Insert new track
+         * @param track Track to be inserted
+         * @return True on success
+         */
+        bool TrackInsert(ATrack track);
+
+        /**
          * Turns metronome on and off
          * @param enabled True to enable, false to disable
          * @return True on success

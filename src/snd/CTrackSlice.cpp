@@ -240,6 +240,8 @@ void CTrackSlice::DeserializeSlices(std::istream &input) {
         newSlice->m_id = id.ID;
         std::memcpy(newSlice->m_buffer, sound.sound, sizeof(SoundDataUni));
 
+//        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CTrackSlice: Deserialized slice %", id.ID);
+
         m_sliceDatabase.insert(std::make_pair(id.ID, newSlice));
     }
 }

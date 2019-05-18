@@ -219,6 +219,11 @@ namespace NLgc {
          * Current octave
          */
         uint32_t m_octave;
+
+        /**
+         * Reference to the sound core
+         */
+        NSnd::ASndCore m_soundCore;
     };
 
     typedef std::shared_ptr<CNoiApp> ANoiApp;

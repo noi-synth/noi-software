@@ -57,6 +57,13 @@ namespace NSnd {
         // bool UndoRecording();
 
         /**
+         * Insert new track into the manager
+         * @param track Track to be inserted
+         * @return True on success
+         */
+        bool InsertTrack(ATrack track);
+
+        /**
          * Start recording on selected track.
          * @return True on success
          */
