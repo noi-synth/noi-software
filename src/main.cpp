@@ -20,6 +20,7 @@
 #include "../include/msc/CSerializationNode.hpp"
 #include "../include/ui/zero/CZeroUi.hpp"
 #include "../include/ui/zero/CNoiZeroCommunicator.hpp"
+#include "../include/ui/zero/CNoiZeroCommunicatorReal.hpp"
 
 uint8_t tn;
 
@@ -228,28 +229,35 @@ int main(int argc, const char *argv[]) {
 
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
+#ifndef NO_RPI_HW
     NHw::ANoiZeroHw physicalInput = std::make_shared<NHw::CNoiZeroHw>();
 
-
-    physicalInput->AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
+        physicalInput->AttachMidiOutput(([app](NSnd::CMidiMsg msg) {
          app->SendMidiMessage(msg);
      }));
+
+    NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
+
+    NUi::NZero::CNoiZeroCommunicatorReal communicator(physicalInput, ZeroUi);
+
+    ZeroUi->Run();
+
+#endif /* NO_RPI_HW */
+
+
 
      NUi::NTerm::CTerminalUi Ui(app);
      Ui.Run();
 
-    NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
 
-    NUi::NZero::CNoiZeroCommunicator communicator(physicalInput, ZeroUi);
-
-    ZeroUi->Run();
 
     Ui.WaitForStop();
 
+#ifndef NO_RPI_HW
     ZeroUi->Stop();
 
     ZeroUi->WaitForStop();
-
+#endif /* NO_RPI_HW */
 
     NMsc::CMaintainer::GetInstance().Stop();
 
