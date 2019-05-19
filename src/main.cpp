@@ -21,6 +21,7 @@
 #include "../include/ui/zero/CZeroUi.hpp"
 #include "../include/ui/zero/CNoiZeroCommunicator.hpp"
 #include "../include/ui/zero/CNoiZeroCommunicatorReal.hpp"
+#include "../include/ui/zero/CNoiZeroCommunicatorFake.hpp"
 
 uint8_t tn;
 
@@ -229,12 +230,19 @@ int main(int argc, const char *argv[]) {
 
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
+    NSnd::AAudioDevice audioIO = std::make_shared<NSnd::CAudioDevicePA>(
+            NSnd::CAudioDevicePA::GetAvailableDevices()[NSnd::CAudioDevicePA::GetDefaultDeviceId()]);
+    app->AudioDeviceSet(audioIO);
+    app->AudioStart();
+
+
     // Add tracks to the app
     for (int i = 0; i < 4; ++i) {
         app->TrackCreate();
     }
     app->TrackActiveSet(app->TracksGet()[0]);
 
+    NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
 
 #ifndef NO_RPI_HW
     NHw::ANoiZeroHw physicalInput = std::make_shared<NHw::CNoiZeroHw>();
@@ -243,22 +251,22 @@ int main(int argc, const char *argv[]) {
          app->SendMidiMessage(msg);
      }));
 
-    NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
+    ;
 
     NUi::NZero::CNoiZeroCommunicatorReal communicator(physicalInput, ZeroUi);
 
-    ZeroUi->Run();
-
+#else /* NO_RPI_HW */
+    NUi::NZero::CNoiZeroCommunicatorFake communicator(ZeroUi, app);
 #endif /* NO_RPI_HW */
 
+    ZeroUi->Run();
 
+    ZeroUi->WaitForStop();
 
-     NUi::NTerm::CTerminalUi Ui(app);
-     Ui.Run();
+    /*NUi::NTerm::CTerminalUi Ui(app);
+    Ui.Run();
 
-
-
-    Ui.WaitForStop();
+   Ui.WaitForStop();*/
 
 #ifndef NO_RPI_HW
     ZeroUi->Stop();

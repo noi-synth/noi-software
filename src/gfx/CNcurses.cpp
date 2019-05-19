@@ -30,6 +30,14 @@ CNcurses::CNcurses() {
     init_pair(ColorPair::WHITE_BLUE, COLOR_WHITE, COLOR_BLUE);
     init_pair(ColorPair::BLACK_BLUE, COLOR_BLACK, COLOR_BLUE);
 
+    init_pair(ColorPair::BLACK_WHITE, COLOR_BLACK, COLOR_WHITE);
+    init_pair(ColorPair::BLACK_RED, COLOR_BLACK, COLOR_RED);
+    init_pair(ColorPair::BLACK_GREEN, COLOR_BLACK, COLOR_GREEN);
+    init_pair(ColorPair::BLACK_YELLOW, COLOR_BLACK, COLOR_YELLOW);
+    init_pair(ColorPair::BLACK_MAGENTA, COLOR_BLACK, COLOR_MAGENTA);
+    init_pair(ColorPair::BLACK_CYAN, COLOR_BLACK, COLOR_CYAN);
+
+
 
     timeout(17);
     curs_set(0);
@@ -134,6 +142,13 @@ void CNcurses::DrawTextCentered(unsigned int y, std::string text, NGfx::CNcurses
     int x = (int) (m_frameW / 2 - text.length() / 2);
     attron(COLOR_PAIR(colors));
     mvaddstr(m_frameY + y, m_frameX + x, text.c_str());
+    attroff(COLOR_PAIR(colors));
+}
+
+/*----------------------------------------------------------------------*/
+void CNcurses::DrawPoint(unsigned int x, unsigned int y, char ch, NGfx::CNcurses::ColorPair colors) {
+    attron(COLOR_PAIR(colors));
+    mvaddch(m_frameY + y, m_frameX + x, ch);
     attroff(COLOR_PAIR(colors));
 }
 

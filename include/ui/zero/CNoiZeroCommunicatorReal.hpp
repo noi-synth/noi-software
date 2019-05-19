@@ -52,18 +52,7 @@ namespace NUi::NZero {
         /// Global instance of this calss
         static CNoiZeroCommunicator *m_instance;
 
-        /**
-         * Represents LED status
-         */
-        struct CLedStatus {
-            CLedStatus() : m_state(ELedState::OFF), m_color(NHw::ELedColor::BLACK) {};
 
-            /// State of the LED
-            ELedState m_state;
-
-            /// Color of the LED
-            NHw::ELedColor m_color;
-        };
 
         /// State of Fn LEDs
         CLedStatus m_fnLeds[8];

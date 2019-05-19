@@ -27,7 +27,15 @@ namespace NGfx {
             WHITE_BLACK = 1,
             RED_BLACK,
             WHITE_BLUE,
-            BLACK_BLUE
+            BLACK_BLUE,
+
+            BLACK_WHITE,
+            BLACK_RED,
+            BLACK_GREEN,
+            BLACK_YELLOW,
+            BLACK_MAGENTA,
+            BLACK_CYAN,
+
         };
 
         /**
@@ -71,6 +79,8 @@ namespace NGfx {
          * @param colors Foreground and background of the text
          */
         void DrawTextCentered(unsigned int y, std::string text, ColorPair colors);
+
+        void DrawPoint(unsigned int x, unsigned int y, char ch, ColorPair colors);
 
         /**
          * Clears the whole terminal screen.
