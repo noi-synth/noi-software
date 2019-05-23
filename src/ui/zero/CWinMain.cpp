@@ -22,8 +22,6 @@ void CWinMain::Draw() {
     if (CNoiZeroCommunicator::GetInstance()) {
         CNoiZeroCommunicator &g = *CNoiZeroCommunicator::GetInstance();
 
-        //g.SetStatusLed(EStatusLed::PAGE, ELedState::BLINKING, NHw::ELedColor::WHITE);
-
         g.ClearFnLeds();
 
         // Play LED

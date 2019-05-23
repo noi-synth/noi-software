@@ -5,6 +5,7 @@
 #include "../../../include/ui/zero/CWinPgEffects.hpp"
 #include "../../../include/ui/zero/CNoiZeroCommunicator.hpp"
 #include "../../../plg/CPluginFactory.hpp"
+#include "CChainMember.hpp"
 
 using namespace NUi::NZero;
 

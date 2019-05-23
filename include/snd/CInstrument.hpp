@@ -8,6 +8,7 @@
 #include "NSndConfig.hpp"
 #include "../msc/CLocklessQue.hpp"
 #include "CMidiMsg.hpp"
+#include "CChainMember.hpp"
 //#include "../lgc/CParameter.hpp"
 
 #ifndef NOI_SOFTWARE_CINSTRUMENT_HPP
@@ -20,7 +21,7 @@ namespace NSnd {
     /**
      * Base class for all instruments
      */
-    class CInstrument {
+    class CInstrument : public CChainMember {
     public:
 
         //TODO implement TICK logic

@@ -29,6 +29,7 @@ CNoiZeroCommunicatorFake::CNoiZeroCommunicatorFake(NUi::NZero::AZeroUi ui, NLgc:
 //    }
     ClearStatusLeds();
     ClearFnLeds();
+    DrawKnoabs();
 
 
     g->DrawPoint(STAT_LED_X + STAT_LED_X_STEP * 1, STAT_LED_Y, 'P', Color::WHITE_BLACK);
@@ -197,6 +198,54 @@ void CNoiZeroCommunicatorFake::Update() {
                                    NSnd::ETones::C0, 255));
             break;
 
+        case 'e':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_0, EControlInputType::SCROLL_DOWN, m_shift));
+            m_knobPos[0] = (m_knobPos[0] - 1) & 3;
+            DrawKnoabs();
+            break;
+
+
+        case 'r':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_0, EControlInputType::SCROLL_UP, m_shift));
+            m_knobPos[0] = (m_knobPos[0] + 1) & 3;
+            DrawKnoabs();
+            break;
+
+        case 't':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_1, EControlInputType::SCROLL_DOWN, m_shift));
+            m_knobPos[1] = (m_knobPos[1] - 1) & 3;
+            DrawKnoabs();
+            break;
+
+        case 'y':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_1, EControlInputType::SCROLL_UP, m_shift));
+            m_knobPos[1] = (m_knobPos[1] + 1) & 3;
+            DrawKnoabs();
+            break;
+
+        case 'u':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_2, EControlInputType::SCROLL_DOWN, m_shift));
+            m_knobPos[2] = (m_knobPos[2] - 1) & 3;
+            DrawKnoabs();
+            break;
+
+        case 'i':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_2, EControlInputType::SCROLL_UP, m_shift));
+            m_knobPos[2] = (m_knobPos[2] + 1) & 3;
+            DrawKnoabs();
+            break;
+
+        case 'o':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_3, EControlInputType::SCROLL_DOWN, m_shift));
+            m_knobPos[3] = (m_knobPos[3] - 1) & 3;
+            DrawKnoabs();
+            break;
+
+        case 'p':
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_3, EControlInputType::SCROLL_UP, m_shift));
+            m_knobPos[3] = (m_knobPos[3] + 1) & 3;
+            DrawKnoabs();
+            break;
 
         default:
             break;
@@ -235,4 +284,16 @@ NGfx::CNcurses::ColorPair CNoiZeroCommunicatorFake::TranslateColor(NHw::ELedColo
             NMsc::CLogger::Log(NMsc::ELogType::WARNING, "CNoiZeroCommunicatorFake: Unknown color %", col);
             return Color::WHITE_BLACK;
     }
+}
+
+/*----------------------------------------------------------------------*/
+void CNoiZeroCommunicatorFake::DrawKnoabs() {
+
+    NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
+
+    for (int i = 0; i < 4; ++i) {
+        g->DrawPoint(KNOB_X + i * KNOB_X_STEP, KNOB_Y, KNOB_CHARS[m_knobPos[i] & 3], Color::RED_BLACK);
+    }
+
+
 }

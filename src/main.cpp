@@ -23,17 +23,10 @@
 #include "../include/ui/zero/CNoiZeroCommunicatorReal.hpp"
 #include "../include/ui/zero/CNoiZeroCommunicatorFake.hpp"
 
-uint8_t tn;
-
-int callback(const SND_DATA_TYPE *in, SND_DATA_TYPE *out,
-             unsigned long num, void *userData) {
-    for (uint32_t i = 0; i < num; ++i) {
-        out[i * 2] = out[i * 2 + 1] = ((unsigned char) ++tn) / 256.0f;
-    }
-
-
-}
-
+/**
+ * Hande interrupt signals - print them into output
+ * @param signum Number of the signal
+ */
 void signalHandler(int signum) {
 
 
@@ -47,6 +40,12 @@ void signalHandler(int signum) {
     exit(signum);
 }
 
+/**
+ * The main function of entire application
+ * @param argc Number of arguments
+ * @param argv Arguments
+ * @return Return code
+ */
 int main(int argc, const char *argv[]) {
 
     /*NMsc::ASerializationNode n = NMsc::CSerializationNode::GetNewTopNode();
@@ -227,9 +226,10 @@ int main(int argc, const char *argv[]) {
 
     /*--------------------------------*/
 
-
+    // Create backend
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
+    // Set audio device
     NSnd::AAudioDevice audioIO = std::make_shared<NSnd::CAudioDevicePA>(
             NSnd::CAudioDevicePA::GetAvailableDevices()[NSnd::CAudioDevicePA::GetDefaultDeviceId()]);
     app->AudioDeviceSet(audioIO);
@@ -242,6 +242,7 @@ int main(int argc, const char *argv[]) {
     }
     app->TrackActiveSet(app->TracksGet()[0]);
 
+    // Create real UI
     NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
 
 #ifndef NO_RPI_HW
@@ -259,14 +260,16 @@ int main(int argc, const char *argv[]) {
     NUi::NZero::CNoiZeroCommunicatorFake communicator(ZeroUi, app);
 #endif /* NO_RPI_HW */
 
-    ZeroUi->Run();
-
-    ZeroUi->WaitForStop();
-
-    /*NUi::NTerm::CTerminalUi Ui(app);
+    // Create and run terminal UI
+    NUi::NTerm::CTerminalUi Ui(app);
     Ui.Run();
 
-   Ui.WaitForStop();*/
+    Ui.WaitForStop();
+
+    // Run real UI
+    ZeroUi->Run();
+    ZeroUi->WaitForStop();
+
 
 #ifndef NO_RPI_HW
     ZeroUi->Stop();
@@ -274,6 +277,7 @@ int main(int argc, const char *argv[]) {
     ZeroUi->WaitForStop();
 #endif /* NO_RPI_HW */
 
+    // Stop the maintainer, if running
     NMsc::CMaintainer::GetInstance().Stop();
 
     return 0;

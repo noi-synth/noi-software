@@ -9,8 +9,16 @@
 #include "../../gfx/CNcurses.hpp"
 
 namespace NUi::NZero {
+    /**
+     * Fake NOI Zero graphical output. Allows running ZeroUI in terminal.
+     */
     class CNoiZeroCommunicatorFake : public CNoiZeroCommunicator {
     public:
+        /**
+         * Constructor
+         * @param ui
+         * @param app
+         */
         CNoiZeroCommunicatorFake(AZeroUi ui, NLgc::ANoiApp app);
 
         virtual void SetFnLed(uint32_t ledId, ELedState state, NHw::ELedColor color) override;
@@ -39,8 +47,10 @@ namespace NUi::NZero {
 
         NGfx::CNcurses::ColorPair TranslateColor(NHw::ELedColor col);
 
-        static const uint32_t WIDTH = 35;
-        static const uint32_t HEIGHT = 20;
+        void DrawKnoabs();
+
+        static const uint32_t WIDTH = 29;
+        static const uint32_t HEIGHT = 13;
 
         static const uint32_t FN_LED_X = 10;
         static const uint32_t FN_LED_Y = 4;
@@ -51,6 +61,9 @@ namespace NUi::NZero {
         static const uint32_t STAT_LED_X_STEP = 2;
         static const uint32_t STAT_LED_Y_STEP = 2;
 
+        static const uint32_t KNOB_X = 10;
+        static const uint32_t KNOB_Y = 2;
+        static const uint32_t KNOB_X_STEP = 4;
 
         static const uint32_t NOTE_CNT = 12;
         bool m_pressedNotes[NOTE_CNT];

@@ -3,6 +3,7 @@
 //
 
 #include "CEffEcho.hpp"
+#include "CChainMember.hpp"
 
 #define EchoLongLong(buffSrc, len, buffDst)   buffDst[(m_buffCursor + len) & (LONG_BUFF_LEN-1)]  += buffSrc[m_buffCursor] * m_absorbtion * (1-m_reverbPortion)
 
@@ -16,7 +17,7 @@
 using namespace NPlg::NEcho;
 
 /*----------------------------------------------------------------------*/
-CEffEcho::CEffEcho() : m_buffCursor(0), m_size(10), m_delaySize(30000), m_absorbtion(0.9999999999999),
+CEffEcho::CEffEcho() : m_buffCursor(0), m_size(60), m_delaySize(30000), m_absorbtion(1),
                        m_reverbPortion(1) {
     for (uint32_t i = 0; i < LONG_BUFF_LEN; ++i) {
         m_buffAl[i] = m_buffAr[i] = 0;
@@ -72,29 +73,53 @@ void CEffEcho::ProcessBuffer(SND_DATA_TYPE *buffer, unsigned long buffLen) {
     uint32_t lnAlAr = (uint32_t) m_delaySize;
     uint32_t lnArAl = (uint32_t) m_delaySize;
 
-    uint32_t lnAlBr = (uint32_t) (m_size * 7.1235732);
-    uint32_t lnAlCr = (uint32_t) (m_size * 11.8635732);
+    uint32_t lnAlBr = (uint32_t) (m_size * 25.1235732);
+    uint32_t lnAlCr = (uint32_t) (m_size * 37.8635732);
 
-    uint32_t lnArBl = (uint32_t) (m_size * 8.7412853);
-    uint32_t lnArCl = (uint32_t) (m_size * 11.2212853);
+    uint32_t lnArBl = (uint32_t) (m_size * 37.7412853);
+    uint32_t lnArCl = (uint32_t) (m_size * 43.2212853);
 
     // B
-    uint32_t lnBlCr = (uint32_t) (m_size * 677.234857);
-    uint32_t lnBlAr = (uint32_t) (m_size * 13.374112);
-    uint32_t lnBlCl = (uint32_t) (m_size * 137.10557697);
+    uint32_t lnBlCr = (uint32_t) (m_size * 33.234857);
+    uint32_t lnBlAr = (uint32_t) (m_size * 72.374112);
+    uint32_t lnBlCl = (uint32_t) (m_size * 16.10557697);
 
-    uint32_t lnBrCl = (uint32_t) (m_size * 677.7364557);
-    uint32_t lnBrAl = (uint32_t) (m_size * 13.97945612);
-    uint32_t lnBrCr = (uint32_t) (m_size * 137.645645697);
+    uint32_t lnBrCl = (uint32_t) (m_size * 97.7364557);
+    uint32_t lnBrAl = (uint32_t) (m_size * 69.97945612);
+    uint32_t lnBrCr = (uint32_t) (m_size * 81.645645697);
 
     // C
-    uint32_t lnClBr = (uint32_t) (m_size * 683.1832857);
-    uint32_t lnClBl = (uint32_t) (m_size * 113.224112);
-    uint32_t lnClAr = (uint32_t) (m_size * 17.44557697);
+    uint32_t lnClBr = (uint32_t) (m_size * 54.1832857);
+    uint32_t lnClBl = (uint32_t) (m_size * 19.224112);
+    uint32_t lnClAr = (uint32_t) (m_size * 87.44557697);
 
-    uint32_t lnCrBl = (uint32_t) (m_size * 683.8327897);
-    uint32_t lnCrBr = (uint32_t) (m_size * 113.7267812);
-    uint32_t lnCrAl = (uint32_t) (m_size * 17.84312697);
+    uint32_t lnCrBl = (uint32_t) (m_size * 76.8327897);
+    uint32_t lnCrBr = (uint32_t) (m_size * 24.7267812);
+    uint32_t lnCrAl = (uint32_t) (m_size * 60.84312697);
+
+//    uint32_t lnAlBr = (uint32_t) (m_size * 7.1235732);
+//    uint32_t lnAlCr = (uint32_t) (m_size * 11.8635732);
+//
+//    uint32_t lnArBl = (uint32_t) (m_size * 8.7412853);
+//    uint32_t lnArCl = (uint32_t) (m_size * 11.2212853);
+//
+//    // B
+//    uint32_t lnBlCr = (uint32_t) (m_size * 677.234857);
+//    uint32_t lnBlAr = (uint32_t) (m_size * 13.374112);
+//    uint32_t lnBlCl = (uint32_t) (m_size * 137.10557697);
+//
+//    uint32_t lnBrCl = (uint32_t) (m_size * 677.7364557);
+//    uint32_t lnBrAl = (uint32_t) (m_size * 13.97945612);
+//    uint32_t lnBrCr = (uint32_t) (m_size * 137.645645697);
+//
+//    // C
+//    uint32_t lnClBr = (uint32_t) (m_size * 683.1832857);
+//    uint32_t lnClBl = (uint32_t) (m_size * 113.224112);
+//    uint32_t lnClAr = (uint32_t) (m_size * 17.44557697);
+//
+//    uint32_t lnCrBl = (uint32_t) (m_size * 683.8327897);
+//    uint32_t lnCrBr = (uint32_t) (m_size * 113.7267812);
+//    uint32_t lnCrAl = (uint32_t) (m_size * 17.84312697);
 
 
     for (uint32_t i = 0; i < buffLen; ++i) {

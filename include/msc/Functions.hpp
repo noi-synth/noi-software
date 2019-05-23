@@ -10,9 +10,9 @@
 
 namespace NMsc {
 
-/***
- * This class contains various functions for general use.
- */
+    /***
+     * This class contains various functions for general use.
+     */
     class Functions {
     public:
 

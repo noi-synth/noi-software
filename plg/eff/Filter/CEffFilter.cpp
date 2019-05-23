@@ -4,6 +4,7 @@
 
 #include <cmath>
 #include "CEffFilter.hpp"
+#include "CChainMember.hpp"
 
 using namespace NPlg::NFilter;
 

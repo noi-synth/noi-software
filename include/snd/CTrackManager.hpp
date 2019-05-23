@@ -13,6 +13,9 @@
 #include "../msc/CTeamLock.hpp"
 
 namespace NSnd {
+    /**
+     * Manages tracks and their synchronous playback.
+     */
     class CTrackManager {
     public:
         CTrackManager();
