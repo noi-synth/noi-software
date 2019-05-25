@@ -110,6 +110,8 @@ namespace NMsc {
 
         static void AddMessageTarget(std::function<void(const std::string &)> target);
 
+        static void ClearMessageTargets();
+
         static std::list<std::function<void(const std::string &)>> m_messageTargets;
 
     };

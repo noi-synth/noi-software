@@ -56,6 +56,8 @@ namespace NSnd {
 
         virtual void AsyncTick();
 
+        virtual void ProcessInputChanges();
+
         /**
          * One polyphony voice
          */
@@ -96,6 +98,7 @@ namespace NSnd {
             bool IsActive();
 
         protected:
+
             /// Is this voice active?
             bool m_active;
             /// Parent instrument

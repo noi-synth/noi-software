@@ -22,6 +22,8 @@ namespace NPlg {
 
         protected:
 
+            virtual void ProcessInputChanges() override;
+
             bool m_on;
 
             /// Ratio of both oscillator volume
@@ -48,7 +50,10 @@ namespace NPlg {
 
                 void Activate(NSnd::CMidiMsg midiMessage) override;
 
+                /// Number of waves
+                static const uint32_t WAVE_CNT = 6;
             protected:
+
                 // todo initialize all the values in constructor
 
                 /// Phase of the oscillation
@@ -83,9 +88,6 @@ namespace NPlg {
 
                 /// Square 10%table
                 static float SQUARE10_WAVE[WAVETABLE_LEN];
-
-                /// Number of waves
-                static const uint32_t WAVE_CNT = 6;
             };
 
 

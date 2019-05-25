@@ -40,6 +40,12 @@ NUi::CInptutEventInfo CWinInstrument::ProcessInput(NUi::CInptutEventInfo input) 
     if (!input.IsScroll())
         return input;
 
-    activeInstrument->ScrollParameter(NMsc::Functions::EnumSub(input.m_input, NUi::EControlInput::ROT_0),
-                                      input.m_type == NUi::EControlInputType::SCROLL_UP, input.m_shift);
+
+    uint32_t knobId = input.m_input == NUi::EControlInput::ROT_0 ? 0 :
+                      input.m_input == NUi::EControlInput::ROT_1 ? 1 :
+                      input.m_input == NUi::EControlInput::ROT_2 ? 2 : 3;
+
+
+    activeInstrument->ScrollParameter(knobId, input.m_type == NUi::EControlInputType::SCROLL_UP,
+                                      input.m_shift);
 }

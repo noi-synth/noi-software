@@ -271,6 +271,7 @@ int main(int argc, const char *argv[]) {
     ZeroUi->Run();
     ZeroUi->WaitForStop();
 
+    NMsc::CLogger::ClearMessageTargets();
 
 #ifndef NO_RPI_HW
     ZeroUi->Stop();

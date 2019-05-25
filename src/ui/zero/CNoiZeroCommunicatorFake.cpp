@@ -311,7 +311,7 @@ void CNoiZeroCommunicatorFake::DrawKnoabs() {
 void CNoiZeroCommunicatorFake::DebugMessage(const std::string &message) {
     NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
 
-    g->SetFrame(g->GetScreenWidth(), HEIGHT, 0, -HEIGHT);
+    g->SetFrame(g->GetScreenWidth() - 3, HEIGHT, 0, HEIGHT * 2);
     g->DrawEmptyWindow(Color::WHITE_BLACK);
 
     if (m_debugMessages.size() >= HEIGHT - 1)

@@ -26,6 +26,7 @@ void CInstrument::Tick() {
 
 /*----------------------------------------------------------------------*/
 int CInstrument::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) {
+
     this->AsyncTick();
     memset(outputBuff, 0, buffLen * 2 * sizeof(SND_DATA_TYPE));
 
@@ -63,6 +64,8 @@ int CInstrument::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *o
 
 /*----------------------------------------------------------------------*/
 void CInstrument::AsyncTick() {
+
+    ProcessInputChanges();
 
     bool debugPrint = false;
 
@@ -152,4 +155,10 @@ void CInstrument::CInstrumentVoice::Activate(NSnd::CMidiMsg midiMessage) {
 void CInstrument::CInstrumentVoice::Deactivate() {
     m_active = false;
     //NMsc::CLogger::Log("DeActivated");
+}
+
+/*----------------------------------------------------------------------*/
+void CInstrument::ProcessInputChanges() {
+    if (!m_paramChanges.Empty())
+        m_paramChanges.Clear();
 }
