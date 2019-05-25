@@ -239,6 +239,7 @@ int main(int argc, const char *argv[]) {
     // Add tracks to the app
     for (int i = 0; i < 4; ++i) {
         app->TrackCreate();
+        app->ChainCreate();
     }
     app->TrackActiveSet(app->TracksGet()[0]);
 

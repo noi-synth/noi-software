@@ -8,6 +8,7 @@
 #include "../../../include/ui/zero/CWinPgEffects.hpp"
 #include "../../../include/ui/zero/CWinInstrument.hpp"
 #include "../../../include/ui/zero/CWinSystemMenu.hpp"
+#include "../../../include/ui/zero/CWinPgChainTrackPick.hpp"
 
 using namespace NUi::NZero;
 
@@ -46,6 +47,11 @@ NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
         case 0:
             manager->OpenSingleWindowCallback(std::make_shared<CWinPgPlayback>(m_manager));
             break;
+
+        case 1:
+            manager->OpenSingleWindowCallback(std::make_shared<CWinPgChainTrackPick>(m_manager));
+            break;
+
         case 2:
             manager->OpenSingleWindowCallback(std::make_shared<CWinInstrument>(m_manager));
             break;

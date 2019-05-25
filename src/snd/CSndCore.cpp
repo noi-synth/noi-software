@@ -118,8 +118,11 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
     //todo mixer
     //todo active chains , proper deletion
 
-    while (!m_newSelectedChain.Empty())
+    while (!m_newSelectedChain.Empty()) {
+        if (m_selectedChain)
+            m_selectedChain->ReciveMidiMsg(CMidiMsg(EMidiMsgType::ALL_OFF, ETones::NO_TONE, 0));
         m_selectedChain = m_newSelectedChain.Pop();
+    }
 
     // Send recived midi messages to the active instrument.
     if (m_selectedChain) {

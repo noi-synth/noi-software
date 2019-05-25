@@ -7,6 +7,7 @@
 #include "../../plg/instr/SimpleOsc/CInstrSimpleOsc.hpp"
 #include "../../include/msc/CLogger.hpp"
 #include "../../include/msc/CSerializationNode.hpp"
+#include "../../plg/CPluginFactory.hpp"
 
 using namespace NLgc;
 
@@ -217,6 +218,14 @@ NSnd::AChain CNoiApp::ChainActiveGet() {
 /*----------------------------------------------------------------------*/
 std::vector<NSnd::AChain> CNoiApp::ChainsGet() {
     return m_state.m_chains;
+}
+
+/*----------------------------------------------------------------------*/
+NSnd::AChain CNoiApp::ChainCreate() {
+    NSnd::AInstrument instr = NPlg::CPluginFactory::GetInstrument(0);
+    NSnd::AChain newChain = std::make_shared<NSnd::CChain>(instr);
+    m_state.m_chains.push_back(newChain);
+    return newChain;
 }
 
 /*----------------------------------------------------------------------*/

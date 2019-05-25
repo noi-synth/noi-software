@@ -18,6 +18,10 @@ CNoiZeroCommunicatorFake::CNoiZeroCommunicatorFake(NUi::NZero::AZeroUi ui, NLgc:
     }
 
 
+    for (auto &knobPo : m_knobPos) {
+        knobPo = 0;
+    }
+
     NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
 
     g->SetFrame(WIDTH, HEIGHT);

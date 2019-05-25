@@ -18,6 +18,7 @@ rebuild:
 debug: noi
 	./bin/noi 2>log.log
 	less -R log.log
+	stty sane
 
 doc:
 	doxygen Doxyfile
@@ -25,6 +26,7 @@ doc:
 vlg: noi
 	valgrind --suppressions=./vlgsuppress.conf ./bin/noi 2>log.log
 	less -R log.log
+	stty sane
 
 vlgf: noi
 	

@@ -197,6 +197,12 @@ namespace NLgc {
         std::vector<NSnd::AChain> ChainsGet();
 
         /**
+         * Create new chain
+         * @return New chain
+         */
+        NSnd::AChain ChainCreate();
+
+        /**
          * Saves current project to disk.
          * @param path Path to the project file
          * @return True on success
