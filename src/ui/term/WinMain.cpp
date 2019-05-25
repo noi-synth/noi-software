@@ -109,7 +109,7 @@ NUi::CInptutEventInfo WinMain::ProcessInput(CInptutEventInfo input) {
             }));
             ActionList.push_back(
                     std::make_pair("Save", [&]() {
-                        m_app->SaveProject("lulz");
+                        m_app->SaveProject("./usr/saves/lulz");
                     }));
 
             ActionList.push_back(

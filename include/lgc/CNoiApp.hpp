@@ -198,19 +198,30 @@ namespace NLgc {
 
         /**
          * Saves current project to disk.
-         * @param name Name of the project file
+         * @param path Path to the project file
          * @return True on success
          */
-        bool SaveProject(std::string name);
+        bool SaveProject(std::string path);
 
         /**
          * Destroys current project and loads a project from disk.
-         * @param name Name of the project file
+         * @param path Path to the project file
          * @return  True on success
          */
-        bool LoadProject(std::string name);
+        bool LoadProject(std::string path);
+
+        /**
+         * Clears current project and load to default state.
+         * @return True on success
+         */
+        bool ClearProject();
 
     private:
+        /**
+         * Applies current app state into the sound core
+         */
+        void ApplyStateToSoundCore();
+
         /**
          * Holds current state of the project
          */

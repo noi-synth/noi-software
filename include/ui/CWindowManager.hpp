@@ -90,8 +90,31 @@ namespace NUi {
          */
         NLgc::ANoiApp GetApp();
 
+        /**
+         * Creates new request for return value. The ID 0 will never be used.
+         * @return Unique ID for request
+         */
+        uint64_t RequestReturnValue();
+
+        /**
+         * Get a return value. Returns invalid shared_ptr if no value returned yet.
+         * If return value is found, it is returned and then deleted from return value list.
+         * @param requestID ID of the request.
+         * @return Returned value if found, invalid shared_ptr otherwise.
+         */
+        NMsc::ASerializationNode GetReturnValue(uint64_t requestID);
+
+        /**
+         * Returns a value. You can return only one value per request.
+         * @param requestID ID of the original request.
+         * @param returnValue Value to be returned.
+         * @return True on success.
+         */
+        bool ReturnValue(uint64_t requestID, NMsc::ASerializationNode returnValue);
+
         /// Affects how windows are being drawn
         EDrawingPolicy m_drawingPolicy;
+
     private:
 
         /// Redraws all windows
@@ -114,7 +137,14 @@ namespace NUi {
 
         /// Reference to main App class
         NLgc::ANoiApp m_app;
+
+        /// Returned values from opened windows to their parents
+        std::map<uint64_t, NMsc::ASerializationNode> m_returnValues;
+
+        /// Counts return value requests. Used for unique request IDs.
+        uint64_t m_returnValueCounter;
     };
+
 
 }
 

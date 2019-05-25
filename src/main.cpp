@@ -261,10 +261,10 @@ int main(int argc, const char *argv[]) {
 #endif /* NO_RPI_HW */
 
     // Create and run terminal UI
-    NUi::NTerm::CTerminalUi Ui(app);
+    /*NUi::NTerm::CTerminalUi Ui(app);
     Ui.Run();
 
-    Ui.WaitForStop();
+    Ui.WaitForStop();*/
 
     // Run real UI
     ZeroUi->Run();

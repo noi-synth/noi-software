@@ -12,7 +12,8 @@ CWindowManager::CWindowManager(NUi::EDrawingPolicy drawingPolicy, NLgc::ANoiApp 
                                                                                        m_exiting(false),
                                                                                        m_app(app),
                                                                                        m_redrawRequested(true),
-                                                                                       m_breakWindowIteration(false) {
+                                                                                       m_breakWindowIteration(false),
+                                                                                       m_returnValueCounter(0) {
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CWindowManager constructor, app  = %, m_app = %", app.get(),
                        m_app.get());
 }
@@ -166,4 +167,36 @@ void CWindowManager::Update() {
 
     // Destroy deleted windows
     m_deletedWindows.clear();
+}
+
+/*----------------------------------------------------------------------*/
+uint64_t CWindowManager::RequestReturnValue() {
+    ++m_returnValueCounter;
+
+    if (!m_returnValueCounter) {
+        ++m_returnValueCounter;
+        NMsc::CLogger::Log(NMsc::ELogType::WARNING, "CWindowManager: Return value ID counter overflow.");
+    }
+
+    return m_returnValueCounter;
+}
+
+/*----------------------------------------------------------------------*/
+NMsc::ASerializationNode CWindowManager::GetReturnValue(uint64_t requestID) {
+    if (m_returnValues.find(requestID) != m_returnValues.end()) {
+        NMsc::ASerializationNode rtrn = m_returnValues[requestID];
+        m_returnValues.erase(requestID);
+        return rtrn;
+    } else
+        return nullptr;
+}
+
+/*----------------------------------------------------------------------*/
+bool CWindowManager::ReturnValue(uint64_t requestID, NMsc::ASerializationNode returnValue) {
+    if (m_returnValues.find(requestID) != m_returnValues.end())
+        return false;
+    else
+        m_returnValues.emplace(std::make_pair(requestID, returnValue));
+
+    return true;
 }

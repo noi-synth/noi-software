@@ -220,9 +220,12 @@ std::vector<NSnd::AChain> CNoiApp::ChainsGet() {
 }
 
 /*----------------------------------------------------------------------*/
-bool CNoiApp::SaveProject(std::string name) {
-    std::ofstream project(name + ".noiProj");
-    std::ofstream data(name + ".noiDat");
+bool CNoiApp::SaveProject(std::string path) {
+    std::ofstream project(path);
+    std::ofstream data(path + ".dat");
+
+    if (!project.good() || !project.is_open() || !data.good() || !data.is_open())
+        return false;
 
     // serialize track data
     NSnd::CTrackSlice::SerializeAllUsedSlices(data);
@@ -233,15 +236,23 @@ bool CNoiApp::SaveProject(std::string name) {
 
     project << rootNode->Dump();
 
+    if (!project.good() || !project.is_open() || !data.good() || !data.is_open())
+        return false;
+
     project.close();
     data.close();
+
+    return true;
 
 }
 
 /*----------------------------------------------------------------------*/
-bool CNoiApp::LoadProject(std::string name) {
-    std::ifstream project(name + ".noiProj");
-    std::ifstream data(name + ".noiDat");
+bool CNoiApp::LoadProject(std::string path) {
+    std::ifstream project(path);
+    std::ifstream data(path + ".dat");
+
+    if (!project.good() || !project.is_open() || !data.good() || !data.is_open())
+        return false;
 
     // Deserialize track data
     NSnd::CTrackSlice::DeserializeSlices(data);
@@ -252,14 +263,31 @@ bool CNoiApp::LoadProject(std::string name) {
     m_state = CAppState(projNode);
 
     // Apply the project to sound core
-    m_soundCore->TrackDeleteAll();
-    for (auto &track : m_state.m_tracks) {
-        m_soundCore->TrackInsert(track);
-    }
+    ApplyStateToSoundCore();
 
     project.close();
     data.close();
 }
 
+/*----------------------------------------------------------------------*/
+bool CNoiApp::ClearProject() {
+    m_state = CAppState();
+    ApplyStateToSoundCore();
+}
 
+/*----------------------------------------------------------------------*/
+void CNoiApp::ApplyStateToSoundCore() {
 
+    // Replace tracks
+    m_soundCore->TrackDeleteAll();
+    for (auto &track : m_state.m_tracks) {
+        m_soundCore->TrackInsert(track);
+    }
+    m_soundCore->TrackSetActive(m_state.m_activeTrack);
+
+    m_soundCore->BpmSet(m_state.m_bpm);
+
+    // Replace Chain
+    m_soundCore->ChainSelect(m_state.m_activeChain);
+
+}

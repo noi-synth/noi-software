@@ -53,10 +53,11 @@ bool CTrackManager::SelectTrack(const NSnd::ATrack &track) {
         if (m_selectedTrack)
             m_selectedTrack->StopRecording();
 
-        track->SetPosition();
-        if (m_isRecording)
-            track->StartRecording();
-
+        if (track) {
+            track->SetPosition();
+            if (m_isRecording)
+                track->StartRecording();
+        }
         // m_tracks.insert(track);
         m_selectedTrack = track;
 

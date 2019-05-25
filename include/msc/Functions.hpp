@@ -82,6 +82,13 @@ namespace NMsc {
             return (T) (((uint32_t) first) | ((uint32_t) second));
         }
 
+        /**
+         * Check if file exists
+         * @param path Path to the file
+         * @return True if file exists
+         */
+        static bool FileExtists(const std::string &path);
+
         /*std::string FormatToString(const char * format){
             return format;
         }
