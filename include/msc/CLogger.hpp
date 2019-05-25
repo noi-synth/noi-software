@@ -5,11 +5,18 @@
 #ifndef NOI_SOFTWARE_CLOGGER_HPP
 #define NOI_SOFTWARE_CLOGGER_HPP
 
+namespace NMsc {
+    class CLogger;
+}
+
 #define LOG_LINE_PREFIX "#NOI>"
 
 #include <iostream>
 #include <string>
+#include <list>
+#include <functional>
 #include "Functions.hpp"
+
 
 /**
  * Enables color highlight in log output
@@ -62,6 +69,10 @@ namespace NMsc {
                 std::cerr << TYPE_COLORS[type] << LINE_PREFIXES[type] << format << TYPE_COLOR_RESET << std::endl;
             else
                 std::cerr << LINE_PREFIXES << format << std::endl;
+
+            for (auto &messageTarget : m_messageTargets) {
+                messageTarget(LINE_PREFIXES[type] + format);
+            }
         }
 
         /*----------------------------------------------------------------------*/
@@ -81,13 +92,25 @@ namespace NMsc {
             else
                 std::cerr << LINE_PREFIXES[type];
 
-            NMsc::Functions::Print(std::cerr, format, value, Fargs...);
+            std::stringstream ss;
+
+            NMsc::Functions::Print(ss, format, value, Fargs...);
+
+            std::cerr << ss.str();
+
+            for (auto &messageTarget : m_messageTargets) {
+                messageTarget(LINE_PREFIXES[type] + ss.str());
+            }
 
             if (COLOR_OUTPUT)
                 std::cerr << TYPE_COLORS[type] << std::endl;
             else
                 std::cerr << std::endl;
         }
+
+        static void AddMessageTarget(std::function<void(const std::string &)> target);
+
+        static std::list<std::function<void(const std::string &)>> m_messageTargets;
 
     };
 

@@ -6,3 +6,9 @@
 
 using namespace NMsc;
 
+std::list<std::function<void(const std::string &)>> CLogger::m_messageTargets;
+
+/*----------------------------------------------------------------------*/
+void CLogger::AddMessageTarget(std::function<void(const std::string &)> target) {
+    m_messageTargets.push_back(target);
+}

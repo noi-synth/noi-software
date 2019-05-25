@@ -65,14 +65,14 @@ void CNcurses::FreeInstance() {
 }
 
 /*----------------------------------------------------------------------*/
-bool CNcurses::SetFrame(unsigned int width, unsigned int height) {
-    if (width > COLS || height > LINES)
+bool CNcurses::SetFrame(unsigned int width, unsigned int height, int xOffset, int yOffset) {
+    if (width + std::abs(xOffset) > COLS || height + std::abs(yOffset) > LINES)
         return false;
 
     m_frameW = width;
     m_frameH = height;
-    m_frameX = (COLS - width) / 2;
-    m_frameY = (LINES - height) / 2;
+    m_frameX = (COLS - width) / 2 + xOffset;
+    m_frameY = (LINES - height) / 2 + yOffset;
     return true;
 }
 

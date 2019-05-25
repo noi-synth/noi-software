@@ -36,6 +36,8 @@ namespace NUi::NZero {
         virtual void Update() override;
 
     private:
+
+        void DebugMessage(const std::string &message);
         AZeroUi m_ui;
         NLgc::ANoiApp m_app;
 
@@ -70,6 +72,7 @@ namespace NUi::NZero {
 
         const char KNOB_CHARS[4] = {'-', '\\', '|', '/'};
 
+        std::list<std::string> m_debugMessages;
     };
 }
 

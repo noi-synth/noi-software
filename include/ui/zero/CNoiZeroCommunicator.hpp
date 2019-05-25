@@ -5,7 +5,10 @@
 #ifndef NOI_SOFTWARE_CNOIZEROCOMMUNICATOR_HPP
 #define NOI_SOFTWARE_CNOIZEROCOMMUNICATOR_HPP
 
-
+namespace NUi {}
+namespace NUi::NZero {
+    class CNoiZeroCommunicator;
+}
 
 #include <cstdint>
 #include "CZeroUi.hpp"

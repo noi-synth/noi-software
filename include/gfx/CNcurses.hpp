@@ -53,9 +53,11 @@ namespace NGfx {
          * Sets a frame in center of the screen for drawing. From now on, all drawing is relative to this region.
          * @param width Width of the region
          * @param height Height of the region
+         * @param xOffset X-axis offset of the frame from centered position
+         * @param yOffset Y-axis offset of the frame from centered position
          * @return True if frame fits on terminal screen
          */
-        bool SetFrame(unsigned int width, unsigned int height);
+        bool SetFrame(unsigned int width, unsigned int height, int xOffset = 0, int yOffset = 0);
 
         /**
          * Draws a window in the whole frame.

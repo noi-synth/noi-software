@@ -48,6 +48,8 @@ CNoiZeroCommunicatorFake::CNoiZeroCommunicatorFake(NUi::NZero::AZeroUi ui, NLgc:
     g->DrawPoint(STAT_LED_X + STAT_LED_X_STEP * 1, STAT_LED_Y + STAT_LED_Y_STEP * 3, '<', Color::WHITE_BLACK);
     g->DrawPoint(STAT_LED_X + STAT_LED_X_STEP * 2, STAT_LED_Y + STAT_LED_Y_STEP * 3, '>', Color::WHITE_BLACK);
 
+    NMsc::CLogger::AddMessageTarget([&](const std::string &message) { DebugMessage(message); });
+
 //    for (int i = 0; i < 8; ++i) {
 //        g->DrawPoint(FN_LED_X+ FN_LED_X_STEP*i, FN_LED_Y, '#', Color::WHITE_BLACK);
 //    }
@@ -57,6 +59,7 @@ CNoiZeroCommunicatorFake::CNoiZeroCommunicatorFake(NUi::NZero::AZeroUi ui, NLgc:
 /*----------------------------------------------------------------------*/
 void CNoiZeroCommunicatorFake::SetFnLed(uint32_t ledId, NUi::NZero::ELedState state, NHw::ELedColor color) {
     NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
+    g->SetFrame(WIDTH, HEIGHT);
 
     Color gfxCol = TranslateColor(color);
     if (state == ELedState::OFF)
@@ -69,6 +72,7 @@ void CNoiZeroCommunicatorFake::SetFnLed(uint32_t ledId, NUi::NZero::ELedState st
 void CNoiZeroCommunicatorFake::SetStatusLed(NUi::NZero::EStatusLed ledId, NUi::NZero::ELedState state,
                                             NHw::ELedColor color) {
     NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
+    g->SetFrame(WIDTH, HEIGHT);
 
     Color gfxCol = TranslateColor(color);
     if (state == ELedState::OFF)
@@ -94,6 +98,7 @@ void CNoiZeroCommunicatorFake::ClearStatusLeds() {
 /*----------------------------------------------------------------------*/
 void CNoiZeroCommunicatorFake::Update() {
     NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
+    g->SetFrame(WIDTH, HEIGHT);
 
     g->Update();
 
@@ -294,10 +299,28 @@ NGfx::CNcurses::ColorPair CNoiZeroCommunicatorFake::TranslateColor(NHw::ELedColo
 void CNoiZeroCommunicatorFake::DrawKnoabs() {
 
     NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
+    g->SetFrame(WIDTH, HEIGHT);
 
     for (int i = 0; i < 4; ++i) {
         g->DrawPoint(KNOB_X + i * KNOB_X_STEP, KNOB_Y, KNOB_CHARS[m_knobPos[i] & 3], Color::RED_BLACK);
     }
 
+}
 
+/*----------------------------------------------------------------------*/
+void CNoiZeroCommunicatorFake::DebugMessage(const std::string &message) {
+    NGfx::CNcurses *g = NGfx::CNcurses::GetInstance();
+
+    g->SetFrame(g->GetScreenWidth(), HEIGHT, 0, -HEIGHT);
+    g->DrawEmptyWindow(Color::WHITE_BLACK);
+
+    if (m_debugMessages.size() >= HEIGHT - 1)
+        m_debugMessages.pop_front();
+
+    m_debugMessages.push_back(message);
+
+    int y = 1;
+    for (const auto &mDebugMessage : m_debugMessages) {
+        g->DrawText(1, y++, mDebugMessage, Color::WHITE_BLACK);
+    }
 }

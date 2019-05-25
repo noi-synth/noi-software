@@ -5,6 +5,7 @@
 #ifndef NOI_SOFTWARE_CZEROUI_HPP
 #define NOI_SOFTWARE_CZEROUI_HPP
 
+#include "../../lgc/CNoiApp.hpp"
 #include "../CUi.hpp"
 #include "../CInputEventInfo.hpp"
 
