@@ -12,6 +12,7 @@
 #include "CChain.hpp"
 #include "CAudioDevice.hpp"
 #include "CTrackManager.hpp"
+#include "CTimeInfo.hpp"
 
 using NMsc::CLocklessQue;
 
@@ -203,8 +204,8 @@ namespace NSnd {
         /// Currently selected audio device
         AAudioDevice m_audioDevice;
 
-        /// Song tempo
-        int m_bpm;
+        /// Time info
+        CTimeInfo m_time;
 
         /// True if metronome enabled
         bool m_metronomeEnabled;
@@ -214,6 +215,9 @@ namespace NSnd {
 
         /// Track manager, that manages all tracks
         ATrackManager m_trackManager;
+
+        /// Midi processor.
+        AMidiProcessor m_processor; // used only from UI thread
     };
 
     typedef std::shared_ptr<CSndCore> ASndCore;

@@ -22,6 +22,7 @@
 #include "../include/ui/zero/CNoiZeroCommunicator.hpp"
 #include "../include/ui/zero/CNoiZeroCommunicatorReal.hpp"
 #include "../include/ui/zero/CNoiZeroCommunicatorFake.hpp"
+#include "../plg/midiProcessors/CSequencer.hpp"
 
 /**
  * Hande interrupt signals - print them into output
@@ -229,11 +230,30 @@ int main(int argc, const char *argv[]) {
     // Create backend
     NLgc::ANoiApp app = std::make_shared<NLgc::CNoiApp>();
 
-    // Set audio device
-    NSnd::AAudioDevice audioIO = std::make_shared<NSnd::CAudioDevicePA>(
-            NSnd::CAudioDevicePA::GetAvailableDevices()[NSnd::CAudioDevicePA::GetDefaultDeviceId()]);
-    app->AudioDeviceSet(audioIO);
-    app->AudioStart();
+
+    std::vector<NSnd::CAudioDeviceInfo> allDevices = NSnd::CAudioDevicePA::GetAvailableDevices();
+    int defaultDeviceId = NSnd::CAudioDevicePA::GetDefaultDeviceId();
+    if (defaultDeviceId >= allDevices.size()) {
+        NMsc::CLogger::Log(NMsc::ELogType::WARNING, "main: Number of devices found: %, default device number: %. Wtf?",
+                           allDevices.size(), defaultDeviceId);
+
+        if (allDevices.size()) {
+            defaultDeviceId = 0;
+            NMsc::CLogger::Log(NMsc::ELogType::WARNING, "main: Using audio device %: %", defaultDeviceId,
+                               allDevices[defaultDeviceId].m_name);
+        }
+
+    }
+
+    if (allDevices.size()) {
+        // Set audio device
+        NSnd::AAudioDevice audioIO = std::make_shared<NSnd::CAudioDevicePA>(
+                NSnd::CAudioDevicePA::GetAvailableDevices()[defaultDeviceId]);
+        app->AudioDeviceSet(audioIO);
+        app->AudioStart();
+    } else {
+        NMsc::CLogger::Log(NMsc::ELogType::ERROR, "main: No audio device found.");
+    }
 
 
     // Add tracks to the app
@@ -242,6 +262,27 @@ int main(int argc, const char *argv[]) {
         app->ChainCreate();
     }
     app->TrackActiveSet(app->TracksGet()[0]);
+
+    // //////////
+    NPlg::NSequencer::CSequencer::AToneSequence sequence = std::make_shared<NPlg::NSequencer::CSequencer::CToneSequence>();
+
+
+    /*sequence->push_back(std::vector<int32_t >({5,12}));
+    sequence->push_back(std::vector<int32_t >({0, 7}));
+    sequence->push_back(std::vector<int32_t >({0, 5}));
+    sequence->push_back(std::vector<int32_t >({0, 7}));*/
+
+    sequence->push_back(std::vector<int32_t>({0}));
+    sequence->push_back(std::vector<int32_t>({2}));
+    sequence->push_back(std::vector<int32_t>({5}));
+    sequence->push_back(std::vector<int32_t>({7}));
+
+
+    NSnd::AMidiProcessor sequencer = std::make_shared<NPlg::NSequencer::CSequencer>(sequence);
+
+    app->ChainActiveGet()->ApplyMidiProcessor(sequencer);
+
+    // /////////
 
     // Create real UI
     NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);
@@ -373,7 +414,7 @@ int main(int argc, const char *argv[]) {
             delete core;
             return 0;
         }
-        chain->ReciveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_OFF, toneKeys[tmp], 255));
+        chain->RecieveMidiMsg(NSnd::CMidiMsg(NSnd::EMidiMsgType::NOTE_OFF, toneKeys[tmp], 255));
 
     }
 

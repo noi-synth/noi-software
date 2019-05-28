@@ -17,7 +17,7 @@ namespace NSnd {
     /// Sample rate of the audio I/O stream
     const uint32_t SAMPLE_RATE = 44100;
 
-    // const uint32_t TICK_LENGTH = 882; // 44100/50
+    const uint32_t TICK_LENGTH = 441; // 44100/100
 
     // Track slice length must be 2^n
     /// Track slice length must be 2^n.

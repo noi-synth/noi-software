@@ -10,7 +10,7 @@
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CSndCore::CSndCore() : m_bpm(120), m_metronomeEnabled(true) {
+CSndCore::CSndCore() : m_time(0, 0, 120), m_metronomeEnabled(true) {
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSndCore constructor");
 
     m_trackManager = std::make_shared<CTrackManager>();
@@ -81,6 +81,7 @@ bool CSndCore::ReciveMidiMsg(const NSnd::CMidiMsg &message) {
 
 /*----------------------------------------------------------------------*/
 bool CSndCore::ChainSelect(NSnd::AChain &chain) {
+    //chain->ApplyMidiProcessor(m_processor);
     return m_newSelectedChain.Push(chain);
 }
 
@@ -109,6 +110,8 @@ void CSndCore::Panic() {
 int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *outputBuffer,
                                unsigned long sampleCnt) {
 
+    m_time.AddTime(sampleCnt);
+
     if (sampleCnt * 2 > INTERNAL_BUFFERS_LEN) {
         NMsc::CLogger::Log(NMsc::ELogType::RT_ERROR,
                            "NsdCore: Unreasonably big request of % samples came from the audio device.", sampleCnt);
@@ -130,7 +133,7 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
             m_selectedChain->ReciveMidiMsg(m_midiMsgQue.Pop());
 
         // todo process all the active chains
-        int ret = m_selectedChain->ProcessBuffer(inputBuffer, m_buffer, sampleCnt);
+        int ret = m_selectedChain->ProcessBuffer(inputBuffer, m_buffer, sampleCnt, m_time);
 #ifdef DEBUG
         NMsc::CDebugInfo::m_sndLastChainOutput = m_buffer[0];
 #endif
@@ -143,7 +146,7 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
 
     // Metronome
     if (m_metronomeEnabled && m_trackManager->IsPlaying()) {
-        const int bpmModulo = SAMPLE_RATE * 60 / m_bpm;
+        const int bpmModulo = SAMPLE_RATE * 60 / m_time.m_bpm;
         int positionInBeat = m_trackManager->GetPlaybackPosition() % bpmModulo;
 
         // todo do this properly
@@ -202,7 +205,12 @@ uint32_t CSndCore::TrackGetPosition() {
 
 /*----------------------------------------------------------------------*/
 bool CSndCore::TrackSetPosition(uint32_t position) {
-    return m_trackManager->SetPlaybackPosition(position);
+    bool ret = m_trackManager->SetPlaybackPosition(position);
+
+    if (ret)
+        m_time.m_trackTime = position;
+
+    return ret;
 }
 
 /*----------------------------------------------------------------------*/
@@ -228,7 +236,7 @@ bool CSndCore::SetMetronome(bool enabled) {
 
 /*----------------------------------------------------------------------*/
 void CSndCore::BpmSet(uint32_t bpm) {
-    m_bpm = bpm;
+    m_time.m_bpm = bpm;
 }
 
 /*----------------------------------------------------------------------*/

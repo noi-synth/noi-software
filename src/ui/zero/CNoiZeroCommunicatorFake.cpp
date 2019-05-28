@@ -207,6 +207,29 @@ void CNoiZeroCommunicatorFake::Update() {
                                    NSnd::ETones::C0, 255));
             break;
 
+        case 'v':
+            m_pressedNotes[1] = !m_pressedNotes[1];
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::NOTE_1, m_pressedNotes[1] ? EControlInputType::PRESS
+                                                                                         : EControlInputType::RELEASE,
+                                                m_shift));
+            m_app->SendMidiMessage(
+                    NSnd::CMidiMsg(m_pressedNotes[1] ? NSnd::EMidiMsgType::NOTE_ON : NSnd::EMidiMsgType::NOTE_OFF,
+                                   NSnd::ETones::Cs0, 255));
+            break;
+
+        case 'b':
+            m_pressedNotes[2] = !m_pressedNotes[2];
+            m_ui->ProcessInput(CInptutEventInfo(EControlInput::NOTE_2, m_pressedNotes[2] ? EControlInputType::PRESS
+                                                                                         : EControlInputType::RELEASE,
+                                                m_shift));
+            m_app->SendMidiMessage(
+                    NSnd::CMidiMsg(m_pressedNotes[2] ? NSnd::EMidiMsgType::NOTE_ON : NSnd::EMidiMsgType::NOTE_OFF,
+                                   NSnd::ETones::D0, 255));
+            break;
+
+
+
+            // Knobs
         case 'e':
             m_ui->ProcessInput(CInptutEventInfo(EControlInput::ROT_0, EControlInputType::SCROLL_DOWN, m_shift));
             m_knobPos[0] = (m_knobPos[0] - 1) & 3;

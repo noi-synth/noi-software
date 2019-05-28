@@ -4,6 +4,7 @@
 
 #include "../../include/snd/CChain.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/snd/CTimeInfo.hpp"
 
 using namespace NSnd;
 
@@ -36,12 +37,13 @@ bool CChain::InstrumentChange(const NSnd::AInstrument &instrument) {
 bool CChain::ReciveMidiMsg(const NSnd::CMidiMsg &message) {
     if (!m_instrument)
         return false;
-    m_instrument->ReciveMidiMsg(message);
+    m_instrument->ReceiveMidiMsg(message, false);
     return false;
 }
 
 /*----------------------------------------------------------------------*/
-int CChain::ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) {
+int CChain::ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen,
+                          const CTimeInfo &timeInfo) {
     // m_active = true;
 
     //todo do this at tick
@@ -56,7 +58,7 @@ int CChain::ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputB
     }
 
     if (m_instrument)
-        m_instrument->GenerateBuffer(inputBuff, outputBuff, buffLen);
+        m_instrument->GenerateBuffer(inputBuff, outputBuff, buffLen, timeInfo);
 
     // Change the eff chain
     while (!m_newEffectChains.Empty()) {
@@ -107,3 +109,11 @@ AInstrument CChain::InstrumentGet() {
     return m_uiInstrument;
 }
 
+/*----------------------------------------------------------------------*/
+void CChain::ApplyMidiProcessor(NSnd::AMidiProcessor &processor) {
+    // Local copy to prevent data races
+    AInstrument instr = m_instrument;
+
+    if (instr)
+        instr->ApplyMidiProcessor(processor);
+}

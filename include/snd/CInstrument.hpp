@@ -1,18 +1,30 @@
 //);
 // Created by ddl_blue on 15.11.17.
 //
+#ifndef NOI_SOFTWARE_CINSTRUMENT_HPP
+#define NOI_SOFTWARE_CINSTRUMENT_HPP
+
+#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <list>
 #include <vector>
+
+namespace NSnd {
+    class CInstrument;
+
+    typedef std::shared_ptr<CInstrument> AInstrument;
+}
+
 #include "NSndConfig.hpp"
 #include "../msc/CLocklessQue.hpp"
 #include "CMidiMsg.hpp"
 #include "CChainMember.hpp"
+#include "CMidiProcessor.hpp"
+#include "CTimeInfo.hpp"
 //#include "../lgc/CParameter.hpp"
 
-#ifndef NOI_SOFTWARE_CINSTRUMENT_HPP
-#define NOI_SOFTWARE_CINSTRUMENT_HPP
+
 
 using NMsc::CLocklessQue;
 
@@ -38,21 +50,26 @@ namespace NSnd {
          * @return 0 if succesfull
          */
         virtual int
-        GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen);
+        GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen,
+                       const CTimeInfo &timeInfo);
 
         /**
-         * Send midi message into this instrument
+         * Send midi message into this instrument.
          * @param msg Midi message
+         * @param midiProcessed Midi True if message already went through midi processor. Must be true for calls from MIDI processors.
          */
-        void ReciveMidiMsg(const CMidiMsg &msg);
+        void ReceiveMidiMsg(const CMidiMsg &msg, bool midiProcessed);
 
-        //void ReciveParameter(const NLgc::CParameter &parameter);
-
+        /**
+         * Apply different midi processor
+         * @param processor New midi processor. If nullptr, no processor will be used.
+         */
+        void ApplyMidiProcessor(AMidiProcessor &processor);
 
     protected:
 
 
-        virtual void Tick();
+        virtual void Tick(const CTimeInfo &timeInfo);
 
         virtual void AsyncTick();
 
@@ -78,7 +95,8 @@ namespace NSnd {
              * @return 0 on success
              */
             virtual int
-            GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) = 0;
+            GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen,
+                           const CTimeInfo &timeInfo) = 0;
 
             /**
              * Stop this voice
@@ -101,10 +119,13 @@ namespace NSnd {
 
             /// Is this voice active?
             bool m_active;
+
             /// Parent instrument
             CInstrument &m_instrument;
+
             /// Tone the voice is playing
             ETones m_tone;
+
         };
 
         typedef std::shared_ptr<CInstrumentVoice> AInstrumentVoice;
@@ -112,21 +133,26 @@ namespace NSnd {
         //NMsc::CLocklessQue<NLgc::CParameter> m_newParameters;
 
         /// Notes to be played
-        std::list<CMidiMsg> m_newMidiMsg; //todo is list a good idea?
+        NMsc::CLocklessQue<CMidiMsg> m_newMidiMsg; //todo is list a good idea?
+
         /// Number of samples from last tick
         uint32_t m_sambleFromTickCounter;
+
         /// Voices in this instrument
         std::vector<std::pair<ETones, AInstrumentVoice >> m_voices;
+
         /// How tones should be played
         EInstrumentMode m_mode;
+
         /// Temporary buffer, used for voice output mixing
         SND_DATA_TYPE m_tmpBuffer[INTERNAL_BUFFERS_LEN]; // todo get rid of that
 
+        /// Midi processor in the instrument
+        AMidiProcessor m_midiProcessor;
+        NMsc::CLocklessQue<AMidiProcessor> m_newMidiProcessor;
 
 
     };
-
-    typedef std::shared_ptr<CInstrument> AInstrument;
 }
 
 #endif // NOI_SOFTWARE_CINSTRUMENT_HPP

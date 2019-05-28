@@ -24,7 +24,7 @@ namespace NSnd {
 /*----------------------------------------------------------------------*/
     /// Type of midi message
     enum EMidiMsgType {
-        NOTE_OFF, NOTE_ON, BEND_ON, BEND_OFF, ALL_OFF
+        NOTE_OFF, NOTE_ON, BEND_ON, BEND_OFF, ALL_OFF, NO_TYPE
     };
 
 /*----------------------------------------------------------------------*/

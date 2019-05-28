@@ -45,8 +45,8 @@ namespace NPlg {
             public:
                 CSimpleOscVoice(CInstrSimpleOsc &instrument, NSnd::ETones tone);
 
-                int GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff,
-                                   unsigned long buffLen) override;
+                int GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen,
+                                   const NSnd::CTimeInfo &timeInfo) override;
 
                 void Activate(NSnd::CMidiMsg midiMessage) override;
 

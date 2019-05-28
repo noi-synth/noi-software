@@ -13,6 +13,7 @@
 #include "CInstrument.hpp"
 #include "NSndConfig.hpp"
 #include "CEffect.hpp"
+#include "CTimeInfo.hpp"
 
 using NMsc::CLocklessQue;
 
@@ -77,7 +78,14 @@ namespace NSnd {
          * @param buffLen Length of buffers in frames
          * @return 0 on success
          */
-        int ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen);
+        int ProcessBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen,
+                          const CTimeInfo &timeInfo);
+
+        /**
+         * Apply different midi processor
+         * @param processor New midi processor. If nullptr, no processor will be used.
+         */
+        void ApplyMidiProcessor(AMidiProcessor &processor);
 
     private:
 

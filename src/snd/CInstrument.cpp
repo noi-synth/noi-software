@@ -5,6 +5,7 @@
 #include <cstring>
 #include "../../include/snd/CInstrument.hpp"
 #include "../../include/msc/CLogger.hpp"
+#include "../../include/snd/CTimeInfo.hpp"
 
 
 using namespace NSnd;
@@ -15,26 +16,50 @@ CInstrument::CInstrument() : m_sambleFromTickCounter(0), m_mode(EInstrumentMode:
 }
 
 /*----------------------------------------------------------------------*/
-void CInstrument::ReciveMidiMsg(const NSnd::CMidiMsg &msg) {
-    m_newMidiMsg.push_back(msg);
+void CInstrument::ReceiveMidiMsg(const CMidiMsg &msg, bool midiProcessed) {
+
+    AMidiProcessor processor = m_midiProcessor;
+
+    if (m_midiProcessor && !midiProcessed)
+        processor->RecieveMidiMessage(msg, *this);
+    else
+        m_newMidiMsg.Push(msg);
 }
 
 /*----------------------------------------------------------------------*/
-void CInstrument::Tick() {
+void CInstrument::Tick(const CTimeInfo &timeInfo) {
     this->AsyncTick();
+
+    // Tick of midi processor
+    if (m_midiProcessor)
+        m_midiProcessor->Tick(*this, timeInfo);
 }
 
 /*----------------------------------------------------------------------*/
-int CInstrument::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen) {
+int CInstrument::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff, unsigned long buffLen,
+                                const CTimeInfo &timeInfo) {
 
     this->AsyncTick();
+
+    {
+        // Synchronous ticks
+        CTimeInfo now = timeInfo;
+        CTimeInfo afterThisCallback = timeInfo;
+        afterThisCallback.AddTime(buffLen);
+        uint64_t tickCnt = afterThisCallback.GetTickNumber() - now.GetTickNumber();
+        for (uint64_t i = 0; i < tickCnt; ++i) {
+            Tick(timeInfo);
+        }
+    }
+
+
     memset(outputBuff, 0, buffLen * 2 * sizeof(SND_DATA_TYPE));
 
     int a = 0;
 
     for (auto &&voice : m_voices) {
         if (voice.second->IsActive()) {
-            voice.second->GenerateBuffer(inputBuff, /*outputBuff*/ m_tmpBuffer, buffLen);
+            voice.second->GenerateBuffer(inputBuff, /*outputBuff*/ m_tmpBuffer, buffLen, timeInfo);
             //++a;
             /*SND_DATA_TYPE *end = outputBuff + 2 * buffLen;
             SND_DATA_TYPE *cursorSrc = m_tmpBuffer;
@@ -65,14 +90,18 @@ int CInstrument::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *o
 /*----------------------------------------------------------------------*/
 void CInstrument::AsyncTick() {
 
+    // New midi processor
+    while (!m_newMidiProcessor.Empty())
+        m_midiProcessor = m_newMidiProcessor.Pop();
+
     ProcessInputChanges();
 
     bool debugPrint = false;
 
-    while (!m_newMidiMsg.empty()) {
+    while (!m_newMidiMsg.Empty()) {
         debugPrint = true;
-        CMidiMsg msg = m_newMidiMsg.front();
-        m_newMidiMsg.pop_front();
+        CMidiMsg msg = m_newMidiMsg.Pop();
+
 
         switch (msg.m_type) {
             case EMidiMsgType::ALL_OFF:
@@ -130,6 +159,11 @@ void CInstrument::AsyncTick() {
         NMsc::CLogger::Log(bff);*/
     }
 
+}
+
+/*----------------------------------------------------------------------*/
+void CInstrument::ApplyMidiProcessor(NSnd::AMidiProcessor &processor) {
+    m_newMidiProcessor.Push(processor);
 }
 
 

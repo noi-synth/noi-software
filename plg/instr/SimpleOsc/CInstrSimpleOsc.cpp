@@ -93,7 +93,8 @@ void CInstrSimpleOsc::CSimpleOscVoice::Activate(NSnd::CMidiMsg midiMessage) {
 
 /*----------------------------------------------------------------------*/
 int CInstrSimpleOsc::CSimpleOscVoice::GenerateBuffer(const SND_DATA_TYPE *inputBuff, SND_DATA_TYPE *outputBuff,
-                                                     unsigned long buffLen) {
+                                                     unsigned long buffLen,
+                                                     const CTimeInfo &timeInfo) {
 
     unsigned int cur = 0;
 
