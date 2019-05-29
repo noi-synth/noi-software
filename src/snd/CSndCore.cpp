@@ -10,7 +10,7 @@
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CSndCore::CSndCore() : m_time(0, 0, 120), m_metronomeEnabled(true) {
+CSndCore::CSndCore() : m_time(0, 0, 120), m_metronomeEnabled(true), m_limiter(5) {
     NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSndCore constructor");
 
     m_trackManager = std::make_shared<CTrackManager>();
@@ -165,6 +165,8 @@ int CSndCore::AudioDevCallback(const SND_DATA_TYPE *inputBuffer, SND_DATA_TYPE *
 #ifdef DEBUG
     NMsc::CDebugInfo::m_sndLastOutput = outputBuffer[0];
 #endif
+
+    m_limiter.ProcessBuffer(outputBuffer, sampleCnt);
 
     return 0; //todo what should I return here?
 }

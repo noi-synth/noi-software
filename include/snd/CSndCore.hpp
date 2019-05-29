@@ -13,6 +13,7 @@
 #include "CAudioDevice.hpp"
 #include "CTrackManager.hpp"
 #include "CTimeInfo.hpp"
+#include "CLimiter.hpp"
 
 using NMsc::CLocklessQue;
 
@@ -224,6 +225,8 @@ namespace NSnd {
 
         /// Midi processor.
         AMidiProcessor m_processor; // used only from UI thread
+
+        CLimiter m_limiter;
     };
 
     typedef std::shared_ptr<CSndCore> ASndCore;
