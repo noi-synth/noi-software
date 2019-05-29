@@ -263,26 +263,26 @@ int main(int argc, const char *argv[]) {
     }
     app->TrackActiveSet(app->TracksGet()[0]);
 
-    // //////////
-    NPlg::NSequencer::CSequencer::AToneSequence sequence = std::make_shared<NPlg::NSequencer::CSequencer::CToneSequence>();
-
-
-    /*sequence->push_back(std::vector<int32_t >({5,12}));
-    sequence->push_back(std::vector<int32_t >({0, 7}));
-    sequence->push_back(std::vector<int32_t >({0, 5}));
-    sequence->push_back(std::vector<int32_t >({0, 7}));*/
-
-    sequence->push_back(std::vector<int32_t>({0}));
-    sequence->push_back(std::vector<int32_t>({2}));
-    sequence->push_back(std::vector<int32_t>({5}));
-    sequence->push_back(std::vector<int32_t>({7}));
-
-
-    NSnd::AMidiProcessor sequencer = std::make_shared<NPlg::NSequencer::CSequencer>(sequence);
-
-    app->ChainActiveGet()->ApplyMidiProcessor(sequencer);
-
-    // /////////
+//    // //////////
+//    //NPlg::NSequencer::CSequencer::AToneSequence sequence = std::make_shared<NPlg::NSequencer::CSequencer::CToneSequence>();
+//
+//
+//    /*sequence->push_back(std::vector<int32_t >({5,12}));
+//    sequence->push_back(std::vector<int32_t >({0, 7}));
+//    sequence->push_back(std::vector<int32_t >({0, 5}));
+//    sequence->push_back(std::vector<int32_t >({0, 7}));*/
+//
+//    /*sequence->push_back(std::vector<int32_t>({0}));
+//    sequence->push_back(std::vector<int32_t>({2}));
+//    sequence->push_back(std::vector<int32_t>({5}));
+//    sequence->push_back(std::vector<int32_t>({7}));
+//
+//
+//    NSnd::AMidiProcessor sequencer = std::make_shared<NPlg::NSequencer::CSequencer>(sequence);
+//
+//    app->ChainActiveGet()->ApplyMidiProcessor(sequencer);*/
+//
+//    // /////////
 
     // Create real UI
     NUi::NZero::AZeroUi ZeroUi = std::make_shared<NUi::NZero::CZeroUi>(app);

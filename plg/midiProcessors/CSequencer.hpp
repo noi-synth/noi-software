@@ -16,30 +16,35 @@ namespace NPlg::NSequencer {
         typedef std::vector<std::vector<int32_t>> CToneSequence;
         typedef std::shared_ptr<CToneSequence> AToneSequence;
 
-        CSequencer(AToneSequence &sequence);
+        CSequencer();
 
         virtual void Tick(NSnd::CInstrument &instrument, const NSnd::CTimeInfo &timeInfo) override;
 
         virtual void RecieveMidiMessage(const NSnd::CMidiMsg &midiMsg, NSnd::CInstrument &instrument) override;
 
-        void ChangeSequence(const AToneSequence &sequence);
+        void ChangeSequence(const CToneSequence &sequence);
+
+        CToneSequence GetCurrentSequence();
+
+        std::atomic_int m_speed;
 
     private:
 
         AToneSequence m_sequence;
+        CToneSequence m_uiSequence;
         NMsc::CLocklessQue<AToneSequence> m_newSequence;
 
         uint32_t m_sequencePosition;
         uint64_t m_time;
         uint64_t m_sequenceStartTime;
 
-        uint32_t m_speed;
-
         bool m_playing;
 
         NSnd::ETones m_baseTone;
 
     };
+
+    typedef std::shared_ptr<CSequencer> ASequencer;
 }
 
 #endif //NOI_SOFTWARE_CSEQUENCER_HPP

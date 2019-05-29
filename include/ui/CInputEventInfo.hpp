@@ -30,7 +30,9 @@ namespace NUi {
         bool IsFnKey() { return m_input >= EControlInput::BTN_FN_0 && m_input <= EControlInput::BTN_FN_7; }
 
         /// True if event source is a key
-        bool IsKey() { return m_input >= EControlInput::_BTN_FIRST && m_input <= EControlInput::_BTN_LAST; }
+        bool IsKey() { return m_input > EControlInput::_BTN_FIRST && m_input < EControlInput::_BTN_LAST; }
+
+        bool IsNoteKey() { return m_input > EControlInput::_NOTE_FIRST && m_input < EControlInput::_NOTE_LAST; }
 
         /// True if event type is PRESS
         bool JustPressed() { return m_type == EControlInputType::PRESS; }

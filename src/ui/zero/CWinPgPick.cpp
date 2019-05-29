@@ -9,6 +9,7 @@
 #include "../../../include/ui/zero/CWinInstrument.hpp"
 #include "../../../include/ui/zero/CWinSystemMenu.hpp"
 #include "../../../include/ui/zero/CWinPgChainTrackPick.hpp"
+#include "../../../include/ui/zero/CWinPgSequencer.hpp"
 
 using namespace NUi::NZero;
 
@@ -55,8 +56,13 @@ NUi::CInptutEventInfo CWinPgPick::ProcessInput(NUi::CInptutEventInfo input) {
         case 2:
             manager->OpenSingleWindowCallback(std::make_shared<CWinInstrument>(m_manager));
             break;
+
         case 4:
             manager->OpenSingleWindowCallback(std::make_shared<CWinPgEffects>(m_manager));
+            break;
+
+        case 5:
+            manager->OpenSingleWindowCallback(std::make_shared<CWinPgSequencer>(m_manager));
             break;
 
         case 7:

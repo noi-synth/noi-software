@@ -81,7 +81,8 @@ bool CSndCore::ReciveMidiMsg(const NSnd::CMidiMsg &message) {
 
 /*----------------------------------------------------------------------*/
 bool CSndCore::ChainSelect(NSnd::AChain &chain) {
-    //chain->ApplyMidiProcessor(m_processor);
+    if (chain)
+        chain->ApplyMidiProcessor(m_processor);
     return m_newSelectedChain.Push(chain);
 }
 
@@ -237,6 +238,13 @@ bool CSndCore::SetMetronome(bool enabled) {
 /*----------------------------------------------------------------------*/
 void CSndCore::BpmSet(uint32_t bpm) {
     m_time.m_bpm = bpm;
+}
+
+/*----------------------------------------------------------------------*/
+void CSndCore::MidiProcessorSelect(NSnd::AMidiProcessor processor) {
+    m_processor = processor;
+    if (m_selectedChain)
+        m_selectedChain->ApplyMidiProcessor(m_processor);
 }
 
 /*----------------------------------------------------------------------*/

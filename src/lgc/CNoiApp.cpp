@@ -285,6 +285,28 @@ bool CNoiApp::ClearProject() {
 }
 
 /*----------------------------------------------------------------------*/
+std::vector<NSnd::AMidiProcessor> CNoiApp::MidiProcessorsGet() {
+    return m_state.m_midiProcessors;
+}
+
+/*----------------------------------------------------------------------*/
+void CNoiApp::MidiProcessorAdd(NSnd::AMidiProcessor processor) {
+    m_state.m_midiProcessors.push_back(processor);
+}
+
+/*----------------------------------------------------------------------*/
+void CNoiApp::MidiProcessorSelect(NSnd::AMidiProcessor processor) {
+    m_state.m_activeMidiProcessor = processor;
+    m_soundCore->MidiProcessorSelect(processor);
+    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CNoiApp: Sekecting Midi Processor %", processor.get());
+}
+
+/*----------------------------------------------------------------------*/
+NSnd::AMidiProcessor CNoiApp::MidiProcessorSelectedGet() {
+    return m_state.m_activeMidiProcessor;
+}
+
+/*----------------------------------------------------------------------*/
 void CNoiApp::ApplyStateToSoundCore() {
 
     // Replace tracks

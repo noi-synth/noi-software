@@ -171,6 +171,12 @@ namespace NSnd {
          */
         void BpmSet(uint32_t bpm);
 
+        /**
+         * Selects new midi processor
+         * @param processor new midi processor
+         */
+        void MidiProcessorSelect(AMidiProcessor processor);
+
 
     private:
         /**

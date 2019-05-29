@@ -8,10 +8,11 @@ using namespace NPlg::NSequencer;
 using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
-CSequencer::CSequencer(AToneSequence &sequence) : m_sequence(sequence), m_sequencePosition(0), m_time(0),
-                                                  m_sequenceStartTime(0), m_speed(4), m_playing(
+CSequencer::CSequencer() : m_sequencePosition(0), m_time(0),
+                           m_sequenceStartTime(0), m_speed(4), m_playing(
                 false), m_baseTone(ETones::NO_TONE) {
 
+    m_sequence = std::make_shared<CToneSequence>();
 }
 
 /*----------------------------------------------------------------------*/
@@ -57,8 +58,10 @@ void CSequencer::Tick(NSnd::CInstrument &instrument, const NSnd::CTimeInfo &time
 
 /*----------------------------------------------------------------------*/
 void CSequencer::RecieveMidiMessage(const NSnd::CMidiMsg &midiMsg, NSnd::CInstrument &instrument) {
-    if (!m_sequence)
+    if (!m_sequence || m_sequence->empty()) {
+        instrument.ReceiveMidiMsg(midiMsg, true);
         return;
+    }
 
     if (midiMsg.m_type == EMidiMsgType::NOTE_ON) {
         if (m_baseTone == ETones::NO_TONE) {
@@ -87,4 +90,15 @@ void CSequencer::RecieveMidiMessage(const NSnd::CMidiMsg &midiMsg, NSnd::CInstru
     }
 }
 
+/*----------------------------------------------------------------------*/
+void CSequencer::ChangeSequence(const NPlg::NSequencer::CSequencer::CToneSequence &sequence) {
+    AToneSequence sequenceClone = std::make_shared<CToneSequence>(sequence);
 
+    m_uiSequence = sequence;
+    m_newSequence.Push(sequenceClone);
+}
+
+/*----------------------------------------------------------------------*/
+CSequencer::CToneSequence CSequencer::GetCurrentSequence() {
+    return m_uiSequence;
+}

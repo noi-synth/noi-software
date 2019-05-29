@@ -222,6 +222,14 @@ namespace NLgc {
          */
         bool ClearProject();
 
+        std::vector<NSnd::AMidiProcessor> MidiProcessorsGet();
+
+        void MidiProcessorAdd(NSnd::AMidiProcessor processor);
+
+        void MidiProcessorSelect(NSnd::AMidiProcessor processor);
+
+        NSnd::AMidiProcessor MidiProcessorSelectedGet();
+
     private:
         /**
          * Applies current app state into the sound core

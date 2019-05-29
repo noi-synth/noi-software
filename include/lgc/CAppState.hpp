@@ -41,6 +41,13 @@ namespace NLgc {
          */
         int m_bpm;
 
+        /**
+         * Active MIDI processor
+         */
+        NSnd::AMidiProcessor m_activeMidiProcessor;
+
+        std::vector<NSnd::AMidiProcessor> m_midiProcessors;
+
         // Not serialized
 
         //int m_chainId;
