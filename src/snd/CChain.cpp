@@ -117,3 +117,10 @@ void CChain::ApplyMidiProcessor(NSnd::AMidiProcessor &processor) {
     if (instr)
         instr->ApplyMidiProcessor(processor);
 }
+
+/*----------------------------------------------------------------------*/
+AAdsrSettings CChain::GetAdsr() {
+    if (m_instrument)
+        return m_instrument->GetAdsr();
+    return nullptr;
+}

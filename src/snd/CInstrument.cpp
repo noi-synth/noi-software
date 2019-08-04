@@ -12,7 +12,7 @@ using namespace NSnd;
 
 /*----------------------------------------------------------------------*/
 CInstrument::CInstrument() : m_sambleFromTickCounter(0), m_mode(EInstrumentMode::POLYPHONE) {
-
+    m_adsrInfo = std::make_shared<CAdsrSettings>(0.2, 0.2, 0.7, 0.2);
 }
 
 /*----------------------------------------------------------------------*/
@@ -33,6 +33,10 @@ void CInstrument::Tick(const CTimeInfo &timeInfo) {
     // Tick of midi processor
     if (m_midiProcessor)
         m_midiProcessor->Tick(*this, timeInfo);
+
+    for (const auto &voice : m_voices) {
+        voice.second->Tick();
+    }
 }
 
 /*----------------------------------------------------------------------*/
@@ -169,25 +173,28 @@ void CInstrument::ApplyMidiProcessor(NSnd::AMidiProcessor &processor) {
 
 /*##############################################################################*/
 CInstrument::CInstrumentVoice::CInstrumentVoice(CInstrument &instrument, NSnd::ETones tone)
-        : m_active(false), m_instrument(instrument), m_tone(tone) {
+        : m_instrument(instrument), m_tone(tone) {
+    m_adsr = std::make_shared<CAdsr>(instrument.m_adsrInfo);
 
 }
 
 /*----------------------------------------------------------------------*/
 bool CInstrument::CInstrumentVoice::IsActive() {
-    return m_active;
+    return m_adsr->GetNoteOn();
 }
 
 /*----------------------------------------------------------------------*/
 void CInstrument::CInstrumentVoice::Activate(NSnd::CMidiMsg midiMessage) {
     m_tone = midiMessage.m_tone;
-    m_active = true;
+    // m_active = true;
+    m_adsr->StartNote();
     //NMsc::CLogger::Log("Activated");
 }
 
 /*----------------------------------------------------------------------*/
 void CInstrument::CInstrumentVoice::Deactivate() {
-    m_active = false;
+    // m_active = false;
+    m_adsr->StopNote();
     //NMsc::CLogger::Log("DeActivated");
 }
 
@@ -195,4 +202,14 @@ void CInstrument::CInstrumentVoice::Deactivate() {
 void CInstrument::ProcessInputChanges() {
     if (!m_paramChanges.Empty())
         m_paramChanges.Clear();
+}
+
+/*----------------------------------------------------------------------*/
+void CInstrument::CInstrumentVoice::Tick() {
+    m_adsr->Tick();
+}
+
+/*----------------------------------------------------------------------*/
+AAdsrSettings CInstrument::GetAdsr() {
+    return m_adsrInfo;
 }

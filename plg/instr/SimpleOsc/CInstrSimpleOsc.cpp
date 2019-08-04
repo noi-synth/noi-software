@@ -103,15 +103,19 @@ int CInstrSimpleOsc::CSimpleOscVoice::GenerateBuffer(const SND_DATA_TYPE *inputB
     SND_DATA_TYPE *wave1 = tables[m_owner.m_firstOscIndex];
     SND_DATA_TYPE *wave2 = tables[m_owner.m_secondOscIndex];
 
-    if (m_active)
-        for (int i = 0; i < buffLen; ++i) {
-            outputBuff[cur++] = wave1[(int) m_phase] * m_owner.m_oscillatorRatio
-                                + wave2[(int) fmod(m_phase + m_owner.m_phaseShift * WAVETABLE_LEN, WAVETABLE_LEN)] *
-                                  (1 - m_owner.m_oscillatorRatio);
+    if (m_adsr->GetNoteOn()) {
 
-            outputBuff[cur++] = wave1[(int) m_phase] * m_owner.m_oscillatorRatio
+        double adsrVolume = m_adsr->GetVolume();
+
+        for (int i = 0; i < buffLen; ++i) {
+            outputBuff[cur++] = (wave1[(int) m_phase] * m_owner.m_oscillatorRatio
+                                 + wave2[(int) fmod(m_phase + m_owner.m_phaseShift * WAVETABLE_LEN, WAVETABLE_LEN)] *
+                                   (1 - m_owner.m_oscillatorRatio)) * adsrVolume;
+
+            outputBuff[cur++] = (wave1[(int) m_phase] * m_owner.m_oscillatorRatio * adsrVolume
                                 + wave2[(int) fmod(m_phase + m_owner.m_phaseShift * WAVETABLE_LEN, WAVETABLE_LEN)] *
-                                  (1 - m_owner.m_oscillatorRatio);
+                                  (1 - m_owner.m_oscillatorRatio)) * adsrVolume;
+
             m_phase = fmod(m_phase + m_sampleStep, WAVETABLE_LEN);
 
 //
@@ -119,6 +123,7 @@ int CInstrSimpleOsc::CSimpleOscVoice::GenerateBuffer(const SND_DATA_TYPE *inputB
 //      while(m_phase > WAVETABLE_LEN)
 //                m_phase -= WAVETABLE_LEN;
         }
+    }
     else
         memset(outputBuff, 0, sizeof(SND_DATA_TYPE) * buffLen * 2);
 
@@ -137,8 +142,8 @@ void CInstrSimpleOsc::ProcessInputChanges() {
     while (!m_paramChanges.Empty()) {
         CParamScroll change = m_paramChanges.Pop();
 
-        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: got % from %", change.m_directionUp,
-                           change.m_paramId);
+//        NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: got % from %", change.m_directionUp,
+//                           change.m_paramId);
 
         switch (change.m_paramId) {
             case 0:
@@ -147,7 +152,7 @@ void CInstrSimpleOsc::ProcessInputChanges() {
                 else
                     m_phaseShift = fmod(m_phaseShift + 0.95, 1);
 
-                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: phase shift = %", m_phaseShift);
+//                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: phase shift = %", m_phaseShift);
                 break;
 
 
@@ -158,8 +163,8 @@ void CInstrSimpleOsc::ProcessInputChanges() {
                 if (!change.m_directionUp && m_oscillatorRatio > 0)
                     m_oscillatorRatio -= 0.05;
 
-                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: oscillator ratio = %",
-                                   m_oscillatorRatio);
+//                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: oscillator ratio = %",
+//                                   m_oscillatorRatio);
                 break;
 
             case 2:
@@ -176,7 +181,7 @@ void CInstrSimpleOsc::ProcessInputChanges() {
                                           CInstrSimpleOsc::CSimpleOscVoice::WAVE_CNT - 1;
                 }
 
-                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: first oscillator = %", m_firstOscIndex);
+//                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: first oscillator = %", m_firstOscIndex);
                 break;
 
             case 3:
@@ -194,8 +199,8 @@ void CInstrSimpleOsc::ProcessInputChanges() {
                                            1;
                 }
 
-                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: second oscillator = %",
-                                   m_secondOscIndex);
+//                NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "CSimpleOscVoice: second oscillator = %",
+//                                   m_secondOscIndex);
                 break;
 
         }

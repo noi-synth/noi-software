@@ -17,8 +17,8 @@
 using namespace NPlg::NEcho;
 
 /*----------------------------------------------------------------------*/
-CEffEcho::CEffEcho() : m_buffCursor(0), m_size(60), m_delaySize(30000), m_absorbtion(1),
-                       m_reverbPortion(1) {
+CEffEcho::CEffEcho() : m_buffCursor(0), m_size(60), m_delaySize(30000), m_absorbtion(0.9),
+                       m_reverbPortion(1), m_limiter(6) {
     for (uint32_t i = 0; i < LONG_BUFF_LEN; ++i) {
         m_buffAl[i] = m_buffAr[i] = 0;
     }
@@ -68,6 +68,9 @@ void CEffEcho::ProcessBuffer(SND_DATA_TYPE *buffer, unsigned long buffLen) {
                 break;
         }
     }
+
+
+    m_limiter.ProcessBuffer(buffer, buffLen);
 
     // A
     uint32_t lnAlAr = (uint32_t) m_delaySize;
@@ -122,6 +125,7 @@ void CEffEcho::ProcessBuffer(SND_DATA_TYPE *buffer, unsigned long buffLen) {
 //    uint32_t lnCrAl = (uint32_t) (m_size * 17.84312697);
 
 
+
     for (uint32_t i = 0; i < buffLen; ++i) {
         uint32_t shortCursor = m_buffCursor & (SHORT_BUFF_LEN - 1);
 
@@ -155,7 +159,6 @@ void CEffEcho::ProcessBuffer(SND_DATA_TYPE *buffer, unsigned long buffLen) {
         EchoShortShort(m_buffCr, lnCrBl, m_buffBl);
         EchoShortShort(m_buffCr, lnCrBr, m_buffBr);
         EchoShortLong(m_buffCr, lnCrAl, m_buffAl);
-
 
         m_buffAl[m_buffCursor] = m_buffAr[m_buffCursor] = m_buffBl[shortCursor] = m_buffBr[shortCursor] = m_buffCl[shortCursor] = m_buffCr[shortCursor] = 0;
 

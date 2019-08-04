@@ -6,6 +6,7 @@
 #define NOI_SOFTWARE_CEFFECHO_HPP
 
 #include "../../../include/snd/CEffect.hpp"
+#include "../../../include/snd/CLimiter.hpp"
 
 namespace NPlg::NEcho {
     /**
@@ -49,6 +50,11 @@ namespace NPlg::NEcho {
         SND_DATA_TYPE m_buffAl[LONG_BUFF_LEN];
         SND_DATA_TYPE m_buffBl[SHORT_BUFF_LEN];
         SND_DATA_TYPE m_buffCl[SHORT_BUFF_LEN];
+
+        // NEW
+        SND_DATA_TYPE m_buffLeft[LONG_BUFF_LEN];
+        SND_DATA_TYPE m_buffRight[LONG_BUFF_LEN];
+        NSnd::CLimiter m_limiter;
 
     };
 }

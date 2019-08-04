@@ -22,6 +22,8 @@ namespace NSnd {
 #include "CChainMember.hpp"
 #include "CMidiProcessor.hpp"
 #include "CTimeInfo.hpp"
+#include "CAdsrSettings.hpp"
+#include "CAdsr.hpp"
 //#include "../lgc/CParameter.hpp"
 
 
@@ -65,6 +67,8 @@ namespace NSnd {
          * @param processor New midi processor. If nullptr, no processor will be used.
          */
         void ApplyMidiProcessor(AMidiProcessor &processor);
+
+        AAdsrSettings GetAdsr();
 
     protected:
 
@@ -115,16 +119,20 @@ namespace NSnd {
              */
             bool IsActive();
 
+            void Tick();
+
         protected:
 
-            /// Is this voice active?
-            bool m_active;
+            /* /// Is this voice active?
+             bool m_active;*/
 
             /// Parent instrument
             CInstrument &m_instrument;
 
             /// Tone the voice is playing
             ETones m_tone;
+
+            AAdsr m_adsr;
 
         };
 
@@ -151,7 +159,7 @@ namespace NSnd {
         AMidiProcessor m_midiProcessor;
         NMsc::CLocklessQue<AMidiProcessor> m_newMidiProcessor;
 
-
+        AAdsrSettings m_adsrInfo;
     };
 }
 

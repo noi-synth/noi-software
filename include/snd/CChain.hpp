@@ -87,6 +87,8 @@ namespace NSnd {
          */
         void ApplyMidiProcessor(AMidiProcessor &processor);
 
+        AAdsrSettings GetAdsr();
+
     private:
 
         // Active instrument and effect chain as seen from RT

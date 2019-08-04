@@ -76,8 +76,13 @@ void CWinSystemMenu::Update() {
         DoWithManager([&](AWindowManager manager) {
             NMsc::ASerializationNode ret = manager->GetReturnValue(m_clearProjectDialog);
             if (ret) {
-                if (ret->GetBool("ok"))
+                if (ret->GetBool("ok")) {
                     m_app->ClearProject();
+                    for (int i = 0; i < 4; ++i) {
+                        m_app->TrackCreate();
+                        m_app->ChainCreate();
+                    }
+                }
             }
         });
     }

@@ -32,5 +32,5 @@ void CLimiter::ProcessBuffer(SND_DATA_TYPE *buffer, uint32_t len) {
         m_volume = MIN(0.99, m_volume * (1 + (1 / m_release / SAMPLE_RATE * 500)));
     }
 
-    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "Volume = %", m_volume);
+//    NMsc::CLogger::Log(NMsc::ELogType::TMP_DEBUG, "Volume = %", m_volume);
 }

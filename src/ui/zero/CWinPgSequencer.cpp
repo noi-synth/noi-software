@@ -117,9 +117,10 @@ NUi::CInptutEventInfo CWinPgSequencer::ProcessInput(NUi::CInptutEventInfo input)
 
             if (input.JustPressed()) {
                 // First sequence position
-                if (m_sequence.empty())
+                if (m_sequence.empty()) {
                     m_baseTone = input.m_input;
-
+                    noteValue = 0;
+                }
                 // Record note
                 if (m_thisPositionTones.find(noteValue) == m_thisPositionTones.end()) {
 
